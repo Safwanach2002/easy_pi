@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .alert {
+      padding: 15px;
+      background-color: #f44336;
+      color: white;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+    .alert-success {
+      background-color: #4caf50;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Product Scheme Management</h1>
+    <form method="post" id="schemeForm">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="product_id">Product ID:</label>
+        <input type="text" id="product_id" name="product_id" value="{{ product_id }}" readonly>
+      </div>
+      <div class="form-group">
+        <label for="investment">Investment:</label>
+        <select id="investment" name="investment" required>
+          <option value="" disabled selected>Select Investment Amount</option>
+          <option value="200">200</option>
+          <option value="500">500</option>
+          <option value="1000">1000</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="total">Total:</label>
+        <input type="text" id="total" name="total" value="{{ total }}" readonly>
+      </div>
+      <div class="form-group">
+        <label for="days">Number of Days:</label>
+        <input type="text" id="days" name="days" value="" readonly>
+      </div>
+      <button type="submit" id="saveButton">Save Scheme</button>
+    </form>
+  </div>
+
+  <script>
+    // Calculate and display the number of days based on investment and total
+    document.getElementById('investment').addEventListener('change', function () {
+      const investment = parseFloat(this.value);
+      const total = parseFloat(document.getElementById('total').value);
+
+      if (!isNaN(investment) && !isNaN(total)) {
+        const days = total / investment;
+        document.getElementById('days').value = days.toFixed(0); // Display calculated days
+      } else {
+        document.getElementById('days').value = ''; // Clear days if invalid
+      }
+    });
+
+    // Handle form submission
+    document.getElementById('schemeForm').addEventListener('submit', function (e) {
+      const investment = parseFloat(document.getElementById('investment').value);
+      const total = parseFloat(document.getElementById('total').value);
+
+      if (isNaN(investment) || isNaN(total)) {
+        e.preventDefault();
+        alert('Please select a valid investment amount.');
+      } else {
+        alert('Product Scheme saved successfully!');
+      }
+    });
+  </script>
+</body>
+</html>

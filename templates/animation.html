@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome Animation</title>
+  <style>
+    /* Reset Styles */
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(to bottom right, #6a11cb, #2575fc);
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+    }
+
+    /* Container for Welcome Text */
+    .welcome-container {
+      text-align: center;
+    }
+
+    /* Welcome Text Styling */
+    .welcome-text {
+      font-size: 4rem;
+      color: white;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 2s ease-out forwards, pulse 1.5s ease-in-out 2s 1;
+    }
+
+    /* Fade in and move up */
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Pulse effect */
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="welcome-container">
+    <h1 class="welcome-text">Welcome to Freelancer's Hub </h1>
+  </div>
+
+  <script>
+    // Wait for the animation to finish before redirecting to another page
+    document.addEventListener("DOMContentLoaded", () => {
+      const welcomeText = document.querySelector(".welcome-text");
+
+      // Listen for the end of the animation
+      welcomeText.addEventListener("animationend", () => {
+        // Redirect after animation ends
+        window.location.href = "login.html"; // Replace with your desired page URL
+      });
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+

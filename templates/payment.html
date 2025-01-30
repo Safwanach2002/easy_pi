@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make a Payment</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f4f7fc;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .payment-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .payment-header h1 {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group label {
+            font-weight: bold;
+            color: #555;
+        }
+        .payment-options {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .payment-options h3 {
+            font-size: 24px;
+            color: #007bff;
+        }
+        .payment-options ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .payment-options li {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        .payment-options img {
+            max-width: 150px;
+            margin-bottom: 15px;
+        }
+        .submit-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+        .payment-status {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .payment-status p {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Media Queries for responsiveness */
+        @media (max-width: 768px) {
+            .payment-header h1 {
+                font-size: 28px;
+            }
+            .payment-options h3 {
+                font-size: 20px;
+            }
+            .payment-options li {
+                font-size: 16px;
+            }
+            .submit-btn {
+                padding: 8px 25px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="payment-header">
+        <h1>Make a Payment</h1>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+        
+        <div class="payment-options">
+            <h3>Payment Options</h3>
+            <ul>
+                <li><strong>Scan QR Code:</strong></li>
+                <li><img src="{% static 'img/qr1.jpg' %}" alt="QR Code"></li>
+                <li><strong>Account Number:</strong> 2345 6789 0956 78</li>
+                <li><strong>IFSC Code:</strong> CNRB8907800678</li>
+                <li><strong>UPI ID:</strong> example@bank</li>
+            </ul>
+        </div>
+        
+        <div class="text-center mt-4">
+            <button type="submit" class="submit-btn">Submit Payment</button>
+        </div>
+    </form>
+</div>
+
+<!-- Include Bootstrap JS (optional, for responsiveness) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
