@@ -33,7 +33,7 @@ def reject_payments(modeladmin, request, queryset):
     queryset.update(payment_status='rejected')
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('profile', 'product_scheme', 'amount_paid', 'payment_status', 'created_at')
+    list_display = ('profile', 'product_scheme', 'transaction_id', 'payment_status', 'created_at')
     list_filter = ('payment_status', 'created_at')
     search_fields = ('profile__user__username', 'product_scheme__product_id')
     actions = [approve_payments, reject_payments]

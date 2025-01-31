@@ -120,7 +120,7 @@ class ProductSchemeForm(forms.ModelForm):
 class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
-        fields = ['product_scheme', 'amount_paid', 'payment_proof']
+        fields = ['product_scheme', 'transaction_id', 'payment_proof']
     
     def __init__(self, *args, **kwargs):
         # Get the user from the kwargs

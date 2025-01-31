@@ -170,7 +170,7 @@ def referral_view(request):
         'total_rewards': total_rewards,
         'referred_persons': referred_persons,
     }
-    return render(request, 'refar.html', context)
+    return render(request, 'reference.html', context)
 
 @login_required 
 def product_scheme_manage(request):
@@ -224,41 +224,47 @@ def privacy_view(request):
 
 @login_required
 def plans_view(request):
-    profile = request.user.profile  # Get the user's profile
-    product_schemes = ProductScheme.objects.filter(profile=profile)  # Get all product schemes
+    profile = request.user.profile
+    product_schemes = ProductScheme.objects.filter(profile=profile)
 
     plans = []
     for scheme in product_schemes:
         try:
-            service = Services.objects.get(product_id=scheme.product_id)  # Get service details
+            service = Services.objects.get(product_id=scheme.product_id)
 
-            # Get the latest payment for this scheme
+            # Fetch all approved payments for this scheme
+            approved_payments = Payment.objects.filter(product_scheme=scheme, payment_status='approved')
+            approved_days = approved_payments.count()  # Count the number of approved payments
+
+            # Calculate remaining days based on approved payments
+            total_duration = (scheme.end_date - scheme.start_date).days
+            remaining_days = max(0, total_duration - approved_days)
+
             latest_payment = Payment.objects.filter(product_scheme=scheme).order_by('-created_at').first()
             
-            # Determine if the user needs to pay today
             needs_payment = False
-            balance = scheme.total  # Default: show total amount unless payment is approved
-            
-            if latest_payment:
-                if latest_payment.payment_status == 'approved':
-                    balance = scheme.total - scheme.investment  # Update balance only if approved
-                elif latest_payment.payment_status == 'rejected':
-                    needs_payment = True  # User needs to pay again if rejected
-                else:
-                    last_payment_date = latest_payment.created_at.date()
-                    today = date.today()
-                    if last_payment_date < today:  # Daily investment check
-                        needs_payment = True  # User needs to pay again today
+            balance = scheme.total  # Default balance
 
-            remaining_days = (scheme.end_date - date.today()).days  # Calculate remaining days
+            if latest_payment:
+                last_payment_date = latest_payment.created_at.date()
+                today = date.today()
+
+                if latest_payment.payment_status == 'approved':
+                    balance = scheme.total - scheme.investment  
+                    # "Pay Now" should appear only after 12 AM (next day)
+                    if last_payment_date < today:
+                        needs_payment = True  
+
+                elif latest_payment.payment_status == 'rejected':
+                    needs_payment = True  # Rejected payments require reattempt
 
             plans.append({
-                'img': service.img.url if service.img else None,  
+                'img': service.img.url if service.img else None,
                 'product_id': scheme.product_id,
                 'title': service.title,
                 'investment': scheme.investment,
-                'balance': balance,  # Balance updates only if payment is approved
-                'remaining_days': max(0, remaining_days),
+                'balance': balance,
+                'remaining_days': remaining_days,  # Decreases based on payments
                 'payment_status': latest_payment.payment_status if latest_payment else 'pending',
                 'needs_payment': needs_payment,
             })

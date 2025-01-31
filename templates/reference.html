@@ -232,10 +232,10 @@
                     <div class="modal-body text-center">
                         <p>Share your referral link on:</p>
                         <div class="d-flex justify-content-center gap-3">
-                            <a href="#" class="btn btn-primary" data-platform="facebook">Facebook</a>
-                            <a href="#" class="btn btn-info" data-platform="twitter">Twitter</a>
-                            <a href="#" class="btn btn-success" data-platform="whatsapp">WhatsApp</a>
-                            <a href="#" class="btn btn-danger" data-platform="email">Email</a>
+                            <a href="https://www.facebook.com/" class="btn btn-primary" data-platform="facebook">Facebook</a>
+                            <a href="https://x.com/?lang=en-in&mx=2" class="btn btn-info" data-platform="twitter">Twitter</a>
+                            <a href="https://whatsapp.com/" class="btn btn-success" data-platform="whatsapp">WhatsApp</a>
+                            <a href="https://workspace.google.com/intl/en-US/gmail/" class="btn btn-danger" data-platform="email">Email</a>
                         </div>
                     </div>
                 </div>
@@ -265,10 +265,9 @@
             });
     
             function shareReferralCode(platform, code) {
+                const referralLink = `https://epielio.com?code=${encodeURIComponent(code)}`;
+                const message = encodeURIComponent`(Join and earn rewards! Use my referral code: ${code})`;
                 let url = '';
-                const referralLink = `https://example.com/referral?code=${code}`;
-                const encodedReferralLink = encodeURIComponent(referralLink);
-                const encodedMessage = encodeURIComponent(`Join and earn rewards! Use my referral code: ${code}`);
     
                 switch(platform) {
                     case 'facebook':
@@ -368,7 +367,6 @@
             </div>
         </div>
         <!-- Footer End -->
-
         
         <!-- Copyright Start -->
         <div class="container-fluid copyright py-4">

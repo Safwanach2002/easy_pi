@@ -78,7 +78,7 @@ class Payment(models.Model):
 
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
     product_scheme = models.ForeignKey(ProductScheme, on_delete=models.CASCADE, null=True, blank=True)
-    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    transaction_id =models.CharField(max_length=20, unique=True, blank=True, null=True)
     payment_proof = models.ImageField(upload_to='payment_proofs/', blank=True, null=True)
     payment_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(default=now)

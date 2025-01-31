@@ -112,12 +112,12 @@
         </div>
 
         {% block content %}
-        <div class="container">
+        <div class="container mt-4">
             {% if plans %}
                 <div class="row">
                     {% for plan in plans %}
                         <div class="col-md-4">
-                            <div class="card mb-4">
+                            <div class="card mb-4 shadow-sm">
                                 {% if plan.img %}
                                     <img src="{{ plan.img }}" class="card-img-top" alt="{{ plan.title }}">
                                 {% endif %}
@@ -126,7 +126,8 @@
                                     <p><strong>Product ID:</strong> {{ plan.product_id }}</p>
                                     <p><strong>Investment:</strong> ₹{{ plan.investment }}</p>
                                     <p><strong>Balance:</strong> ₹{{ plan.balance }}</p>
-                                    <p><strong>Remaining Days:</strong> {{ plan.remaining_days }}</p>
+                                    <p><strong>Remaining Days:</strong> {{ plan.remaining_days }} Day(s)</p>
+        
                                     <p>
                                         <strong>Payment Status:</strong>
                                         {% if plan.payment_status == "approved" %}
@@ -140,11 +141,13 @@
                                         {% endif %}
                                     </p>
                                 </div>
+        
                                 {% if plan.needs_payment %}
-                                    <a href="{% url 'payment_view' %}" class="btn btn-primary"
-                                       style="padding: 10px 20px; text-align: center; border-radius: 5px;">
-                                        Pay Now
-                                    </a>
+                                    <div class="card-footer text-center">
+                                        <a href="{% url 'payment_view' %}" class="btn btn-primary w-100">
+                                            Pay Now
+                                        </a>
+                                    </div>
                                 {% endif %}
                             </div>
                         </div>
