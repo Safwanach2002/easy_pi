@@ -1,8 +1,5 @@
-//signup_section
-
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('form');
-    /*console.log('Form:', form);*/
 
     if (!form) {
         console.error('Form element not found. Ensure the form selector is correct.');
@@ -14,30 +11,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = new FormData(form);
 
-        // Append referral code if already provided in the popup
-        const referralCodeInput = document.getElementById('referralCodeInput');
-        if (referralCodeInput && referralCodeInput.value.trim() !== '') {
-            formData.append('referred_by', referralCodeInput.value.trim());
-        }
-
         try {
             const response = await fetch(form.action, {
                 method: 'POST',
                 body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest', // To identify AJAX requests
+                },
             });
 
-            // Validate response
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                throw new Error('HTTP error! Status: ${response.status}');
             }
 
             const result = await response.json();
-            console.log('Result JSON:',result);
+            console.log('Result JSON:', result);
 
             if (result.success) {
-                const referralCode = result.referral_code;
-                document.getElementById('Who_referred_by').textContent = referralCode;
-                openReferralPopup();
+                // Show the referral popup with the generated referral code
+                showReferralPopup(result.referral_code);
             } else {
                 let errorMessage = 'Signup failed. Please try again.';
                 if (result.errors) {
@@ -52,11 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-function openReferralPopup() {
+// Show the referral popup with the user's referral code
+function showReferralPopup(referralCode) {
+    const referralCodeElement = document.getElementById('Who_referred_by');
     const overlay = document.getElementById('referralOverlay');
     const popup = document.getElementById('referralPopup');
 
-    if (overlay && popup) {
+    if (referralCodeElement && overlay && popup) {
+        referralCodeElement.textContent = referralCode;
         overlay.style.display = 'block';
         popup.style.display = 'block';
     } else {
@@ -64,6 +59,7 @@ function openReferralPopup() {
     }
 }
 
+// Close the referral popup
 function closeReferralPopup() {
     const overlay = document.getElementById('referralOverlay');
     const popup = document.getElementById('referralPopup');
@@ -76,13 +72,7 @@ function closeReferralPopup() {
     }
 }
 
-// Show the referral popup with the user's referral code
-function showReferralPopup(referralCode) {
-    document.getElementById('Who_referred_by').innerText = referralCode;
-    document.getElementById('referralOverlay').style.display = 'block';
-    document.getElementById('referralPopup').style.display = 'block';
-}
-
+// Submit the referral code
 function submitReferralCode() {
     const referralCodeInput = document.getElementById('referralCodeInput');
     const referralCode = referralCodeInput ? referralCodeInput.value.trim() : '';
@@ -92,33 +82,54 @@ function submitReferralCode() {
         return;
     }
 
-    // Attach the referral code to the form as a hidden input
-    const form = document.querySelector('form');
-    if (!form) {
-        console.error('Form element not found. Ensure the form selector is correct.');
-        return;
-    }
+    // Send the referral code to the server
+    fetch('/EPI_App/submit-referral/', {  // Include the prefix
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: JSON.stringify({ referral_code: referralCode }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert('Referral code submitted successfully!');
+            closeReferralPopup();
+            window.location.href = '/'; // Redirect to home page
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again later.');
+    });
+}
 
-    let referredByInput = document.querySelector('input[name="referred_by"]');
-
-    if (!referredByInput) {
-        referredByInput = document.createElement('input');
-        referredByInput.type = 'hidden';
-        referredByInput.name = 'referred_by';
-        form.appendChild(referredByInput);
-    }
-
-    referredByInput.value = referralCode.trim();
-
-    alert(`Referral code ${referralCode} submitted!`);
+// Skip the referral process
+function skipReferral() {
     closeReferralPopup();
+    window.location.href = '/'; // Redirect to home page
+}
 
-       // Redirect to the home page
-       window.location.href = '/';
+// Helper function to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
     }
-    function skipReferral() {
-        closeReferralPopup();
-
-        // Redirect to the home page
-        window.location.href = '/';
-    }
+    return cookieValue;
+}

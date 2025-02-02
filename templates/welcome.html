@@ -6,38 +6,144 @@
     <title>Splash Screen</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/styles.css">
+
     <style>
-        @keyframes fadeZoom {
-            0% { opacity: 0; transform: scale(0.5); }
-            50% { opacity: 0.5; transform: scale(1.1); }
-            100% { opacity: 1; transform: scale(1); }
+        /* Smooth Background Animation */
+        body {
+            background: linear-gradient(45deg, #6a11cb, #93959a);
+            background-size: 200% 200%;
+            animation: gradientMove 6s ease infinite;
+            background-image: url('/static/img/animation2.jpg');
+            background-blend-mode: overlay;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            padding: 10px;
         }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Typewriter Animation */
         .animated-text {
-            animation: fadeZoom 3s ease-in-out;
-            font-size: 3rem;
+            font-size: 2.5vw; /* Scales with screen size */
             font-weight: bold;
+            color: #141212;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 4px solid #fff; /* Cursor effect */
+            width: 0;
+            animation: typing 4s steps(40, end) forwards, blink 1s infinite step-end alternate;
+            text-align: center;
         }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        /* Slide-up & Fade-in Animation */
         .tagline {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
+            color: #0c0b0b;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeSlideUp 3s ease-in-out 2s forwards;
+            max-width: 90%;
+            text-align: center;
+            line-height: 1.6;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        /* Join Message Styling */
+        .join-message {
+            font-size: 1.1rem;
+            color: #fff;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeSlideUp 3s ease-in-out 3s forwards;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        /* Fade Slide Up Keyframes */
+        @keyframes fadeSlideUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Centering Everything */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            max-width: 800px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .animated-text {
+                font-size: 5vw; /* Increase for mobile */
+            }
+            .tagline {
+                font-size: 1rem;
+                max-width: 95%;
+            }
+            .join-message {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .animated-text {
+                font-size: 6vw; /* Even bigger for smaller screens */
+            }
+            .tagline {
+                font-size: 0.9rem;
+            }
+            .join-message {
+                font-size: 0.9rem;
+            }
         }
     </style>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             setTimeout(() => {
-                let userId = localStorage.getItem("id"); // Simulating SharedPreferences
+                let userId = localStorage.getItem("id"); // Check user session
                 if (userId) {
-                    window.location.href = "/index/";
+                    window.location.replace("/index/"); // Redirect to Home if logged in
                 } else {
-                    window.location.href = "/login/";
+                    window.location.replace("/login/"); // Redirect to Login if not logged in
                 }
-            }, 3000);
+            }, 9000); // Increased delay for better readability
         });
     </script>
 </head>
 <body>
-    <div class="container d-flex flex-column align-items-center justify-content-center vh-100">
-        <h1 class="display-1 text-center animated-text">Easy Purchase Investment</h1>
-        <p class="text-muted fade-in tagline" style="letter-spacing: 2px;">Invest Small, Dream Big Own It!</p>
+    <div class="container">
+        <h1 class="animated-text">Easy Purchase Investment</h1>
+        <p class="tagline">
+            Smart saving meets effortless shopping!<br> 
+            Invest small amounts daily and unlock big rewards.<br>
+            With <strong>EPI</strong>, your dream purchases are just a few savings away!<br>
+            Plan ahead, save easily, and buy what you love without financial stress.<br>
+            Enjoy exclusive discounts, early access to sales, and hassle-free shopping like never before.
+        </p>
+        <p class="join-message">Join the EPI Family today — Sign up or log in now!</p>
     </div>
 </body>
 </html>

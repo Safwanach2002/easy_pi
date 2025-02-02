@@ -9,9 +9,11 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from decimal import Decimal
-from .models import Payment, Referral, Profile, ProductScheme, Services
+from .models import Investment, Payment, Referral, Profile, ProductScheme, Services
 from datetime import datetime, timedelta, date
+from django.views.decorators.csrf import csrf_exempt
+import json
+from decimal import Decimal
 
 
 # Create your views here.
@@ -26,57 +28,150 @@ def signup_view(request):
     if request.method == 'POST':
         form = SignupForm(request.POST, request.FILES)
         if form.is_valid():
-            #print("Form is valid")  # Debug message
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
-            
-            # Create profile with referral code and save KYC details
+
+            # Generate a referral code for the new user
             referral_code = generate_referral_code()
-            referred_by = request.POST.get('referred_by', None)
 
+            # Check if a referral code was provided and validate it
+            referred_by_code = request.POST.get('referred_by', None)
             referred_by_profile = None
-            if referred_by:
-                try:
-                    referred_by_profile = Profile.objects.get(referral_code=referred_by)
-                except Profile.DoesNotExist:
-                    referred_by_profile = None
 
-            #print(f"Generated referral code: {referral_code}")  # Debug message
+            if referred_by_code:
+                try:
+                    referred_by_profile = Profile.objects.get(referral_code=referred_by_code)
+                except Profile.DoesNotExist:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'Invalid referral code. Please check and try again.',
+                    })
+
+            # Create the user's profile
             profile = Profile.objects.create(
                 user=user,
                 referral_code=referral_code,
-                referred_by=request.POST.get('referred_by', None),
-                kyc_document = form.cleaned_data.get('kyc_document'),
-                kyc_document_type = form.cleaned_data.get('kyc_document_type'),
+                referred_by=referred_by_profile,
+                kyc_document=form.cleaned_data.get('kyc_document'),
+                kyc_document_type=form.cleaned_data.get('kyc_document_type'),
                 pan_card=form.cleaned_data.get('pan_card'),
                 bank_passbook=form.cleaned_data.get('bank_passbook'),
             )
 
-            # Track referral and rewards
+            # If referred by someone, update their referral count and rewards
             if referred_by_profile:
                 referred_by_profile.referrals_made += 1
                 referred_by_profile.rewards_earned += 10.00  # Example reward
                 referred_by_profile.save()
+
+                # Create a referral record
                 Referral.objects.create(referred_by=referred_by_profile, referred_user=user)
 
+            # Log the user in
             auth_login(request, user)
-            messages.success(request, "Signup successful! Welcome aboard!")
-            return JsonResponse({'success': True, 'referral_code': referral_code})
-        
+
+            # Return success response with referral code
+            return JsonResponse({
+                'success': True,
+                'referral_code': referral_code,
+                'message': 'Signup successful! Welcome aboard!',
+            })
         else:
-            # Process form errors and send them as JSON response
+            # Process form errors and return them as JSON response
             errors = {
-                field: [error['message'] for error in error_list] 
+                field: [error['message'] for error in error_list]
                 for field, error_list in form.errors.get_json_data().items()
             }
-            return JsonResponse({'success': True, 'referral_code': referral_code})
+            return JsonResponse({
+                'success': False,
+                'errors': errors,
+                'message': 'Please correct the errors below.',
+            })
 
     else:
         form = SignupForm()
 
     return render(request, 'signup.html', {'form': form})
 
+@login_required
+def referral_view(request):
+    user_profile = Profile.objects.get(user=request.user)
+    
+    # Generate a referral code if the user doesn't have one
+    if not user_profile.referral_code:
+        user_profile.referral_code = generate_referral_code()
+        user_profile.save()
+
+    # Get referral details
+    referrals = Referral.objects.filter(referred_by=user_profile)
+    referral_count = referrals.count()
+
+    total_rewards = user_profile.rewards_earned
+    
+    # Fetch all the referred person's investment details and calculate total commission earned
+    referred_investments = Investment.objects.filter(referred_user__profile=user_profile)
+    referred_persons = [
+        {
+            'name': referrals.referred_user.username,
+            'product': investment.product.name,
+            'daily_investment': investment.daily_investment,
+            'commission': investment.commission,
+            'timestamp': investment.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+        }
+        for investment in referred_investments
+    ]
+
+    # Calculate the total commission
+    total_commission = sum([investment.commission for investment in referred_investments])
+
+    context = {
+        'referral_code': user_profile.referral_code,
+        'referral_count': referral_count,
+        'total_rewards': total_rewards + total_commission,
+        'referred_persons': referred_persons,
+    }
+    return render(request, 'reference.html', context)
+
+@csrf_exempt
+def submit_referral(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            referral_code = data.get('referral_code')
+
+            # Validate the referral code
+            if not referral_code:
+                return JsonResponse({'success': False, 'message': 'Referral code is required.'})
+
+            # Check if the referral code exists
+            try:
+                referred_by_profile = Profile.objects.get(referral_code=referral_code)
+            except Profile.DoesNotExist:
+                return JsonResponse({'success': False, 'message': 'Invalid referral code.'})
+
+            # Get the current user's profile
+            user_profile = request.user.profile
+
+            # Ensure the user is not referring themselves
+            if user_profile == referred_by_profile:
+                return JsonResponse({'success': False, 'message': 'You cannot refer yourself.'})
+
+            # Update the referred_by field in the user's profile
+            user_profile.referred_by = referred_by_profile
+            user_profile.save()
+
+            # Update the referrer's referral count and rewards
+            referred_by_profile.referrals_made += 1
+            referred_by_profile.rewards_earned += Decimal('10.00')  # Convert float to Decimal
+            referred_by_profile.save()
+
+            return JsonResponse({'success': True, 'message': 'Referral code submitted successfully!'})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -145,32 +240,7 @@ def payment_view(request):
 def payment_success(request):
     return render(request, 'payment_success.html')
 
-@login_required
-def referral_view(request):
-    user_profile = Profile.objects.get(user=request.user)
 
-    if not user_profile.referral_code:
-        user_profile.referral_code = generate_referral_code()
-
-    referrals = Referral.objects.filter(referred_by=user_profile)
-    referral_count = referrals.count()
-    total_rewards = user_profile.rewards_earned
-
-    referred_persons = [
-        {
-            'name': referral.referred_user.username,
-            'timestamp': referral.timestamp,
-        }
-        for referral in referrals
-    ]
-
-    context = {
-        'referral_code': user_profile.referral_code,
-        'referral_count': referral_count,
-        'total_rewards': total_rewards,
-        'referred_persons': referred_persons,
-    }
-    return render(request, 'reference.html', context)
 
 @login_required 
 def product_scheme_manage(request):
@@ -243,14 +313,16 @@ def plans_view(request):
             latest_payment = Payment.objects.filter(product_scheme=scheme).order_by('-created_at').first()
             
             needs_payment = False
-            balance = scheme.total  # Default balance
+            
+            # **Fix: Instead of summing 'amount', use 'investment' from ProductScheme**
+            total_paid = approved_payments.count() * scheme.investment  # Payment count × investment per period
+            balance = max(0, scheme.total - total_paid)  # Ensure balance doesn't go negative
 
             if latest_payment:
                 last_payment_date = latest_payment.created_at.date()
                 today = date.today()
 
                 if latest_payment.payment_status == 'approved':
-                    balance = scheme.total - scheme.investment  
                     # "Pay Now" should appear only after 12 AM (next day)
                     if last_payment_date < today:
                         needs_payment = True  
@@ -263,7 +335,7 @@ def plans_view(request):
                 'product_id': scheme.product_id,
                 'title': service.title,
                 'investment': scheme.investment,
-                'balance': balance,
+                'balance': balance,  # Corrected balance calculation
                 'remaining_days': remaining_days,  # Decreases based on payments
                 'payment_status': latest_payment.payment_status if latest_payment else 'pending',
                 'needs_payment': needs_payment,
@@ -273,3 +345,29 @@ def plans_view(request):
 
     context = {'plans': plans}
     return render(request, 'plans.html', context)
+
+@login_required
+def payment_history(request):
+    profile = request.user.profile  # Get logged-in user's profile
+
+    # Fetch all approved payments for the user
+    payments = Payment.objects.filter(profile=profile, payment_status='approved').select_related('product_scheme')
+
+    history = []
+    for payment in payments:
+        scheme = payment.product_scheme
+        if scheme:
+            try:
+                service = Services.objects.get(product_id=scheme.product_id)  # Fetch service details
+                history.append({
+                    'product_id': service.product_id,
+                    'title': service.title,
+                    'investment': scheme.investment,
+                    'balance': max(0, scheme.total - (scheme.investment * Payment.objects.filter(product_scheme=scheme, payment_status='approved').count())),
+                    'transaction_id': payment.transaction_id,
+                    'payment_paid_date': payment.created_at,
+                })
+            except Services.DoesNotExist:
+                continue
+
+    return render(request, "payment_history.html", {"history": history})

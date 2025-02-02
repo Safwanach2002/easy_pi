@@ -5,7 +5,7 @@ from .models import Profile, ProductScheme, Payment
 
 class SignupForm(forms.ModelForm):
     accept_terms = forms.BooleanField(
-        required=True, 
+        required=True,
         label="I accept the Terms and Conditions.",
         error_messages={'required': "You must accept the terms and conditions to register."},
     )
@@ -17,23 +17,19 @@ class SignupForm(forms.ModelForm):
         label="Email Address",
         widget=forms.EmailInput(attrs={'placeholder': 'Enter email', 'class': 'form-control'}),
     )
-
     password = forms.CharField(
         label="Password",
         widget=forms.PasswordInput(attrs={'placeholder': 'Enter password', 'class': 'form-control'}),
     )
-
     password2 = forms.CharField(
         label="Confirm Password",
         widget=forms.PasswordInput(attrs={'placeholder': 'Confirm password', 'class': 'form-control'}),
     )
-
     kyc_document = forms.FileField(
         required=True,
         label="Upload KYC Document",
         widget=forms.ClearableFileInput(attrs={'class': 'form-control'}),
     )
-
     kyc_document_type = forms.ChoiceField(
         required=True,
         label="Document Type",
@@ -44,17 +40,15 @@ class SignupForm(forms.ModelForm):
         ],
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
-
     pan_card = forms.FileField(
         required=True,
         label="Upload PAN Card",
-        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'}),
     )
-
     bank_passbook = forms.FileField(
         required=True,
         label="Upload Bank Passbook",
-        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'}),
     )
 
     class Meta:
@@ -67,16 +61,33 @@ class SignupForm(forms.ModelForm):
         if password and password2 and password != password2:
             raise ValidationError("Passwords do not match.")
         return password2
-    
+
     def clean_kyc_document(self):
         document = self.cleaned_data.get('kyc_document')
-        if document.size > 5 * 1024 * 1024:  # Limit size to 5MB
-            raise ValidationError("Document size cannot exceed 5MB.")
-        if not document.name.endswith(('.pdf', '.jpg', '.jpeg', '.png')):  # Restrict file types
-            raise ValidationError("Only PDF, JPG, JPEG, and PNG files are allowed.")
-        if not document:
-            raise ValidationError("KYC document is required.")
+        if document:
+            if document.size > 5 * 1024 * 1024:  # Limit size to 5MB
+                raise ValidationError("Document size cannot exceed 5MB.")
+            if not document.name.lower().endswith(('.pdf', '.jpg', '.jpeg', '.png')):
+                raise ValidationError("Only PDF, JPG, JPEG, and PNG files are allowed.")
         return document
+
+    def clean_pan_card(self):
+        pan_card = self.cleaned_data.get('pan_card')
+        if pan_card:
+            if pan_card.size > 5 * 1024 * 1024:  # Limit size to 5MB
+                raise ValidationError("PAN card size cannot exceed 5MB.")
+            if not pan_card.name.lower().endswith(('.pdf', '.jpg', '.jpeg', '.png')):
+                raise ValidationError("Only PDF, JPG, JPEG, and PNG files are allowed.")
+        return pan_card
+
+    def clean_bank_passbook(self):
+        bank_passbook = self.cleaned_data.get('bank_passbook')
+        if bank_passbook:
+            if bank_passbook.size > 5 * 1024 * 1024:  # Limit size to 5MB
+                raise ValidationError("Bank passbook size cannot exceed 5MB.")
+            if not bank_passbook.name.lower().endswith(('.pdf', '.jpg', '.jpeg', '.png')):
+                raise ValidationError("Only PDF, JPG, JPEG, and PNG files are allowed.")
+        return bank_passbook
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -89,13 +100,18 @@ class SignupForm(forms.ModelForm):
         if User.objects.filter(username=username).exists():
             raise ValidationError("This username is already taken.")
         return username
-    
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password'])
         if commit:
             user.save()
         return user
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['kyc_document_type', 'kyc_document', 'pan_card', 'bank_passbook']
     
 class ProfileForm(forms.ModelForm):
     class Meta:

@@ -5,12 +5,14 @@ import random
 from django.utils.timezone import now
 from django.utils import timezone
 from datetime import timedelta
+from django.core.exceptions import ValidationError
+from decimal import Decimal
 
-# Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     referral_code = models.CharField(max_length=8, unique=True, blank=True, null=True)
-    referred_by =models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True, related_name='referrals')
+    referred_by = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True, related_name='referrals')
+    rewards_earned = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))  # Use Decimal
     kyc_document = models.FileField(upload_to='kyc_documents/', blank=True, null=True)
     kyc_document_type = models.CharField(max_length=50, blank=True, null=True)
     pan_card = models.FileField(upload_to='pan_cards/', blank=True, null=True)
@@ -19,21 +21,45 @@ class Profile(models.Model):
     rewards_earned = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def save(self, *args, **kwargs):
-    # Automatically generate a unique referral code if not already set
+        # Automatically generate a unique referral code if not already set
         if not self.referral_code:
-            self.referral_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            self.referral_code = self.generate_referral_code()
         super().save(*args, **kwargs)
 
-    def __str__(self):
+    def generate_referral_code(self):
+        """Generate a unique 8-character referral code."""
+        while True:
+            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            if not Profile.objects.filter(referral_code=code).exists():
+                return code
+
+    def add_referral(self, referred_user):
+        """Add a referral and update the referral count and rewards."""
+        if self.user == referred_user:
+            raise ValidationError("You cannot refer yourself.")
+        
+        Referral.objects.create(referred_by=self, referred_user=referred_user)
+        self.referrals_made += 1
+        self.rewards_earned += 10.00  # Example: Add $10 reward for each referral
+        self.save()
+
+    def _str_(self):
         return f"{self.user.username}'s Profile"
-    
+
+
 class Referral(models.Model):
     referred_by = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='referral_by')
     referred_user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='referred_user')
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"Referral by {self.referred_by.user.username} to {self.referred_user.username}"
+
+    def save(self, *args, **kwargs):
+        # Ensure the referred user is not the same as the referrer
+        if self.referred_by.user == self.referred_user:
+            raise ValidationError("You cannot refer yourself.")
+        super().save(*args, **kwargs)
     
 
 class Services(models.Model):
@@ -86,3 +112,13 @@ class Payment(models.Model):
     def __str__(self):
         return f"Payment for {self.product_scheme.product_id} by {self.profile.user.username}"
     
+class Investment(models.Model):
+    product = models.ForeignKey(Services, on_delete=models.CASCADE)
+    referred_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    daily_investment = models.DecimalField(max_digits=10, decimal_places=2)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    days_to_complete = models.IntegerField()
+
+    @property
+    def commission(self):
+        return self.total_amount * Decimal('0.25')  # 25% commission

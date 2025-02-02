@@ -195,9 +195,9 @@
                     <p><strong>Referral Code:</strong> {{ profile.referral_code }}</p>
                     <p><strong>Referred By:</strong> 
                         {% if profile.referred_by %}
-                            {{ profile.referred_by }}
+                            {{ profile.referred_by.user.username }}  <!-- Fetch the username -->
                         {% else %}
-                            {{ profile.referred_by }}
+                            N/A
                         {% endif %}
                     </p>
                 </div>

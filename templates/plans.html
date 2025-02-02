@@ -23,6 +23,7 @@
         <link href="{% static 'lib/animate/animate.min.css' %}" rel="stylesheet">
         <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
         <link href="{% static 'lib/lightbox/css/lightbox.min.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 
         <!-- Customized Bootstrap Stylesheet -->
@@ -112,7 +113,7 @@
         </div>
 
         {% block content %}
-        <div class="container mt-4">
+        <div class="container mt-4 position-relative">
             {% if plans %}
                 <div class="row">
                     {% for plan in plans %}
@@ -158,6 +159,12 @@
                     Invest your money in our products to view your plans here.
                 </div>
             {% endif %}
+        
+            <!-- Floating Payment History Icon -->
+            <a href="{% url 'payment_history' %}" class="position-fixed bottom-0 end-0 m-4 p-3 bg-info text-white rounded-circle shadow"
+               style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-history fs-4"></i>
+            </a>
         </div>
         {% endblock %}
 
@@ -235,11 +242,6 @@
             </div>
         </div>
         <!-- Copyright End -->
-
-
-        <!-- Back to Top -->
-        <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="fa fa-arrow-up"></i></a>   
-
         
     <!-- JavaScript Libraries -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>

@@ -3,9 +3,29 @@ from .models import Profile, Services, Referral, ProductScheme, Payment
 
 # Register your models here.
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'referral_code', 'referred_by', 'kyc_document_type', 'pan_card', 'bank_passbook')
-    search_fields = ('user__username', 'referral_code')
-    list_filter = ('kyc_document_type',)
+    list_display = ('user', 'referral_code', 'referred_by', 'kyc_document_type', 'referrals_made', 'rewards_earned', 'pan_card', 'bank_passbook')
+    search_fields = ('user_username', 'referral_code', 'referred_byuser_username')
+    list_filter = ('kyc_document_type', 'referred_by')
+    readonly_fields = ('referral_code', 'referrals_made', 'rewards_earned')  # Prevent editing of these fields
+    fieldsets = (
+        ('User Information', {
+            'fields': ('user', 'referral_code', 'referred_by'),
+        }),
+        ('KYC Details', {
+            'fields': ('kyc_document_type', 'kyc_document', 'pan_card', 'bank_passbook'),
+        }),
+        ('Referral Information', {
+            'fields': ('referrals_made', 'rewards_earned'),
+        }),
+    )
+
+    def get_readonly_fields(self, request, obj=None):
+        # Make referral_code and referred_by read-only after creation
+        if obj:  # Editing an existing object
+            return self.readonly_fields + ('referral_code', 'referred_by')
+        return self.readonly_fields
+
+admin.site.register(Profile, ProfileAdmin)
 
 class ServicesAdmin(admin.ModelAdmin):
     list_display = ('title', 'product_id', 'total')
@@ -23,6 +43,17 @@ class ProductSchemeAdmin(admin.ModelAdmin):
 
 class ReferralAdmin(admin.ModelAdmin):
     list_display = ('referred_by', 'referred_user', 'timestamp')
+    search_fields = ('referred_by__userusername', 'referred_user__username')
+    list_filter = ('timestamp', 'referred_by__user__username')
+    readonly_fields = ('timestamp',)  # Prevent editing of the timestamp
+
+    def get_readonly_fields(self, request, obj=None):
+        # Make referred_by and referred_user read-only after creation
+        if obj:  # Editing an existing object
+            return self.readonly_fields + ('referred_by', 'referred_user')
+        return self.readonly_fields
+
+admin.site.register(Referral, ReferralAdmin)
 
 @admin.action(description="Approve selected payments")
 def approve_payments(modeladmin, request, queryset):
@@ -39,8 +70,6 @@ class PaymentAdmin(admin.ModelAdmin):
     actions = [approve_payments, reject_payments]
 
 admin.site.register(Payment, PaymentAdmin)
-admin.site.register(Profile,ProfileAdmin)
 admin.site.register(Services,ServicesAdmin)
 admin.site.register(ProductScheme,ProductSchemeAdmin)
-admin.site.register(Referral,ReferralAdmin)
 
