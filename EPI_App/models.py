@@ -40,7 +40,6 @@ class Profile(models.Model):
         
         Referral.objects.create(referred_by=self, referred_user=referred_user)
         self.referrals_made += 1
-        self.rewards_earned += 10.00  # Example: Add $10 reward for each referral
         self.save()
 
     def _str_(self):
@@ -118,7 +117,15 @@ class Investment(models.Model):
     daily_investment = models.DecimalField(max_digits=10, decimal_places=2)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     days_to_complete = models.IntegerField()
+    start_date = models.DateField(auto_now_add=True) 
+    timestamp = models.DateTimeField(default=timezone.now)
 
     @property
     def commission(self):
-        return self.total_amount * Decimal('0.25')  # 25% commission
+        """Calculate daily commission as 25% of the total amount, divided by the days to complete."""
+        total_commission = self.total_amount * Decimal('0.25')  # 25% commission on total amount
+        daily_commission = total_commission / self.days_to_complete  # Daily commission based on the number of days
+        return daily_commission
+
+    def __str__(self):
+        return f"{self.referred_user.username}'s investment"

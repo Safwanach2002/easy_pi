@@ -14,6 +14,8 @@ from datetime import datetime, timedelta, date
 from django.views.decorators.csrf import csrf_exempt
 import json
 from decimal import Decimal
+from django.db.models import Sum
+from django.utils.timezone import now
 
 
 # Create your views here.
@@ -96,42 +98,45 @@ def signup_view(request):
 
 @login_required
 def referral_view(request):
-    user_profile = Profile.objects.get(user=request.user)
-    
-    # Generate a referral code if the user doesn't have one
-    if not user_profile.referral_code:
-        user_profile.referral_code = generate_referral_code()
-        user_profile.save()
+    # Fetch the profile of the logged-in user
+    profile = get_object_or_404(Profile, user=request.user)
 
-    # Get referral details
-    referrals = Referral.objects.filter(referred_by=user_profile)
-    referral_count = referrals.count()
+    # Initialize total rewards
+    total_rewards = Decimal('0')
+    referred_data = []
 
-    total_rewards = user_profile.rewards_earned
-    
-    # Fetch all the referred person's investment details and calculate total commission earned
-    referred_investments = Investment.objects.filter(referred_user__profile=user_profile)
-    referred_persons = [
-        {
-            'name': referrals.referred_user.username,
-            'product': investment.product.name,
-            'daily_investment': investment.daily_investment,
-            'commission': investment.commission,
-            'timestamp': investment.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-        }
-        for investment in referred_investments
-    ]
+    referred_users = Profile.objects.filter(referred_by=profile)
 
-    # Calculate the total commission
-    total_commission = sum([investment.commission for investment in referred_investments])
+    # Fetch all referred investments for the logged-in user
+    referred_investments = Investment.objects.filter(referred_user=request.user).select_related('product')
 
-    context = {
-        'referral_code': user_profile.referral_code,
-        'referral_count': referral_count,
-        'total_rewards': total_rewards + total_commission,
-        'referred_persons': referred_persons,
-    }
-    return render(request, 'reference.html', context)
+
+    # Calculate total rewards by summing daily commissions for each active day
+    for investment in referred_investments:
+        if investment.start_date:
+            days_active = max((now().date() - investment.start_date).days, 0)  # Ensure non-negative days
+            commission = (investment.daily_investment or Decimal('0')) * Decimal('0.25') * days_active
+            total_rewards += commission
+
+            # Get product details
+            product_title = investment.product.title if investment.product else "Unknown"
+            daily_investment = investment.daily_investment or Decimal('0')
+
+            # Append structured data for the template
+            referred_data.append({
+                "name": investment.referred_user.get_full_name() or investment.referred_user.username,
+                "product": product_title,
+                "daily_investment": daily_investment,
+                "commission": commission,
+                "timestamp": investment.timestamp
+            })
+
+    return render(request, 'reference.html', {
+        'referral_code': profile.referral_code,
+        'referrals_made': profile.referrals_made,
+        'total_rewards': total_rewards,
+        'referred_investments': referred_data
+    })
 
 @csrf_exempt
 def submit_referral(request):

@@ -285,6 +285,14 @@
         </div>
         <!-- Header End -->
 
+        <!-- Search Bar -->
+        <div class="container mt-4">
+            <form method="GET" action="{% url 'services' %}" class="d-flex">
+                <input type="text" name="q" class="form-control me-2" placeholder="Search for a product..." value="{{ query }}">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
         <div class="row">
             {% for service in services %}
             <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;">

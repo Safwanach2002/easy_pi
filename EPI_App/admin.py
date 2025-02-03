@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Services, Referral, ProductScheme, Payment
+from .models import Investment, Profile, Services, Referral, ProductScheme, Payment
 
 # Register your models here.
 class ProfileAdmin(admin.ModelAdmin):
@@ -69,7 +69,14 @@ class PaymentAdmin(admin.ModelAdmin):
     search_fields = ('profile__user__username', 'product_scheme__product_id')
     actions = [approve_payments, reject_payments]
 
+class InvestmentAdmin(admin.ModelAdmin):
+    list_display = ('product', 'referred_user', 'daily_investment', 'total_amount', 'days_to_complete')
+    
+    def product(self, obj):
+        return obj.product.title 
+
 admin.site.register(Payment, PaymentAdmin)
 admin.site.register(Services,ServicesAdmin)
 admin.site.register(ProductScheme,ProductSchemeAdmin)
+admin.site.register(Investment,InvestmentAdmin)
 
