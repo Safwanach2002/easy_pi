@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'EPI_Project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'easypi',
-        'USER': 'root',
-        'PASSWORD': '',
+        'ENGINE': 'mysql.connector.django',
+        'NAME': 'db2',
+        'USER': 'safwana',
+        'PASSWORD': 'Safwana@2002',
         'HOST': 'localhost',
         'PORT': '3306'
     }
