@@ -73,7 +73,7 @@
 }
 
 .btn.btn-primary {
-    background: #44d2f6 !important;
+    background: var(--bs-primary) !important;
     color: var(--bs-white) !important;
     font-family: 'Roboto', sans-serif;
     border: none;
@@ -116,7 +116,7 @@
 /*** Topbar Start ***/
 .topbar {
     padding: 2px 10px 2px 20px;
-    background: rgb(58, 57, 57) !important;
+    background: var(--bs-dark) !important;
 }
 
 @media (max-width: 768px) {
@@ -173,7 +173,7 @@
 .navbar .navbar-nav .nav-link.active,
 .sticky-top .navbar .navbar-nav .nav-link:hover,
 .sticky-top .navbar .navbar-nav .nav-link.active {
-    color: #44d2f6 !important;
+    color: var(--bs-primary) !important;
 }
 
 .navbar .dropdown-toggle::after {
@@ -255,7 +255,7 @@
     transform: translateY(-50%);
     padding: 20px 20px;
     border-radius: 40px;
-    background: #44d2f6;
+    background: var(--bs-primary);
     color: var(--bs-white);
     display: flex;
     align-items: center;
@@ -398,7 +398,7 @@
 .bg-breadcrumb {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(static/img/carousel-1.jpg);
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../img/carousel-1.jpg);
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -478,7 +478,7 @@
 }
 /*** About End ***/
 
-/*** Products Start ***/
+/*** Service Start ***/
 .service .service-item {
     box-shadow: 0 0 45px rgba(0, 0, 0, 0.3);
 }
@@ -507,7 +507,7 @@
     right: 0;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    background: rgba(77, 78, 79, 0.4);
+    background: rgba(68, 210, 246, 0.4);
     transition: 0.5s;
 }
 
@@ -558,9 +558,9 @@
 .service .service-item:hover .service-content .service-content-inner a.h4:hover {
     color: var(--bs-primary) !important;
 }
-/*** Products End ***/
+/*** Service End ***/
 
-/*** Services Start ***/
+/*** Project Start ***/
 .project .project-carousel.owl-carousel {
     height: 100%;
 }
@@ -584,7 +584,7 @@
     top: 0;
     left: 0;
     border-radius: 10px;
-    background: rgba(142, 150, 152, 0.4);
+    background: rgba(68, 210, 246, 0.4);
     transition: 0.5s;
 }
 
@@ -668,7 +668,7 @@
     border-radius: 40px;
     border: 8px solid var(--bs-primary);
 }
-/*** Services End ***/
+/*** Project End ***/
 
 /*** Blog Start ***/
 .blog .blog-item .project-img {
