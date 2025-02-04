@@ -33,7 +33,6 @@
 
     <style>
         /* General Product Card Styling */
-/* Product Card Styling */
 .product-card {
     border-radius: 10px;
     overflow: hidden;
@@ -57,7 +56,7 @@
 
 .product-img img {
     width: 100%;
-    height: 250px;
+    height: auto; /* Ensure image scales properly */
     object-fit: cover;
     transition: transform 0.3s ease-in-out;
 }
@@ -146,6 +145,28 @@
     background: #0056b3;
 }
 
+.details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease;
+    padding: 0 15px;
+}
+
+.details.show {
+    max-height: 200px;
+    padding: 10px 15px;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+    padding: 5px;
+    text-align: center;
+}
+
 /* 🔹 Responsive Grid System */
 
 /* Default Bootstrap Grid for Desktop */
@@ -169,32 +190,88 @@
         max-width: 25%;
     }
 }
+
+/* Mobile Layout Adjustments */
 @media (max-width: 768px) {
-    /* 3 products per row for mobile screens */
+    /* 3 products per row on medium screens like tablets */
     .col-md-6 {
         flex: 0 0 33.33%;
         max-width: 33.33%;
     }
+    .product-card {
+        margin-bottom: 20px;
+    }
+    .product-content h5 {
+        font-size: 16px;
+    }
+    .product-content p {
+        font-size: 13px;
+    }
+    .product-price {
+        font-size: 14px;
+    }
+    .add-button {
+        font-size: 12px;
+    }
 }
 
+/* Mobile Layout for screens under 576px (e.g., small smartphones) */
 @media (max-width: 576px) {
+    /* 3 products per row on small mobile devices */
     .col-md-6 {
         flex: 0 0 33.33%;
         max-width: 33.33%;
     }
+    .product-card {
+        margin-bottom: 20px;
+    }
+    .product-content h5 {
+        font-size: 14px;
+    }
+    .product-content p {
+        font-size: 12px;
+    }
+    .product-price {
+        font-size: 13px;
+    }
+    .add-button {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
 }
 
+/* Smallest Devices (less than 500px) */
 @media (max-width: 500px) {
     .col-md-6 {
         flex: 0 0 33.33%;
-        max-width: 33.33%;
+        max-width: 33.33%; /* Still show 3 cards per row on very small screens */
+    }
+    .product-img img {
+        height: 200px; /* Smaller image height */
     }
 }
 
 
-@media (max-width: 550px) {
+/* Mobile (up to 576px) */
+@media (max-width: 576px) {
     .col-md-6 {
-        flex: 0 0 33.33%;
+        flex: 0 0 50%; /* 2 products per row on small screens */
+        max-width: 50%;
+    }
+}
+
+/* Tablet (576px - 768px) */
+@media (max-width: 768px) {
+    .col-md-6 {
+        flex: 0 0 50%; /* 2 products per row on tablet */
+        max-width: 50%;
+    }
+}
+
+/* Desktop (above 768px) */
+@media (min-width: 768px) {
+    .col-md-6 {
+        flex: 0 0 33.33%; /* 3 products per row on desktop */
         max-width: 33.33%;
     }
 }
@@ -285,33 +362,52 @@
         </div>
         <!-- Header End -->
 
-        <!-- Search Bar -->
-        <div class="container mt-4">
-            <form method="GET" action="{% url 'services' %}" class="d-flex">
-                <input type="text" name="q" class="form-control me-2" placeholder="Search for a product..." value="{{ query }}">
-                <button type="submit" class="btn btn-primary">Search</button>
-            </form>
-        </div>
-
         <div class="row">
-            {% for service in services %}
-            <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;">
-                <div class="product-card shadow-sm bg-white rounded overflow-hidden position-relative">
-                    <div class="product-img position-relative">
-                        <img src="{{ service.img.url }}" class="img-fluid w-100" alt="product image" style="height: 250px; object-fit: cover;">
-                        <div class="overlay d-flex align-items-center justify-content-center">
-                            <a href="{% url 'product_scheme_manage' %}?id={{ service.id }}&total={{ service.total }}" class="btn btn-primary rounded-pill px-4 py-2">Add Now </a>
-                        </div>
-                    </div>
-                    <div class="product-content p-3">
-                        <h5 class="mb-2 text-dark">{{ service.title }}</h5>
-                        <p class="text-muted small">{{ service.desc }}</p>
-                        <p class="h5 text-primary">₹{{ service.total }}</p>
-                    </div>
+
+<!-- Add this right above the product listing section -->
+<div id="no-results" style="display: none;">No products found</div>
+
+<div class="row">
+    <!-- Search Bar -->
+    <div class="container mt-4">
+        <form method="GET" action="{% url 'services' %}" class="d-flex">
+            <input type="text" name="q" id="search-input" class="form-control me-2" placeholder="Search for a product..." value="{{ query }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+    
+    {% for service in services %}
+    <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;">
+        <div class="product-card shadow-sm bg-white rounded overflow-hidden position-relative">
+            <!-- Image Section -->
+            <div class="product-img position-relative">
+                <img src="{{ service.img.url }}" class="img-fluid w-100 toggle-image" alt="product image" 
+                    style="height: 250px; object-fit: cover; cursor: pointer;">
+                <div class="overlay d-flex align-items-center justify-content-center">
+                    <a href="{% url 'product_scheme_manage' %}?id={{ service.id }}&total={{ service.total }}" 
+                    class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
                 </div>
             </div>
-            {% endfor %}
+    
+            <!-- Product Title -->
+            <div class="product-content p-3">
+                <h5 class="mb-2 text-dark">{{ service.title }}</h5>
+                
+                <!-- Toggle Button -->
+                <button class="toggle-btn btn btn-link w-100 text-primary" data-id="{{ forloop.counter }}">
+                    View Details 
+                </button>
+    
+                <!-- Collapsible Details Section -->
+                <div class="details" id="details-{{ forloop.counter }}">
+                    <p class="text-muted small">{{ service.desc }}</p>
+                    <p class="h5 text-primary">₹{{ service.total }}</p>
+                </div>
+            </div>
         </div>
+    </div>
+    {% endfor %}
+    
 
         <!-- Footer Start -->
         <div class="container-fluid footer py-5 wow fadeIn" data-wow-delay="0.2s">
@@ -368,6 +464,9 @@
                                 <!-- <p class="text-uppercase text-primary mb-2">Investment</p> -->
                                 <a href="#" class="text-body">FAQ</a>
                             </div>
+                            <div class="footer-btn text-start">
+                                <a href="https://play.google.com/store/apps/details?id=com.saoirse.epi" class="btn btn-light rounded-pill px-4">Get Our App <i class="fa fa-arrow-right ms-1"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -394,6 +493,8 @@
 
         
     <!-- JavaScript Libraries -->
+
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'lib/wow/wow.min.js' %}"></script>
@@ -404,8 +505,57 @@
     <script src="{% static 'lib/lightbox/js/lightbox.min.js' %}"></script>
     
 
-    <!-- Template Javascript -->
     <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        // Get the search input and products elements
+        const searchInput = document.getElementById('search-input');
+        const products = document.querySelectorAll('.product-card');
+        const noResults = document.getElementById('no-results');
+
+        // Function to filter products based on search input
+        function filterProducts() {
+        const inputValue = searchInput.value.toLowerCase();
+        let found = false;
+        products.forEach(product => {
+            const productName = product.querySelector('.product-content h5').textContent.toLowerCase();
+            if (productName.startsWith(inputValue)) {
+            product.style.display = 'block';
+            found = true;
+            } else {
+            product.style.display = 'none';
+            }
+        });
+        if (!found) {
+            noResults.style.display = 'block';
+        } else {
+            noResults.style.display = 'none';
+        }
+        }
+
+        // Add event listener to search input
+        searchInput.addEventListener('input', filterProducts);
+
+
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".toggle-btn").forEach(button => {
+                button.addEventListener("click", function () {
+                    let details = document.getElementById("details-" + this.dataset.id);
+                    details.classList.toggle("show");
+                    this.innerHTML = details.classList.contains("show") ? "Hide Details " : "View Details ";
+                });
+            });
+    
+            // Image Click for Toggle
+            document.querySelectorAll(".toggle-image").forEach(image => {
+                image.addEventListener("click", function () {
+                    let btn = this.closest(".product-card").querySelector(".toggle-btn");
+                    btn.click();  // Simulate button click when image is clicked
+                });
+            });
+        });
+    </script>
     </body>
 
 </html>

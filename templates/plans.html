@@ -23,7 +23,6 @@
         <link href="{% static 'lib/animate/animate.min.css' %}" rel="stylesheet">
         <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
         <link href="{% static 'lib/lightbox/css/lightbox.min.css' %}" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 
         <!-- Customized Bootstrap Stylesheet -->
@@ -31,6 +30,94 @@
 
         <!-- Template Stylesheet -->
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
+        <style>
+            /* 🔹 Responsive Grid System */
+        
+            /* Default Bootstrap Grid for Desktop */
+            .col-md-4 {
+                flex: 0 0 33.3333%;
+                max-width: 33.3333%;
+            }
+        
+            @media (min-width: 992px) {
+                /* 3 products per row for large screens */
+                .col-md-4 {
+                    flex: 0 0 33.3333%;
+                    max-width: 33.3333%;
+                }
+            }
+        
+            @media (min-width: 1200px) {
+                /* 4 products per row for extra-large screens */
+                .col-md-4 {
+                    flex: 0 0 25%;
+                    max-width: 25%;
+                }
+            }
+        
+            /* Mobile Layout Adjustments */
+            @media (max-width: 768px) {
+                /* 2 products per row on medium screens like tablets */
+                .col-md-4 {
+                    flex: 0 0 50%;
+                    max-width: 50%;
+                }
+                .card {
+                    margin-bottom: 20px;
+                }
+                .card-title {
+                    font-size: 16px;
+                }
+                .card-text {
+                    font-size: 14px;
+                }
+                .badge {
+                    font-size: 12px;
+                }
+                .btn {
+                    font-size: 14px;
+                    padding: 6px 12px;
+                }
+            }
+        
+            /* Mobile Layout for screens under 576px (e.g., small smartphones) */
+            @media (max-width: 576px) {
+                /* 2 products per row on small mobile devices */
+                .col-md-4 {
+                    flex: 0 0 50%;
+                    max-width: 50%;
+                }
+                .card {
+                    margin-bottom: 15px;
+                }
+                .card-title {
+                    font-size: 14px;
+                }
+                .card-text {
+                    font-size: 12px;
+                }
+                .badge {
+                    font-size: 10px;
+                }
+                .btn {
+                    font-size: 12px;
+                    padding: 5px 10px;
+                }
+            }
+        
+            /* Smallest Devices (less than 500px) */
+            @media (max-width: 500px) {
+                .col-md-4 {
+                    flex: 0 0 50%;
+                    max-width: 50%; /* Still show 2 cards per row on very small screens */
+                }
+                .card-img-top {
+                    height: 150px; /* Smaller image height */
+                }
+            }
+        </style>
+
+
     </head>
     <body>
 
@@ -113,7 +200,7 @@
         </div>
 
         {% block content %}
-        <div class="container mt-4 position-relative">
+        <div class="container mt-4">
             {% if plans %}
                 <div class="row">
                     {% for plan in plans %}
@@ -124,23 +211,31 @@
                                 {% endif %}
                                 <div class="card-body">
                                     <h5 class="card-title">{{ plan.title }}</h5>
-                                    <p><strong>Product ID:</strong> {{ plan.product_id }}</p>
-                                    <p><strong>Investment:</strong> ₹{{ plan.investment }}</p>
-                                    <p><strong>Balance:</strong> ₹{{ plan.balance }}</p>
-                                    <p><strong>Remaining Days:</strong> {{ plan.remaining_days }} Day(s)</p>
         
-                                    <p>
-                                        <strong>Payment Status:</strong>
-                                        {% if plan.payment_status == "approved" %}
-                                            <span class="badge bg-success">Approved</span>
-                                        {% elif plan.payment_status == "pending" %}
-                                            <span class="badge bg-warning text-dark">Pending</span>
-                                        {% elif plan.payment_status == "rejected" %}
-                                            <span class="badge bg-danger">Rejected</span>
-                                        {% else %}
-                                            <span class="badge bg-secondary">Not Paid</span>
-                                        {% endif %}
-                                    </p>
+                                    <!-- Fold/Unfold Button -->
+                                    <button class="btn btn-link toggle-details w-100" data-bs-toggle="collapse" data-bs-target="#details-{{ forloop.counter }}">
+                                        View Details 
+                                    </button>
+        
+                                    <!-- Collapsible Details Section -->
+                                    <div class="collapse" id="details-{{ forloop.counter }}">
+                                        <p><strong>Product ID:</strong> {{ plan.product_id }}</p>
+                                        <p><strong>Investment:</strong> ₹{{ plan.investment }}</p>
+                                        <p><strong>Balance:</strong> ₹{{ plan.balance }}</p>
+                                        <p><strong>Remaining Days:</strong> {{ plan.remaining_days }} Day(s)</p>
+                                        <p>
+                                            <strong>Payment Status:</strong>
+                                            {% if plan.payment_status == "approved" %}
+                                                <span class="badge bg-success">Approved</span>
+                                            {% elif plan.payment_status == "pending" %}
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            {% elif plan.payment_status == "rejected" %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Not Paid</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
                                 </div>
         
                                 {% if plan.needs_payment %}
@@ -159,13 +254,8 @@
                     Invest your money in our products to view your plans here.
                 </div>
             {% endif %}
-        
-            <!-- Floating Payment History Icon -->
-            <a href="{% url 'payment_history' %}" class="position-fixed bottom-0 end-0 m-4 p-3 bg-info text-white rounded-circle shadow"
-               style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-history fs-4"></i>
-            </a>
         </div>
+        
         {% endblock %}
 
         <!-- Footer Start -->
@@ -223,6 +313,9 @@
                                 <!-- <p class="text-uppercase text-primary mb-2">Investment</p> -->
                                 <a href="#" class="text-body">FAQ</a>
                             </div>
+                            <div class="footer-btn text-start">
+                                <a href="https://play.google.com/store/apps/details?id=com.saoirse.epi" class="btn btn-light rounded-pill px-4">Get Our App <i class="fa fa-arrow-right ms-1"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -242,6 +335,11 @@
             </div>
         </div>
         <!-- Copyright End -->
+
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="fa fa-arrow-up"></i></a>   
+
         
     <!-- JavaScript Libraries -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -255,11 +353,21 @@
     
 
     <!-- Template Javascript -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('.toggle-details').forEach(button => {
+                button.addEventListener('click', function () {
+                    if (this.innerHTML.includes("View Details")) {
+                        this.innerHTML = "Hide Details ";
+                    } else {
+                        this.innerHTML = "View Details ";
+                    }
+                });
+            });
+        });
+    </script>
     <script src="{% static 'js/main.js' %}"></script>
     </body>
 
 </html>
-
-
-
-
