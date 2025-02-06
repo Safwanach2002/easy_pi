@@ -3,25 +3,24 @@ from django.contrib.auth.models import User
 import string
 import random
 from django.utils.timezone import now
-from django.utils import timezone
 from datetime import timedelta
 from django.core.exceptions import ValidationError
 from decimal import Decimal
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     referral_code = models.CharField(max_length=8, unique=True, blank=True, null=True)
     referred_by = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True, related_name='referrals')
-    rewards_earned = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))  # Use Decimal
     kyc_document = models.FileField(upload_to='kyc_documents/', blank=True, null=True)
     kyc_document_type = models.CharField(max_length=50, blank=True, null=True)
     pan_card = models.FileField(upload_to='pan_cards/', blank=True, null=True)
     bank_passbook = models.FileField(upload_to='bank_passbooks/', blank=True, null=True)
     referrals_made = models.IntegerField(default=0)
-    rewards_earned = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    rewards_earned = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
 
     def save(self, *args, **kwargs):
-        # Automatically generate a unique referral code if not already set
+        """Automatically generate a unique referral code if not already set."""
         if not self.referral_code:
             self.referral_code = self.generate_referral_code()
         super().save(*args, **kwargs)
@@ -34,16 +33,25 @@ class Profile(models.Model):
                 return code
 
     def add_referral(self, referred_user):
-        """Add a referral and update the referral count and rewards."""
+        """Add a referral, update the referral count, and rewards."""
         if self.user == referred_user:
             raise ValidationError("You cannot refer yourself.")
-        
+
         Referral.objects.create(referred_by=self, referred_user=referred_user)
         self.referrals_made += 1
         self.save()
 
-    def _str_(self):
+        # Optionally, add a referral reward to the referrer's account
+        self.add_rewards(Decimal('10.00'))  # Example reward for a successful referral
+
+    def add_rewards(self, amount):
+        """Add rewards to the user's profile."""
+        self.rewards_earned += amount
+        self.save()
+
+    def __str__(self):
         return f"{self.user.username}'s Profile"
+
 
 
 class Referral(models.Model):
@@ -51,7 +59,7 @@ class Referral(models.Model):
     referred_user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='referred_user')
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"Referral by {self.referred_by.user.username} to {self.referred_user.username}"
 
     def save(self, *args, **kwargs):
@@ -59,26 +67,27 @@ class Referral(models.Model):
         if self.referred_by.user == self.referred_user:
             raise ValidationError("You cannot refer yourself.")
         super().save(*args, **kwargs)
-    
+
 
 class Services(models.Model):
     product_id = models.CharField(max_length=100, null=True)
-    title=models.CharField(max_length=50)
+    title = models.CharField(max_length=50)
     total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    img=models.ImageField(upload_to="pics")
-    desc=models.CharField(max_length=500 , null=True)
+    img = models.ImageField(upload_to="pics")
+    desc = models.CharField(max_length=500, null=True)
+
     def __str__(self):
         return self.title
-    
+
+
 class ProductScheme(models.Model):
-    product_id = models.CharField(max_length=100, null=True) 
+    product_id = models.CharField(max_length=100, null=True)
     investment = models.DecimalField(max_digits=10, decimal_places=2)
     start_date = models.DateField(auto_now_add=True)  # Automatically set to today's date when created
-    end_date = models.DateField(null=True, blank=True)  # Remove auto_now=True
+    end_date = models.DateField(null=True, blank=True)
     days = models.IntegerField()
     total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
-
 
     def __str__(self):
         return f"Scheme for {self.product_id} - {self.investment} Investment"
@@ -90,9 +99,9 @@ class ProductScheme(models.Model):
     def save(self, *args, **kwargs):
         """Override save method to calculate end date before saving the model."""
         if not self.end_date:
-            self.end_date = self.calculate_end_date()  # Calculate end_date before saving
-        super(ProductScheme, self).save(*args, **kwargs)
-         
+            self.end_date = self.calculate_end_date()
+        super().save(*args, **kwargs)
+
 
 class Payment(models.Model):
     STATUS_CHOICES = [
@@ -103,22 +112,23 @@ class Payment(models.Model):
 
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
     product_scheme = models.ForeignKey(ProductScheme, on_delete=models.CASCADE, null=True, blank=True)
-    transaction_id =models.CharField(max_length=20, unique=True, blank=True, null=True)
+    transaction_id = models.CharField(max_length=20, unique=True, blank=True, null=True)
     payment_proof = models.ImageField(upload_to='payment_proofs/', blank=True, null=True)
     payment_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(default=now)
 
     def __str__(self):
         return f"Payment for {self.product_scheme.product_id} by {self.profile.user.username}"
-    
+
+
 class Investment(models.Model):
     product = models.ForeignKey(Services, on_delete=models.CASCADE)
     referred_user = models.ForeignKey(User, on_delete=models.CASCADE)
     daily_investment = models.DecimalField(max_digits=10, decimal_places=2)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     days_to_complete = models.IntegerField()
-    start_date = models.DateField(auto_now_add=True) 
-    timestamp = models.DateTimeField(default=timezone.now)
+    start_date = models.DateField(auto_now_add=True)
+    timestamp = models.DateTimeField(default=now)
 
     @property
     def commission(self):
@@ -126,6 +136,25 @@ class Investment(models.Model):
         total_commission = self.total_amount * Decimal('0.25')  # 25% commission on total amount
         daily_commission = total_commission / self.days_to_complete  # Daily commission based on the number of days
         return daily_commission
+
+    def save(self, *args, **kwargs):
+        """Override save method to distribute commission to the referrer daily."""
+        is_new = self.pk is None  # Check if this is a new investment
+
+        super().save(*args, **kwargs)  # Save the investment record first
+
+        if is_new:  # Only distribute rewards when a new investment is created
+            referred_profile = self.referred_user.profile
+            if referred_profile.referred_by:  # Check if there is a referrer
+                referrer_profile = referred_profile.referred_by
+
+                # Calculate daily commission (25% of total investment divided by days)
+                total_commission = self.total_amount * Decimal('0.25')
+                daily_commission = total_commission / self.days_to_complete
+
+                # Add the daily commission to the referrer's rewards earned
+                referrer_profile.rewards_earned += daily_commission
+                referrer_profile.save()
 
     def __str__(self):
         return f"{self.referred_user.username}'s investment"

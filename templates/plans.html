@@ -38,6 +38,30 @@
                 flex: 0 0 33.3333%;
                 max-width: 33.3333%;
             }
+
+            /* Payment History Floating Button */
+            .payment-history-btn {
+                position: fixed;
+                bottom: 80px;
+                right: 20px;
+                background: #44d2f6 ;
+                color: white;
+                width: 50px; /* Set equal width and height */
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%; /* Makes it a perfect circle */
+                font-size: 22px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                transition: background 0.3s ease;
+                text-align: center;
+            }
+
+            .payment-history-btn:hover {
+                background: #102147;
+                text-decoration: none;
+            }
         
             @media (min-width: 992px) {
                 /* 3 products per row for large screens */
@@ -136,8 +160,8 @@
                 <div class="row gx-0 align-items-center" style="height: 45px;">
                     <div class="col-lg-8 text-center text-lg-start mb-lg-0">
                         <div class="d-flex flex-wrap">
-                            <a href="#" class="text-muted me-4"><i class="fas fa-map-marker-alt text-primary me-2"></i>Find A Location</a>
-                            <a href="#" class="text-muted me-4"><i class="fas fa-phone-alt text-primary me-2"></i>+91 6238 691 096</a>
+                            <a href="#" class="text-muted me-4"><i class="fas fa-map-marker-alt text-primary me-2"></i>Kannur, Kerala</a>
+                            <a href="#" class="text-muted me-4"><i class="fas fa-phone-alt text-primary me-2"></i>+91 87143 99951</a>
                             <a href="#" class="text-muted me-0"><i class="fas fa-envelope text-primary me-2"></i>epielio2025@gmail.com</a>
                         </div>
                     </div>
@@ -285,9 +309,9 @@
                     <div class="col-md-6 col-lg-6 col-xl-3">
                         <div class="footer-item d-flex flex-column">
                             <h4 class="text-white mb-4">Contact Info</h4>
-                            <a href=""><i class="fa fa-map-marker-alt me-2"></i> 123 Street, Kannur, Kerala</a>
-                            <a href=""><i class="fas fa-envelope me-2"></i> epi2025@gmail.com</a>
-                            <a href=""><i class="fas fa-phone me-2"></i> +012 345 67890</a>
+                            <a href=""><i class="fa fa-map-marker-alt me-2"></i>Kannur, Kerala</a>
+                            <a href=""><i class="fas fa-envelope me-2"></i> epielio2025@gmail.com</a>
+                            <a href=""><i class="fas fa-phone me-2"></i>+91 87143 99951</a>
                             <div>
                                 <div class="d-flex align-items-center">
                                 <a class="btn btn-light btn-md-square me-2" href="https://www.facebook.com/"><i class="fab fa-facebook-f"></i></a>
@@ -338,7 +362,11 @@
 
 
         <!-- Back to Top -->
-        <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="fa fa-arrow-up"></i></a>   
+        <!-- <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="fa fa-arrow-up"></i></a>    -->
+
+        <a href="{% url 'payment_history' %}" class="payment-history-btn" title="Payment History">
+            <i class="fas fa-history"></i>
+        </a>
 
         
     <!-- JavaScript Libraries -->

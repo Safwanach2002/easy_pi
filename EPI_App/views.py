@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import SignupForm, ProductSchemeForm, PaymentForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
@@ -23,10 +23,11 @@ def generate_referral_code():
     """Generate a unique 8-character referral code."""
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
+
 def signup_view(request):
     if request.user.is_authenticated:
-        return redirect('index')  # Redirect authenticated users to home
-
+        return redirect('index')
+    
     if request.method == 'POST':
         form = SignupForm(request.POST, request.FILES)
         if form.is_valid():
@@ -34,23 +35,10 @@ def signup_view(request):
             user.set_password(form.cleaned_data['password'])
             user.save()
 
-            # Generate a referral code for the new user
             referral_code = generate_referral_code()
-
-            # Check if a referral code was provided and validate it
-            referred_by_code = request.POST.get('referred_by', None)
-            referred_by_profile = None
-
-            if referred_by_code:
-                try:
-                    referred_by_profile = Profile.objects.get(referral_code=referred_by_code)
-                except Profile.DoesNotExist:
-                    return JsonResponse({
-                        'success': False,
-                        'message': 'Invalid referral code. Please check and try again.',
-                    })
-
-            # Create the user's profile
+            referred_by_code = request.POST.get('referred_by')
+            referred_by_profile = Profile.objects.filter(referral_code=referred_by_code).first()
+            
             profile = Profile.objects.create(
                 user=user,
                 referral_code=referral_code,
@@ -60,77 +48,37 @@ def signup_view(request):
                 pan_card=form.cleaned_data.get('pan_card'),
                 bank_passbook=form.cleaned_data.get('bank_passbook'),
             )
-
-            # If referred by someone, update their referral count and rewards
+            
             if referred_by_profile:
                 referred_by_profile.referrals_made += 1
-                referred_by_profile.rewards_earned += 10.00  # Example reward
+                referred_by_profile.rewards_earned += Decimal('10.00')
                 referred_by_profile.save()
-
-                # Create a referral record
                 Referral.objects.create(referred_by=referred_by_profile, referred_user=user)
-
-            # Log the user in
+            
             auth_login(request, user)
-
-            # Return success response with referral code
-            return JsonResponse({
-                'success': True,
-                'referral_code': referral_code,
-                'message': 'Signup successful! Welcome aboard!',
-            })
-        else:
-            # Process form errors and return them as JSON response
-            errors = {
-                field: [error['message'] for error in error_list]
-                for field, error_list in form.errors.get_json_data().items()
-            }
-            return JsonResponse({
-                'success': False,
-                'errors': errors,
-                'message': 'Please correct the errors below.',
-            })
-
-    else:
-        form = SignupForm()
-
-    return render(request, 'signup.html', {'form': form})
+            return JsonResponse({'success': True, 'referral_code': referral_code, 'message': 'Signup successful! Welcome aboard!'})
+        
+        errors = {field: error_list for field, error_list in form.errors.get_json_data().items()}
+        return JsonResponse({'success': False, 'errors': errors, 'message': 'Please correct the errors below.'})
+    
+    return render(request, 'signup.html', {'form': SignupForm()})
 
 @login_required
 def referral_view(request):
-    # Fetch the profile of the logged-in user
     profile = get_object_or_404(Profile, user=request.user)
-
-    # Initialize total rewards
-    total_rewards = Decimal('0')
-    referred_data = []
-
     referred_users = Profile.objects.filter(referred_by=profile)
-
-    # Fetch all referred investments for the logged-in user
     referred_investments = Investment.objects.filter(referred_user=request.user).select_related('product')
-
-
-    # Calculate total rewards by summing daily commissions for each active day
-    for investment in referred_investments:
-        if investment.start_date:
-            days_active = max((now().date() - investment.start_date).days, 0)  # Ensure non-negative days
-            commission = (investment.daily_investment or Decimal('0')) * Decimal('0.25') * days_active
-            total_rewards += commission
-
-            # Get product details
-            product_title = investment.product.title if investment.product else "Unknown"
-            daily_investment = investment.daily_investment or Decimal('0')
-
-            # Append structured data for the template
-            referred_data.append({
-                "name": investment.referred_user.get_full_name() or investment.referred_user.username,
-                "product": product_title,
-                "daily_investment": daily_investment,
-                "commission": commission,
-                "timestamp": investment.timestamp
-            })
-
+    
+    total_rewards = sum((inv.daily_investment or Decimal('0')) * Decimal('0.25') * max((now().date() - inv.start_date).days, 0) for inv in referred_investments)
+    
+    referred_data = [{
+        "name": inv.referred_user.get_full_name() or inv.referred_user.username,
+        "product": inv.product.title if inv.product else "Unknown",
+        "daily_investment": inv.daily_investment or Decimal('0'),
+        "commission": (inv.daily_investment or Decimal('0')) * Decimal('0.25') * max((now().date() - inv.start_date).days, 0),
+        "timestamp": inv.timestamp,
+    } for inv in referred_investments]
+    
     return render(request, 'reference.html', {
         'referral_code': profile.referral_code,
         'referrals_made': profile.referrals_made,
@@ -144,39 +92,29 @@ def submit_referral(request):
         try:
             data = json.loads(request.body)
             referral_code = data.get('referral_code')
-
-            # Validate the referral code
+            
             if not referral_code:
                 return JsonResponse({'success': False, 'message': 'Referral code is required.'})
-
-            # Check if the referral code exists
-            try:
-                referred_by_profile = Profile.objects.get(referral_code=referral_code)
-            except Profile.DoesNotExist:
+            
+            referred_by_profile = Profile.objects.filter(referral_code=referral_code).first()
+            if not referred_by_profile:
                 return JsonResponse({'success': False, 'message': 'Invalid referral code.'})
-
-            # Get the current user's profile
+            
             user_profile = request.user.profile
-
-            # Ensure the user is not referring themselves
             if user_profile == referred_by_profile:
                 return JsonResponse({'success': False, 'message': 'You cannot refer yourself.'})
-
-            # Update the referred_by field in the user's profile
+            
             user_profile.referred_by = referred_by_profile
             user_profile.save()
-
-            # Update the referrer's referral count and rewards
             referred_by_profile.referrals_made += 1
-            referred_by_profile.rewards_earned += Decimal('10.00')  # Convert float to Decimal
+            referred_by_profile.rewards_earned += Decimal('10.00')
             referred_by_profile.save()
-
+            
             return JsonResponse({'success': True, 'message': 'Referral code submitted successfully!'})
-
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)})
-
-    return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -218,7 +156,7 @@ def terms(request):
 def profile_view(request):
     # Fetch user profile data
     profile = request.user.profile
-    return render(request, 'profile.html', {'profile': profile})
+    return render(request, 'profile.html', {'profile': request.user.profile})
 
 def logout_view(request):
     logout(request)
@@ -244,8 +182,6 @@ def payment_view(request):
 @login_required
 def payment_success(request):
     return render(request, 'payment_success.html')
-
-
 
 @login_required 
 def product_scheme_manage(request):
@@ -319,7 +255,6 @@ def plans_view(request):
             
             needs_payment = False
             
-            # **Fix: Instead of summing 'amount', use 'investment' from ProductScheme**
             total_paid = approved_payments.count() * scheme.investment  # Payment count × investment per period
             balance = max(0, scheme.total - total_paid)  # Ensure balance doesn't go negative
 

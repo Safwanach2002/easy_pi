@@ -1,12 +1,14 @@
+from decimal import Decimal
 from django.contrib import admin
 from .models import Investment, Profile, Services, Referral, ProductScheme, Payment
 
 # Register your models here.
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'referral_code', 'referred_by', 'kyc_document_type', 'referrals_made', 'rewards_earned', 'pan_card', 'bank_passbook')
-    search_fields = ('user_username', 'referral_code', 'referred_byuser_username')
+    list_display = ('user', 'referral_code', 'referred_by', 'kyc_document_type', 'pan_card', 'bank_passbook', 'referrals_made', 'rewards_earned')
+    search_fields = ('user__username', 'referral_code', 'referred_by__username')  # Use double underscore for related fields
     list_filter = ('kyc_document_type', 'referred_by')
     readonly_fields = ('referral_code', 'referrals_made', 'rewards_earned')  # Prevent editing of these fields
+
     fieldsets = (
         ('User Information', {
             'fields': ('user', 'referral_code', 'referred_by'),
@@ -15,7 +17,7 @@ class ProfileAdmin(admin.ModelAdmin):
             'fields': ('kyc_document_type', 'kyc_document', 'pan_card', 'bank_passbook'),
         }),
         ('Referral Information', {
-            'fields': ('referrals_made', 'rewards_earned'),
+            'fields': ['referrals_made', 'rewards_earned'],  # Use a list to avoid tuple issues
         }),
     )
 
@@ -24,6 +26,13 @@ class ProfileAdmin(admin.ModelAdmin):
         if obj:  # Editing an existing object
             return self.readonly_fields + ('referral_code', 'referred_by')
         return self.readonly_fields
+
+    # Add an action to manually add rewards (if needed)
+    @admin.action(description="Add reward to selected users")
+    def add_rewards_to_selected(self, request, queryset):
+        for profile in queryset:
+            profile.add_rewards(Decimal('10.00'))  # Add a fixed reward amount
+            self.message_user(request, f"Rewards added to {profile.user.username}'s profile.")
 
 admin.site.register(Profile, ProfileAdmin)
 
@@ -73,10 +82,11 @@ class InvestmentAdmin(admin.ModelAdmin):
     list_display = ('product', 'referred_user', 'daily_investment', 'total_amount', 'days_to_complete')
     
     def product(self, obj):
-        return obj.product.title 
+        return obj.product.title if obj.product else "Unknown"
+
+admin.site.register(Investment, InvestmentAdmin)
 
 admin.site.register(Payment, PaymentAdmin)
 admin.site.register(Services,ServicesAdmin)
 admin.site.register(ProductScheme,ProductSchemeAdmin)
-admin.site.register(Investment,InvestmentAdmin)
 

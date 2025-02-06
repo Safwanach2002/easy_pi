@@ -112,11 +112,6 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['kyc_document_type', 'kyc_document', 'pan_card', 'bank_passbook']
-    
-class ProfileForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        fields = ['kyc_document_type', 'kyc_document', 'pan_card', 'bank_passbook']
 
 class ProductSchemeForm(forms.ModelForm):
     class Meta:
