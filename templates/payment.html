@@ -9,84 +9,160 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <style>
-        body {
-            background-color: #f4f7fc;
-            font-family: Arial, sans-serif;
-        }
+        /* Container for the entire payment section */
         .container {
-            margin-top: 50px;
-        }
-        .payment-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .payment-header h1 {
-            font-size: 36px;
-            font-weight: bold;
-            color: #333;
-        }
-        .form-group label {
-            font-weight: bold;
-            color: #555;
-        }
-        .payment-options {
-            background-color: #fff;
+            max-width: 800px;
+            margin: 50px auto;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .payment-options h3 {
-            font-size: 24px;
-            color: #007bff;
-        }
-        .payment-options ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        .payment-options li {
-            margin: 10px 0;
-            font-size: 18px;
-        }
-        .payment-options img {
-            max-width: 150px;
-            margin-bottom: 15px;
-        }
-        .submit-btn {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 30px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .submit-btn:hover {
-            background-color: #0056b3;
-        }
-        .payment-status {
-            margin-top: 30px;
-            text-align: center;
-        }
-        .payment-status p {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
+            background-color: #f1f9ff;  /* Light sky-blue background for container */
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
 
-        /* Media Queries for responsiveness */
-        @media (max-width: 768px) {
+        /* Header styling */
+        .payment-header h1 {
+            text-align: center;
+            color: #003366;  /* Navy blue for header */
+            font-family: 'Arial', sans-serif;
+            font-weight: 600;
+        }
+
+        /* Form styling */
+        form {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        form p {
+            font-size: 16px;
+            color: #003366;  /* Navy blue for form text */
+        }
+
+        /* Payment options styling */
+        .payment-options {
+            background-color: #e6f7ff;  /* Light sky blue background for options */
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .payment-options h3 {
+            color: #003366;  /* Navy blue for subheading */
+            font-size: 1.4em;
+            margin-bottom: 20px;
+        }
+
+        .payment-options ul {
+            list-style-type: none;
+            padding: 0;
+            color: #003366;  /* Navy blue for list items */
+        }
+
+        .payment-options li {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .payment-options li strong {
+            color: #0066cc;  /* Sky blue for strong text */
+        }
+
+        /* QR code image styling */
+        .payment-options img {
+        max-width: 250px;  /* Set a max width to ensure it doesn't stretch too large */
+        width: 100%;  /* Make the image responsive */
+        height: auto;  /* Maintain the aspect ratio */
+        margin: 10px auto;  /* Center the image horizontally */
+        display: block;
+        object-fit: contain;  /* Ensure the image doesn't get distorted */
+        }
+
+        /* Button styling */
+        .submit-btn {
+            background-color: #003366;  /* Navy blue for button */
+            color: white;
+            font-size: 18px;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background-color: #005599;  /* Slightly lighter navy blue on hover */
+        }
+
+        .submit-btn:active {
+            background-color: #003366;  /* Darker navy blue on active */
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-4 {
+            margin-top: 30px;
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
             .payment-header h1 {
-                font-size: 28px;
+                font-size: 1.4em;
             }
+
             .payment-options h3 {
-                font-size: 20px;
+                font-size: 1.2em;
             }
+
             .payment-options li {
-                font-size: 16px;
-            }
-            .submit-btn {
-                padding: 8px 25px;
                 font-size: 14px;
+            }
+
+            .submit-btn {
+                font-size: 16px;
+                padding: 10px;
+            }
+
+            /* QR code image adjustments */
+            .payment-options img {
+                max-width: 150px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .payment-header h1 {
+                font-size: 1.2em;
+            }
+
+            .payment-options h3 {
+                font-size: 1.1em;
+            }
+
+            .payment-options li {
+                font-size: 12px;
+            }
+
+            .submit-btn {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            .payment-options img {
+                max-width: 100px;
             }
         }
     </style>

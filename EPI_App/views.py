@@ -299,11 +299,23 @@ def payment_history(request):
         if scheme:
             try:
                 service = Services.objects.get(product_id=scheme.product_id)  # Fetch service details
+                
+                # Fetch the count of approved payments up to the current payment date
+                approved_payments_count = Payment.objects.filter(
+                    product_scheme=scheme, 
+                    payment_status='approved',
+                    created_at__lte=payment.created_at  # Count payments made up to the current payment date
+                ).count()
+
+                # Calculate the balance considering only the payments made up to the current date
+                total_paid = approved_payments_count * scheme.investment  # Approved payments till now
+                balance = max(0, scheme.total - total_paid)  # Correct balance calculation
+                
                 history.append({
                     'product_id': service.product_id,
                     'title': service.title,
                     'investment': scheme.investment,
-                    'balance': max(0, scheme.total - (scheme.investment * Payment.objects.filter(product_scheme=scheme, payment_status='approved').count())),
+                    'balance': balance,
                     'transaction_id': payment.transaction_id,
                     'payment_paid_date': payment.created_at,
                 })

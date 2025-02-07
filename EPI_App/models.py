@@ -3,10 +3,9 @@ from django.contrib.auth.models import User
 import string
 import random
 from django.utils.timezone import now
-from datetime import timedelta
+from datetime import timedelta, timezone
 from django.core.exceptions import ValidationError
 from decimal import Decimal
-
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
@@ -36,13 +35,29 @@ class Profile(models.Model):
         """Add a referral, update the referral count, and rewards."""
         if self.user == referred_user:
             raise ValidationError("You cannot refer yourself.")
+        
+        if referred_user.profile.referred_by:  # Check if the referred user already has a referrer
+            raise ValidationError("This user has already been referred by someone else.")
 
+        # Create a referral entry
         Referral.objects.create(referred_by=self, referred_user=referred_user)
+
+        # Increment the referral count
         self.referrals_made += 1
         self.save()
 
-        # Optionally, add a referral reward to the referrer's account
-        self.add_rewards(Decimal('10.00'))  # Example reward for a successful referral
+        # Calculate and add dynamic rewards based on the referred user's activity (e.g., daily investment)
+        daily_commission = self.calculate_daily_commission(referred_user)
+        self.add_rewards(daily_commission)
+
+    def calculate_daily_commission(self, referred_user):
+        """Calculate the daily commission based on the referred user's investments."""
+        today = timezone.now().date()
+        referred_user_investment = referred_user.investment_set.filter(date__date=today).aggregate(models.Sum('amount'))['amount__sum'] or 0
+        
+        # Example commission calculation: 25% of the referred user's total investment for the day
+        daily_commission = referred_user_investment * Decimal('0.25')
+        return daily_commission
 
     def add_rewards(self, amount):
         """Add rewards to the user's profile."""
@@ -51,7 +66,6 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
-
 
 
 class Referral(models.Model):
