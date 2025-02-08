@@ -235,13 +235,9 @@
                                 {% endif %}
                                 <div class="card-body">
                                     <h5 class="card-title">{{ plan.title }}</h5>
-        
-                                    <!-- Fold/Unfold Button -->
                                     <button class="btn btn-link toggle-details w-100" data-bs-toggle="collapse" data-bs-target="#details-{{ forloop.counter }}">
                                         View Details 
                                     </button>
-        
-                                    <!-- Collapsible Details Section -->
                                     <div class="collapse" id="details-{{ forloop.counter }}">
                                         <p><strong>Product ID:</strong> {{ plan.product_id }}</p>
                                         <p><strong>Investment:</strong> ₹{{ plan.investment }}</p>
@@ -261,14 +257,11 @@
                                         </p>
                                     </div>
                                 </div>
-        
-                                {% if plan.needs_payment %}
-                                    <div class="card-footer text-center">
-                                        <a href="{% url 'payment_view' %}" class="btn btn-primary w-100">
-                                            Pay Now
-                                        </a>
-                                    </div>
-                                {% endif %}
+                                <div class="card-footer text-center">
+                                    <a href="{% url 'paymentview' plan.id %}" class="btn btn-primary w-100">
+                                        Pay Now (₹{{ plan.investment }})
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     {% endfor %}
@@ -279,7 +272,6 @@
                 </div>
             {% endif %}
         </div>
-        
         {% endblock %}
 
         <!-- Footer Start -->

@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'EPI_Project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'easypi',
+        'ENGINE': 'mysql.connector.django',
+        'NAME': 'db1',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': 'MNpass@2025!',
         'HOST': 'localhost',
         'PORT': '3306'
     }
@@ -137,3 +137,6 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+RAZOR_KEY_ID = 'rzp_test_qMOzQiig3dXfhl'
+RAZOR_KEY_SECRET = 'Ux8MA6HhnyQlMVO4BgRLOVFk'

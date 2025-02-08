@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from EPI_App.views import login_view
+from EPI_App.views import payment_callback
 from EPI_App.views import welcome_page
 from django.conf.urls.static import static
 from django.urls import path
@@ -27,6 +28,7 @@ urlpatterns = [
     path('EPI_App/',include('EPI_App.urls')),
     path('', welcome_page, name='welcome'),
     path('login/',login_view, name='login'),
+    path('payment/callback/',payment_callback, name='payment_callback'),
 ]
 
 if settings.DEBUG:

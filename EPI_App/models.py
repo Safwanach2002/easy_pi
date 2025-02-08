@@ -172,3 +172,23 @@ class Investment(models.Model):
 
     def __str__(self):
         return f"{self.referred_user.username}'s investment"
+
+class PaymentOrder(models.Model):
+    order_id = models.CharField(max_length=100, unique=True)
+    amount = models.IntegerField()  # Amount in paise
+    currency = models.CharField(max_length=3, default='INR')
+    payment_id = models.CharField(max_length=100, blank=True)
+    payment_status = models.CharField(
+        max_length=20, 
+        choices=[
+            ('PENDING', 'Pending'),
+            ('SUCCESSFUL', 'Successful'),
+            ('FAILED', 'Failed')
+        ],
+        default='PENDING'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.order_id} - {self.payment_status}"

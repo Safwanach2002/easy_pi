@@ -20,4 +20,5 @@ urlpatterns = [
     path('plans/', views.plans_view, name='plans'),
     path('welcome/', views.welcome_page, name='welcome'),
     path('payment-history/', views.payment_history, name="payment_history"),
+    path('payment/<int:plan_id>/', views.paymentview, name='paymentview'),
 ]
