@@ -167,14 +167,13 @@
     text-align: center;
 }
 
-/* 🔹 Responsive Grid System */
-
 /* Default Bootstrap Grid for Desktop */
 .col-md-6 {
     flex: 0 0 50%;
     max-width: 50%;
 }
 
+/*  Responsive Grid System */
 @media (min-width: 992px) {
     /* 3 products per row for large screens */
     .col-md-6.col-lg-4 {
@@ -534,9 +533,6 @@
 
         // Add event listener to search input
         searchInput.addEventListener('input', filterProducts);
-
-
-
 
         document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".toggle-btn").forEach(button => {

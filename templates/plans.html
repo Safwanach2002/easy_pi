@@ -141,7 +141,6 @@
             }
         </style>
 
-
     </head>
     <body>
 
@@ -228,50 +227,45 @@
             {% if plans %}
                 <div class="row">
                     {% for plan in plans %}
-                        <div class="col-md-4">
-                            <div class="card mb-4 shadow-sm">
-                                {% if plan.img %}
-                                    <img src="{{ plan.img }}" class="card-img-top" alt="{{ plan.title }}">
-                                {% endif %}
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ plan.title }}</h5>
-        
-                                    <!-- Fold/Unfold Button -->
-                                    <button class="btn btn-link toggle-details w-100" data-bs-toggle="collapse" data-bs-target="#details-{{ forloop.counter }}">
-                                        View Details 
-                                    </button>
-        
-                                    <!-- Collapsible Details Section -->
-                                    <div class="collapse" id="details-{{ forloop.counter }}">
-                                        <p><strong>Product ID:</strong> {{ plan.product_id }}</p>
-                                        <p><strong>Investment:</strong> ₹{{ plan.investment }}</p>
-                                        <p><strong>Balance:</strong> ₹{{ plan.balance }}</p>
-                                        <p><strong>Remaining Days:</strong> {{ plan.remaining_days }} Day(s)</p>
-                                        <p>
-                                            <strong>Payment Status:</strong>
-                                            {% if plan.payment_status == "approved" %}
-                                                <span class="badge bg-success">Approved</span>
-                                            {% elif plan.payment_status == "pending" %}
-                                                <span class="badge bg-warning text-dark">Pending</span>
-                                            {% elif plan.payment_status == "rejected" %}
-                                                <span class="badge bg-danger">Rejected</span>
-                                            {% else %}
-                                                <span class="badge bg-secondary">Not Paid</span>
-                                            {% endif %}
-                                        </p>
-                                    </div>
+                    <div class="col-md-4">
+                        <div class="card mb-4 shadow-sm">
+                            {% if plan.img %}
+                                <img src="{{ plan.img }}" class="card-img-top" alt="{{ plan.title }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ plan.title }}</h5>
+                                <button class="btn btn-link toggle-details w-100" data-bs-toggle="collapse" data-bs-target="#details-{{ forloop.counter }}">
+                                    View Details 
+                                </button>
+                                <div class="collapse" id="details-{{ forloop.counter }}">
+                                    <p><strong>Investment:</strong> ₹{{ plan.investment }}</p>
+                                    <p><strong>Balance:</strong> ₹{{ plan.balance }}</p>
+                                    <p><strong>Remaining Days:</strong> {{ plan.remaining_days }} Day(s)</p>
+                                    <p>
+                                        <strong>Last Payment Status:</strong>
+                                        {% if plan.payment_status == "SUCCESSFUL" %}
+                                            <span class="badge bg-success">Successful</span>
+                                        {% elif plan.payment_status == "FAILED" %}
+                                            <span class="badge bg-warning text-dark">Failed</span>
+                                        {% elif plan.payment_status == "NOT_PAID" %}
+                                            <span class="badge bg-danger">Not Paid</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Pending</span>
+                                        {% endif %}
+                                    </p>
+                                    
+                                    <p><strong>Last Payment Date:</strong>{{ plan.last_payment_date }}</p>
                                 </div>
-        
-                                {% if plan.needs_payment %}
-                                    <div class="card-footer text-center">
-                                        <a href="{% url 'payment_view' %}" class="btn btn-primary w-100">
-                                            Pay Now
-                                        </a>
-                                    </div>
-                                {% endif %}
                             </div>
+                            <div class="card-footer text-center">
+                                <a href="{% url 'paymentview' plan.id %}?product_id={{ plan.product_id }}" class="btn btn-primary w-100">
+                                    Pay Now (₹{{ plan.investment }})
+                                </a>
+                            </div>                            
                         </div>
-                    {% endfor %}
+                    </div>
+                {% endfor %}
+                
                 </div>
             {% else %}
                 <div class="alert alert-info text-center" role="alert">
@@ -279,7 +273,6 @@
                 </div>
             {% endif %}
         </div>
-        
         {% endblock %}
 
         <!-- Footer Start -->

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Form</title>
+</head>
+<body>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="amount">Amount (in INR):</label>
+        <input type="number" name="amount" required>
+        <button type="submit">Pay Now</button>
+    </form>
+</body>
+</html>
