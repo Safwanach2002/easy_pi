@@ -189,7 +189,7 @@
 }
 
 .category-item img {
-    width: 80px; /* Adjust size */
+    width: 10px; /* Adjust size */
     height: 80px;
     border-radius: 50%;
     border: 2px solid #ddd;
@@ -198,6 +198,17 @@
 .category-item:hover {
     transform: scale(1.1);
 }
+.button-category {
+    cursor: pointer; /* Makes it behave like a button */
+    user-select: none; /* Prevents text selection */
+}
+
+/* Optional: Add a click effect */
+.button-category:active {
+    transform: scale(0.95); /* Slightly shrink on click for a press effect */
+}
+
+
 
 
 @media (min-width: 992px) {
@@ -300,15 +311,10 @@
         max-width: 33.33%;
     }
 }
-
-        
     </style>
     </head>
-    
-
     <body>
-
-        <!-- Spinner Start -->
+<!-- Spinner Start -->
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                 <span class="sr-only">Loading...</span>
@@ -404,25 +410,23 @@
             <div id="category-list" class="mt-2"></div>
         </div>
     </div>
-
+<!-- 
     <div id="category-container">
-        <div class="category-item" data-category="mobile">
-            
+        <div class="category-item button-category" data-category="mobile">
             <p>Mobiles</p>
         </div>
-        <div class="category-item" data-category="electronics">
-            
+        <div class="category-item button-category" data-category="electronics">
             <p>Electronics</p>
         </div>
-        <div class="category-item" data-category="furniture">
+        <div class="category-item button-category" data-category="furniture">
             <p>Furniture</p>
         </div>
-        <div class="category-item" data-category="Laptops">
+        <div class="category-item button-category" data-category="Laptops">
             <p>Laptops</p>
         </div>
     </div>
     
-    
+     -->
     {% for service in services %}
     <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;">
         <div class="product-card shadow-sm bg-white rounded overflow-hidden position-relative">
@@ -590,7 +594,7 @@
 
     // Toggle View Details Functionality
     document.querySelectorAll(".toggle-btn").forEach(button => {
-        button.addEventListener("click", function () {
+        button.addEventListener("click", function () {  
             let details = document.getElementById("details-" + this.dataset.id);
             details.classList.toggle("show");
 

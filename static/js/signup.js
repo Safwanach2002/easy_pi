@@ -101,7 +101,7 @@ function submitReferralCode() {
         if (data.success) {
             alert('Referral code submitted successfully!');
             closeReferralPopup();
-            window.location.href = '/'; // Redirect to home page
+            window.location.href = '/index/'; // Redirect to home page
         } else {
             alert('Error: ' + data.message);
         }
@@ -115,7 +115,7 @@ function submitReferralCode() {
 // Skip the referral process
 function skipReferral() {
     closeReferralPopup();
-    window.location.href = '/'; // Redirect to home page
+    window.location.href = '/index/'; // Redirect to home page
 }
 
 // Helper function to get CSRF token from cookies

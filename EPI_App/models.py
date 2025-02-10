@@ -11,6 +11,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     referral_code = models.CharField(max_length=8, unique=True, blank=True, null=True)
     referred_by = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True, related_name='referrals')
+    profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
     kyc_document = models.FileField(upload_to='kyc_documents/', blank=True, null=True)
     kyc_document_type = models.CharField(max_length=50, blank=True, null=True)
     pan_card = models.FileField(upload_to='pan_cards/', blank=True, null=True)

@@ -51,6 +51,7 @@ def signup_view(request):
             referral_code = generate_referral_code()
             referred_by_code = request.POST.get('referred_by')
             referred_by_profile = Profile.objects.filter(referral_code=referred_by_code).first()
+            profile_photo = request.FILES.get('profile_photo')
             
             profile = Profile.objects.create(
                 user=user,
@@ -60,6 +61,7 @@ def signup_view(request):
                 kyc_document_type=form.cleaned_data.get('kyc_document_type'),
                 pan_card=form.cleaned_data.get('pan_card'),
                 bank_passbook=form.cleaned_data.get('bank_passbook'),
+                profile_photo=profile_photo,
             )
             
             if referred_by_profile:

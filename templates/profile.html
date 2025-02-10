@@ -162,6 +162,15 @@
                 text-decoration: underline;
             }
 
+            /* Profile Photo Section */
+            .profile-photo img {
+                width: 100px;  /* Adjust the size */
+                height: 100px;  /* Adjust the size */
+                border-radius: 50%;
+                object-fit: cover;  /* Ensures the image fills the circle without distortion */
+                border: 3px solid #ddd; /* Optional: Add a border for a cleaner look */
+            }
+
             /* Logout Button */
             .logout-btn {
                 text-align: center;
@@ -181,15 +190,26 @@
                 background-color: #d32f2f;
             }
         </style>
+        
 
         <!-- Profile Container -->
         <div class="container mt-5">
             <div class="profile-container">
                 <div class="profile-header">
-                    <h2>Profile</h2>
+                      <!-- Profile Photo Section -->
+                      <h2>Profile</h2>
+                <div class="profile-photo">
+                    {% if profile.profile_photo %}
+                        <img src="{{ profile.profile_photo.url }}" alt="Profile Photo" class="img-fluid rounded-circle profile-img">
+                    {% else %}
+                        <img src="{% static 'img/defaultpro.jpg' %}" alt="Default Avatar" class="img-fluid rounded-circle profile-img">
+                    {% endif %}
+                    
+                </div>
                 </div>
                 <div class="profile-section">
-                    <h4>Profile Details</h4>
+                    <p>
+
                     <p><strong>Username:</strong> {{ user.username }}</p>
                     <p><strong>Email:</strong> {{ user.email }}</p>
                     <p><strong>Referral Code:</strong> {{ profile.referral_code }}</p>
@@ -233,6 +253,7 @@
                 </div>
             </div>
         </div>
+
 
         <!-- Footer Start -->
         <div class="container-fluid footer py-5 wow fadeIn" data-wow-delay="0.2s">

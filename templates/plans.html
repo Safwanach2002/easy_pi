@@ -140,7 +140,6 @@
                 }
             }
         </style>
-
     </head>
     <body>
 
@@ -258,10 +257,10 @@
                                 </div>
                             </div>
                             <div class="card-footer text-center">
-                                <a href="{% url 'paymentview' plan.id %}?product_id={{ plan.product_id }}&profile_id={{profile_id}}btn btn-primary w-100">
+                                <a href="{% url 'paymentview' plan.id %}?product_id={{ plan.product_id }}&profile_id={{profile_id}}" class="btn btn-primary w-100">
                                     Pay Now (₹{{ plan.investment }})
                                 </a>
-                            </div>                            
+                            </div>                           
                         </div>
                     </div>
                 {% endfor %}

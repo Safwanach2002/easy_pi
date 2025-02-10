@@ -4,20 +4,20 @@ from .models import Investment, Profile, Services, Referral, ProductScheme, Paym
 
 # Register your models here.
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'referral_code', 'referred_by', 'kyc_document_type', 'pan_card', 'bank_passbook', 'referrals_made', 'rewards_earned')
-    search_fields = ('user__username', 'referral_code', 'referred_by__username')  # Use double underscore for related fields
+    list_display = ('user', 'referral_code', 'referred_by', 'profile_photo', 'kyc_document_type', 'pan_card', 'bank_passbook', 'referrals_made', 'rewards_earned')
+    search_fields = ('user_username', 'referral_code', 'referred_by_username')  # Use double underscore for related fields
     list_filter = ('kyc_document_type', 'referred_by')
     readonly_fields = ('referral_code', 'referrals_made', 'rewards_earned')  # Prevent editing of these fields
 
     fieldsets = (
         ('User Information', {
-            'fields': ('user', 'referral_code', 'referred_by'),
+            'fields': ('user', 'referral_code', 'referred_by', 'profile_photo'),  # Include profile_photo here
         }),
         ('KYC Details', {
             'fields': ('kyc_document_type', 'kyc_document', 'pan_card', 'bank_passbook'),
         }),
         ('Referral Information', {
-            'fields': ['referrals_made', 'rewards_earned'],  # Use a list to avoid tuple issues
+            'fields': ['referrals_made', 'rewards_earned'],
         }),
     )
 
@@ -85,7 +85,6 @@ class InvestmentAdmin(admin.ModelAdmin):
         return obj.product.title if obj.product else "Unknown"
 
 admin.site.register(Investment, InvestmentAdmin)
-
 admin.site.register(Payment, PaymentAdmin)
 admin.site.register(Services,ServicesAdmin)
 admin.site.register(ProductScheme,ProductSchemeAdmin)

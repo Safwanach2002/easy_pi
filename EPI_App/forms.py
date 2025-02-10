@@ -50,6 +50,11 @@ class SignupForm(forms.ModelForm):
         label="Upload Bank Passbook",
         widget=forms.ClearableFileInput(attrs={'class': 'form-control'}),
     )
+    profile_photo = forms.FileField(
+        required=True,
+        label="Upload Profie",
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'}),
+    )
 
     class Meta:
         model = User
@@ -88,6 +93,19 @@ class SignupForm(forms.ModelForm):
             if not bank_passbook.name.lower().endswith(('.pdf', '.jpg', '.jpeg', '.png')):
                 raise ValidationError("Only PDF, JPG, JPEG, and PNG files are allowed.")
         return bank_passbook
+    
+    def clean_profile_photo(self):
+        profile_photo = self.cleaned_data.get('profile_photo')
+        if profile_photo:
+            # Limit the size to 1GB (1GB = 1024 * 1024 * 1024 bytes)
+            if profile_photo.size > 1 * 1024 * 1024 * 1024:  # 1GB
+                raise ValidationError("Profile photo size cannot exceed 1GB.")
+            
+            # Allow only specific file types: JPG, JPEG, PNG
+            if not profile_photo.name.lower().endswith(('.jpg', '.jpeg', '.png')):
+                raise ValidationError("Only JPG, JPEG, and PNG files are allowed for profile photo.")
+        
+        return profile_photo
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -111,7 +129,7 @@ class SignupForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['kyc_document_type', 'kyc_document', 'pan_card', 'bank_passbook']
+        fields = ['profile_photo','kyc_document_type', 'kyc_document', 'pan_card', 'bank_passbook']
 
 class ProductSchemeForm(forms.ModelForm):
     class Meta:

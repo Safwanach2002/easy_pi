@@ -17,13 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
-from EPI_App.views import welcome_page, payment_callback, login_view
+from EPI_App.views import welcome_page, payment_callback, login_view, index
 from django.conf.urls.static import static
 from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('EPI_App/',include('EPI_App.urls')),
+    path('index/',index,name='index'),
     path('', welcome_page, name='welcome'),
     path('login/',login_view, name='login'),
     path('payment/callback/',payment_callback, name='payment_callback'),

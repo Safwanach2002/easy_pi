@@ -212,9 +212,13 @@
         </div>
         <div class="card-body">
             <p><strong>Referral Code:</strong> <span id="referral-code">{{ referral_code }}</span></p>
-            <p><strong>Referrals Made:</strong> <span id="referrals-made" class="badge bg-success">{{ referrals_made }}</span></p>
+            <p><strong>Referrals Made:</strong> <span id="referrals-made" class="badge" style="background-color: #0dcaf0; color: white;">{{ referrals_made }}</span>
             <p><strong>Total Rewards Earned:</strong> ₹<span id="rewards-earned">{{ total_rewards|floatformat:2 }}</span>
-                <i class="fas fa-wallet fa-sm text-success" id="withdraw-icon" style="cursor: pointer;" title="Withdraw" data-bs-toggle="tooltip" data-bs-placement="top"></i>
+                <i class="fas fa-wallet fa-sm" id="withdraw-icon" style="cursor: pointer; color: #0dcaf0;" title="Withdraw" data-bs-toggle="tooltip" data-bs-placement="top"></i>
+                <i class="fas fa-exchange-alt fa-sm ms-2" id="convert-icon" style="cursor: pointer; color: #0dcaf0;" title="Convert" data-bs-toggle="tooltip" data-bs-placement="top"></i>
+            </p>
+            <p id="conversion-message" class="text-muted small d-none">
+                <i class="fas fa-info-circle"></i> Your rewards convert into your investment.
             </p>
             <button id="copy-link-btn" class="btn btn-primary me-2">Copy Referral Code</button>
             <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#shareModal">Share</button>
@@ -339,6 +343,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+document.getElementById("convert-icon").addEventListener("click", function () {
+        let message = document.getElementById("conversion-message");
+        message.classList.toggle("d-none");  // Toggle visibility
+    });
 
 function shareReferralCode(platform, code) {
     const referralLink = `https://epielio.com?code=${encodeURIComponent(code)}`;
