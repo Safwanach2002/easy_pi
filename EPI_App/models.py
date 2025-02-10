@@ -174,6 +174,7 @@ class Investment(models.Model):
         return f"{self.referred_user.username}'s investment"
 
 class PaymentOrder(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
     order_id = models.CharField(max_length=100, unique=True)
     product_id = models.CharField(max_length=100, null=True)
     amount = models.IntegerField()  # Amount in paise

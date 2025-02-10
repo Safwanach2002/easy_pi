@@ -167,13 +167,39 @@
     text-align: center;
 }
 
+/* 🔹 Responsive Grid System */
+
 /* Default Bootstrap Grid for Desktop */
 .col-md-6 {
     flex: 0 0 50%;
     max-width: 50%;
 }
 
-/*  Responsive Grid System */
+#category-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.category-item {
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.category-item img {
+    width: 80px; /* Adjust size */
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+}
+
+.category-item:hover {
+    transform: scale(1.1);
+}
+
+
 @media (min-width: 992px) {
     /* 3 products per row for large screens */
     .col-md-6.col-lg-4 {
@@ -297,8 +323,8 @@
                 <div class="row gx-0 align-items-center" style="height: 45px;">
                     <div class="col-lg-8 text-center text-lg-start mb-lg-0">
                         <div class="d-flex flex-wrap">
-                            <a href="#" class="text-muted me-4"><i class="fas fa-map-marker-alt text-primary me-2"></i>Kannur, Kerala</a>
-                            <a href="#" class="text-muted me-4"><i class="fas fa-phone-alt text-primary me-2"></i>+91 87143 99951</a>
+                            <a href="#" class="text-muted me-4"><i class="fas fa-map-marker-alt text-primary me-2"></i>Find A Location</a>
+                            <a href="#" class="text-muted me-4"><i class="fas fa-phone-alt text-primary me-2"></i>+91 6238 691 096</a>
                             <a href="#" class="text-muted me-0"><i class="fas fa-envelope text-primary me-2"></i>epielio2025@gmail.com</a>
                         </div>
                     </div>
@@ -368,12 +394,34 @@
 
 <div class="row">
     <!-- Search Bar -->
-    <div class="container mt-4">
-        <form method="GET" action="{% url 'services' %}" class="d-flex">
-            <input type="text" name="q" id="search-input" class="form-control me-2" placeholder="Search for a product..." value="{{ query }}">
-            <button type="submit" class="btn btn-primary">Search</button>
-        </form>
+    <div class="row">
+        <!-- Search Bar -->
+        <div class="container mt-4">
+            <form method="GET" action="{% url 'services' %}" class="d-flex">
+                <input type="text" name="q" id="search-input" class="form-control me-2" placeholder="Search for a product..." value="{{ query }}" oninput="showCategory()">
+                <button type="button" id="search-button" class="btn btn-primary">Search</button>
+            </form>
+            <div id="category-list" class="mt-2"></div>
+        </div>
     </div>
+
+    <div id="category-container">
+        <div class="category-item" data-category="mobile">
+            
+            <p>Mobiles</p>
+        </div>
+        <div class="category-item" data-category="electronics">
+            
+            <p>Electronics</p>
+        </div>
+        <div class="category-item" data-category="furniture">
+            <p>Furniture</p>
+        </div>
+        <div class="category-item" data-category="Laptops">
+            <p>Laptops</p>
+        </div>
+    </div>
+    
     
     {% for service in services %}
     <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;">
@@ -435,9 +483,9 @@
                     <div class="col-md-6 col-lg-6 col-xl-3">
                         <div class="footer-item d-flex flex-column">
                             <h4 class="text-white mb-4">Contact Info</h4>
-                            <a href=""><i class="fa fa-map-marker-alt me-2"></i>Kannur, Kerala</a>
-                            <a href=""><i class="fas fa-envelope me-2"></i> epielio2025@gmail.com</a>
-                            <a href=""><i class="fas fa-phone me-2"></i>+91 87143 99951</a>
+                            <a href=""><i class="fa fa-map-marker-alt me-2"></i> 123 Street, Kannur, Kerala</a>
+                            <a href=""><i class="fas fa-envelope me-2"></i> epi2025@gmail.com</a>
+                            <a href=""><i class="fas fa-phone me-2"></i> +012 345 67890</a>
                             <div>
                                 <div class="d-flex align-items-center">
                                 <a class="btn btn-light btn-md-square me-2" href="https://www.facebook.com/"><i class="fab fa-facebook-f"></i></a>
@@ -492,8 +540,6 @@
 
         
     <!-- JavaScript Libraries -->
-
-    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'lib/wow/wow.min.js' %}"></script>
@@ -507,50 +553,54 @@
     <script src="{% static 'js/main.js' %}"></script>
     <script>
         // Get the search input and products elements
-        const searchInput = document.getElementById('search-input');
-        const products = document.querySelectorAll('.product-card');
-        const noResults = document.getElementById('no-results');
+        document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("search-input");
+    const searchButton = document.getElementById("search-button");
+    const products = document.querySelectorAll(".product-card");
+    const noResults = document.getElementById("no-results");
 
-        // Function to filter products based on search input
-        function filterProducts() {
-        const inputValue = searchInput.value.toLowerCase();
+    function filterProducts() {
+        const inputValue = searchInput.value.toLowerCase().trim();
         let found = false;
+
         products.forEach(product => {
-            const productName = product.querySelector('.product-content h5').textContent.toLowerCase();
-            if (productName.startsWith(inputValue)) {
-            product.style.display = 'block';
-            found = true;
+            const productName = product.querySelector(".product-content h5").textContent.toLowerCase();
+
+            if (productName.includes(inputValue) || inputValue === '') {
+                product.style.display = "block";
+                found = true;
             } else {
-            product.style.display = 'none';
+                product.style.display = "none";
             }
         });
-        if (!found) {
-            noResults.style.display = 'block';
-        } else {
-            noResults.style.display = 'none';
-        }
-        }
 
-        // Add event listener to search input
-        searchInput.addEventListener('input', filterProducts);
+        noResults.style.display = found ? "none" : "block";
+    }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll(".toggle-btn").forEach(button => {
-                button.addEventListener("click", function () {
-                    let details = document.getElementById("details-" + this.dataset.id);
-                    details.classList.toggle("show");
-                    this.innerHTML = details.classList.contains("show") ? "Hide Details " : "View Details ";
-                });
-            });
-    
-            // Image Click for Toggle
-            document.querySelectorAll(".toggle-image").forEach(image => {
-                image.addEventListener("click", function () {
-                    let btn = this.closest(".product-card").querySelector(".toggle-btn");
-                    btn.click();  // Simulate button click when image is clicked
-                });
-            });
+    // Search button click event
+    searchButton.addEventListener("click", filterProducts);
+
+    // Enter key event for search
+    searchInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Prevent form submission
+            filterProducts();
+        }
+    });
+
+    // Toggle View Details Functionality
+    document.querySelectorAll(".toggle-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            let details = document.getElementById("details-" + this.dataset.id);
+            details.classList.toggle("show");
+
+            // Change button text dynamically
+            this.innerHTML = details.classList.contains("show") ? "Hide Details" : "View Details";
         });
+    });
+});
+  
+
     </script>
     </body>
 

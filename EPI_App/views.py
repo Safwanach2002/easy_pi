@@ -32,12 +32,10 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import ProductScheme, Services, PaymentOrder
 
-
 # Create your views here.
 def generate_referral_code():
     """Generate a unique 8-character referral code."""
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
-
 
 def signup_view(request):
     if request.user.is_authenticated:
@@ -152,8 +150,14 @@ def login_view(request):
 def about(request):
     return render(request,'about.html')
 
+def about1(request):
+    return render(request,'about1.html')
+
 def contact(request):
     return render(request,'contact.html')
+
+def contact1(request):
+    return render(request,'contact1.html')
 
 def reference(request):
     return render(request,'reference.html')
@@ -175,7 +179,7 @@ def profile_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('welcome')
 
 def services_view(request):
     services = Services.objects.all()
@@ -230,7 +234,7 @@ def product_scheme_manage(request):
             # The end_date will be automatically calculated in the model during save
             scheme.save()  # Save the scheme, which will also calculate the end_date
 
-            return redirect('payment_view')  # Redirect to the payment page
+            return redirect('plans')  # Redirect to the payment page
     else:
         # Pass initial values for product_id and total to the form
         form = ProductSchemeForm(initial={
@@ -403,13 +407,13 @@ def payment_history(request):
 #     context = {'plans': plans}
 #     return render(request, 'plans.html', context)
 
-
 def paymentview(request, plan_id):
     if request.method == 'GET':
         try:
             # Get the plan and amount
             plan = ProductScheme.objects.get(id=plan_id)
             product_id = request.GET.get('product_id')
+            profile = request.GET.get('profile')
             amount = int(plan.investment * 100)  # Convert to paise
             
             # Create Razorpay client and order
@@ -422,12 +426,14 @@ def paymentview(request, plan_id):
                 amount=amount,
                 currency='INR',
                 payment_status='PENDING',
-                product_id=product_id
+                product_id=product_id,
+                profile=profile,
             )
             
             # Prepare data for the frontend
             payment_data = {
                 'order_id': order['id'],
+                'profile': profile,
                 'amount': amount,
                 'currency': 'INR',
                 'key': settings.RAZOR_KEY_ID,
@@ -442,7 +448,6 @@ def paymentview(request, plan_id):
             return JsonResponse({'error': str(e)}, status=400)
     
     return HttpResponseBadRequest()
-
 
 @login_required
 def plans_view(request):
@@ -486,6 +491,7 @@ def plans_view(request):
 
             plans.append({
                 'id': scheme.id,
+                'profile': profile,
                 'img': service.img.url if service.img else None,
                 'product_id': scheme.product_id,
                 'title': service.title,
@@ -501,8 +507,6 @@ def plans_view(request):
             continue
 
     return render(request, 'plans.html', {'plans': plans})
-
-
 
 @csrf_exempt
 def payment_callback(request):
