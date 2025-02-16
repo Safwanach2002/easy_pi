@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import ProfileUpdateForm, SignupForm, ProductSchemeForm
 from django.contrib.auth.forms import AuthenticationForm
@@ -297,6 +298,10 @@ def upto_view(request):
    return render(request, 'upto.html')
 
 @login_required
+def comingsoon_view(request):
+   return render(request, 'coming_soon.html')
+
+@login_required
 def payment_history(request):
     profile = request.user.profile  # Get the logged-in user's profile
 
@@ -304,43 +309,52 @@ def payment_history(request):
     payments = PaymentOrder.objects.filter(profile=profile, payment_status='SUCCESSFUL').order_by('created_at')
 
     history = []
+    daily_payment_tracker = defaultdict(int)  # Tracks total paid on each day
 
     for payment in payments:
         try:
             scheme = ProductScheme.objects.get(product_id=payment.product_id)
-            service = Services.objects.get(product_id=payment.product_id)
+            try:
+                service = Services.objects.get(product_id=payment.product_id)
+                scheme_type = 'service'
+            except Services.DoesNotExist:
+                try:
+                    service = Combo.objects.get(product_id=payment.product_id)
+                    scheme_type = 'combo'
+                except Combo.DoesNotExist:
+                    continue
 
-            # Get the date of this specific payment
+            # Get the payment date (converted to local timezone)
             payment_date = payment.created_at.astimezone(get_current_timezone()).date()
 
-            # Fetch only successful payments **made up to this date**
-            approved_payments = PaymentOrder.objects.filter(
-                product_id=scheme.product_id,
-                payment_status='SUCCESSFUL',
-                created_at__date__lte=payment_date  # Only payments made up to this date
-            )
+            # Track daily payments
+            daily_payment_tracker[payment_date] += payment.amount
 
-            # Calculate total paid as of this payment date
-            total_paid = sum(p.amount for p in approved_payments)
+            # Get all unique dates where payments were made
+            unique_payment_dates = sorted(daily_payment_tracker.keys())
+
+            # Compute cumulative balance and remaining days
+            total_paid = sum(daily_payment_tracker[d] for d in unique_payment_dates if d <= payment_date)
             balance = max(0, scheme.total - total_paid)
 
-            # Calculate remaining days as of this payment date
+            # Remaining days based on payments made
             total_duration = (scheme.end_date - scheme.start_date).days
-            remaining_days = max(0, total_duration - approved_payments.count())
+            remaining_days = max(0, total_duration - len(unique_payment_dates))
 
             history.append({
-                'payment_date': payment_date,  # Show actual payment date
+                'payment_date': payment_date,
                 'plan': {
                     'title': service.title,
-                    'investment': scheme.investment,  
-                    'balance': balance,  # Balance based on the payment date
-                    'remaining_days': remaining_days,  # Remaining days based on the payment date
+                    'investment': scheme.investment,
+                    'balance': balance,  # Updated balance as of this payment date
+                    'remaining_days': remaining_days,  # Remaining days updates dynamically
                     'last_payment_date': payment_date,
                 },
                 'service_total': scheme.total,
+                'scheme_type': scheme_type,
             })
 
-        except (Services.DoesNotExist, ProductScheme.DoesNotExist):
+        except (ProductScheme.DoesNotExist, Services.DoesNotExist, Combo.DoesNotExist):
             continue
 
     return render(request, "payment_history.html", {"payment_history": history})
@@ -404,54 +418,50 @@ def plans_view(request):
     for scheme in product_schemes:
         try:
             service = Services.objects.get(product_id=scheme.product_id)
-            approved_payments = PaymentOrder.objects.filter(product_id=scheme.product_id, payment_status='SUCCESSFUL')
-
-            # Fetch the latest payment
-            latest_payment = PaymentOrder.objects.filter(product_id=scheme.product_id).order_by('-created_at').first()
-
-            # Default values
-            payment_status = 'NOT_PAID'
-            needs_payment = True  # Assume payment is needed unless proven otherwise
-            last_payment_date = None
-            total_paid = approved_payments.count() * scheme.investment
-            balance = max(0, scheme.total - total_paid)
-
-            if latest_payment:
-                payment_status = latest_payment.payment_status
-                # last_payment_date = latest_payment.created_at.date()
-                last_payment_date = latest_payment.created_at.astimezone(tz = get_current_timezone()).date()
-
-                # Enable payment if:
-                # 1. Payment failed
-                # 2. Last successful payment is older than today
-                needs_payment = payment_status == 'FAILED' or (payment_status == 'SUCCESSFUL' and last_payment_date < today)
-            else:
-                # No payments made yet
-                payment_status = 'NOT_PAID'
-                needs_payment = True
-
-            # Calculate remaining days
-            total_duration = (scheme.end_date - scheme.start_date).days
-            remaining_days = max(0, total_duration - approved_payments.count())
-
-            plans.append({
-                'id': scheme.id,
-                'profile': profile,
-                'img': service.img.url if service.img else None,
-                'product_id': scheme.product_id,
-                'title': service.title,
-                'investment': scheme.investment,
-                'balance': balance,
-                'remaining_days': remaining_days,
-                'payment_status': payment_status,
-                'needs_payment': needs_payment,
-                'last_payment_date': last_payment_date if last_payment_date else "No Payment Made",
-            })
-        
+            scheme_type = 'service'
         except Services.DoesNotExist:
-            continue
+            try:
+                service = Combo.objects.get(product_id=scheme.product_id)
+                scheme_type = 'combo'
+            except Combo.DoesNotExist:
+                continue
+
+        approved_payments = PaymentOrder.objects.filter(product_id=scheme.product_id, payment_status='SUCCESSFUL')
+        latest_payment = PaymentOrder.objects.filter(product_id=scheme.product_id).order_by('-created_at').first()
+
+        payment_status = 'NOT_PAID'
+        needs_payment = True
+        last_payment_date = None
+        total_paid = approved_payments.count() * scheme.investment
+        balance = max(0, scheme.total - total_paid)
+
+        if latest_payment:
+            payment_status = latest_payment.payment_status
+            last_payment_date = latest_payment.created_at.astimezone(tz=get_current_timezone()).date()
+            needs_payment = payment_status == 'FAILED' or (payment_status == 'SUCCESSFUL' and last_payment_date < today)
+        else:
+            needs_payment = True
+
+        total_duration = (scheme.end_date - scheme.start_date).days
+        remaining_days = max(0, total_duration - approved_payments.count())
+
+        plans.append({
+            'id': scheme.id,
+            'profile': profile,
+            'img': service.img.url if service.img else None,
+            'product_id': scheme.product_id,
+            'title': service.title,
+            'investment': scheme.investment,
+            'balance': balance,
+            'remaining_days': remaining_days,
+            'payment_status': payment_status,
+            'needs_payment': needs_payment,
+            'last_payment_date': last_payment_date if last_payment_date else "No Payment Made",
+            'scheme_type': scheme_type,
+        })
 
     return render(request, 'plans.html', {'plans': plans})
+
 
 @login_required
 def edit_profile(request):

@@ -33,337 +33,393 @@
 
     <style>
         /* General Product Card Styling */
-.product-card {
-    border-radius: 10px;
-    overflow: hidden;
-    background: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    margin-bottom: 20px;
-}
+        .product-card {
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            margin-bottom: 20px;
+        }
 
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-}
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
 
-/* Product Image */
-.product-img {
-    position: relative;
-    overflow: hidden;
-    border-bottom: 2px solid #ddd;
-}
+        /* Product Image */
+        .product-img {
+            position: relative;
+            overflow: hidden;
+            border-bottom: 2px solid #ddd;
+        }
 
-.product-img img {
-    width: 100%;
-    height: auto; /* Ensure image scales properly */
-    object-fit: cover;
-    transition: transform 0.3s ease-in-out;
-}
+        .product-img img {
+            width: 100%;
+            height: auto; /* Ensure image scales properly */
+            object-fit: cover;
+            transition: transform 0.3s ease-in-out;
+        }
 
-.product-card:hover .product-img img {
-    transform: scale(1.05);
-}
+        .product-card:hover .product-img img {
+            transform: scale(1.05);
+        }
 
-/* Hover Overlay */
-.product-img .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        /* Hover Overlay */
+        .product-img .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.product-card:hover .overlay {
-    opacity: 1;
-}
+        .product-card:hover .overlay {
+            opacity: 1;
+        }
 
-/* Overlay Button */
-.product-img .overlay a {
-    color: white;
-    background: #007bff;
-    padding: 8px 16px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-weight: bold;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-    transform: translateY(10px);
-}
+        /* Overlay Button */
+        .product-img .overlay a {
+            color: white;
+            background: #007bff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transform: translateY(10px);
+        }
 
-.product-card:hover .overlay a {
-    opacity: 1;
-    transform: translateY(0);
-}
+        .product-card:hover .overlay a {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-/* Product Content */
-.product-content {
-    text-align: center;
-    padding: 15px;
-}
+        /* Product Content */
+        .product-content {
+            text-align: center;
+            padding: 15px;
+        }
 
-.product-content h5 {
-    font-weight: 600;
-    font-size: 18px;
-    margin-bottom: 8px;
-}
+        .product-content h5 {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
 
-.product-content p {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 10px;
-}
+        .product-content p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+        }
 
-/* Product Price */
-.product-price {
-    font-size: 16px;
-    font-weight: bold;
-    color: #007bff;
-}
+        /* Product Price */
+        .product-price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #007bff;
+        }
 
-/* Add Button */
-.add-button {
-    display: inline-block;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    border-radius: 20px;
-    background: #007bff;
-    color: white;
-    text-decoration: none;
-    transition: background 0.3s ease-in-out;
-}
+        /* Add Button */
+        .add-button {
+            display: inline-block;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-radius: 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s ease-in-out;
+        }
 
-.add-button:hover {
-    background: #0056b3;
-}
+        .add-button:hover {
+            background: #0056b3;
+        }
 
-.details {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out, padding 0.3s ease;
-    padding: 0 15px;
-}
+        .details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            padding: 0 15px;
+        }
 
-.details.show {
-    max-height: 200px;
-    padding: 10px 15px;
-}
+        .details.show {
+            max-height: 200px;
+            padding: 10px 15px;
+        }
 
-.toggle-btn {
-    background: none;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    outline: none;
-    padding: 5px;
-    text-align: center;
-}
-/* Category section */
-#category-container {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
-}
+        .toggle-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            outline: none;
+            padding: 5px;
+            text-align: center;
+        }
 
-.category-item {
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-    width: auto; /* Adjust width dynamically */
-    min-width: 100px; /* Ensures button doesn't become too small */
-    margin: 5px;
-}
+        /* Default Bootstrap Grid for Desktop */
+        .col-md-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
 
-.category-item img {
-    width: 40px; /* Adjusted for mobile view */
-    height: auto;
-    max-width: 100%; /* Makes sure it scales correctly */
-}
+        #category-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
 
-.category-item:hover {
-    transform: scale(1.1);
-}
+        }
 
-.button-category {
-    cursor: pointer;
-    user-select: none;
-}
+        .category-item {
+            
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
 
-.button-category:active {
-    transform: scale(0.95);
-}
+        .category-item img {
+            width: 10px; /* Adjust size */
+            height: 80px;
+        }
 
-/* Mobile adjustments */
-@media screen and (max-width: 768px) {
-    /* Hide category items on mobile */
-    .category-item {
-        display: none;
-    }
+        .category-item:hover {
+            transform: scale(1.1);
+        }
+        .button-category {
+            cursor: pointer; /* Makes it behave like a button */
+            user-select: none; /* Prevents text selection */
+        }
 
-    /* Show the dropdown on mobile */
-    #category-dropdown {
-        display: block;
-        width: 100%;
-        padding: 10px;
-        font-size: 14px;
-        border: 1px solid #ddd; /* Optional, to match the button style */
-        background-color: #fff;
-    }
-}
+        /* Optional: Add a click effect */
+        .button-category:active {
+            transform: scale(0.95); /* Slightly shrink on click for a press effect */
+        }
 
-/* Desktop view - Hide the dropdown */
-@media screen and (min-width: 769px) {
-    #category-dropdown {
-        display: none; /* Hide dropdown on desktop */
-    }
-}
+        .category-item {
+            padding: 5px 16px; /* Less vertical padding */
+            color: #FFFFFF(216, 214, 214); /* Ensure text is visible */
+            font-weight: bold;
+            text-align: center;
+            margin: 5px;
+            width: auto; /* Adjust width dynamically */
+            min-width: 100px; /* Ensures button doesn't become too small */
+            min-height: 40px; /* Set a standard height */
+            display: flex;
+            flex-direction: column; /* Stack content vertically */
+            align-items: center; /* Center items horizontally */
+            justify-content: center; /* Center content vertically */
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            line-height: 1.2; /* Adjust line height */
+        }
 
-@media screen and (max-width: 480px) {
-    .category-item {
-        font-size: 12px; /* Adjust text size for smaller screens */
-        padding: 6px 12px; /* Adjust padding for tighter space */
-        min-width: 80px; /* Ensure items don't shrink too much */
-    }
+        /* Ensure the text inside is centered */
+        .category-item p {
+            margin: 0; /* Remove default margins */
+            padding: 0;
+            text-align: center;
+            font-size: 14px; /* Adjust text size */
+        }
 
-    .category-item img {
-        width: 40px; /* Even smaller size for images */
-    }
+        /* Optional: Add a hover effect */
+        .category-item:hover {
+            text-decoration: underline;/* Slightly darker blue */
+            color: #44d2f6;
+        box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3); /* Enhanced shadow effect */
+        }
 
-    /* Optionally adjust button styles for mobile */
-    .button-category {
-        padding: 8px 16px; /* Adjust button size for smaller screens */
-    }
-}
+        /* Category section */
+        #category-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
 
-/* Optional hover effect for larger screens */
-.category-item:hover {
-    text-decoration: underline;
-    color: #44d2f6;
-    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
-}
+        .category-item {
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            width: auto;
+            min-width: 100px;
+            margin: 5px;
+        }
 
+        .category-item img {
+            width: 40px;
+            height: auto;
+            max-width: 100%;
+        }
 
+        .category-item:hover {
+            transform: scale(1.1);
+        }
 
-/* 🔹 Responsive Grid System */
+        .button-category {
+            cursor: pointer;
+            user-select: none;
+        }
 
-/* Default Bootstrap Grid for Desktop */
-.col-md-6 {
-    flex: 0 0 50%;
-    max-width: 50%;
-}
+        .button-category:active {
+            transform: scale(0.95);
+        }
 
+        /* Mobile adjustments */
+        @media screen and (max-width: 768px) {
+            .category-item {
+                display: none;
+            }
+            #category-dropdown {
+                display: block;
+                width: 100%;
+                padding: 10px;
+                font-size: 14px;
+                border: 1px solid #ddd;
+                background-color: #fff;
+            }
+        }
 
+        /* Desktop view - Hide the dropdown */
+        @media screen and (min-width: 769px) {
+            #category-dropdown {
+                display: none;
+            }
+        }
 
-@media (min-width: 992px) {
-    /* 3 products per row for large screens */
-    .col-md-6.col-lg-4 {
-        flex: 0 0 33.3333%;
-        max-width: 33.3333%;
-    }
-}
+        @media screen and (max-width: 480px) {
+            .category-item {
+                font-size: 12px;
+                padding: 6px 12px;
+                min-width: 80px;
+            }
 
-@media (min-width: 1200px) {
-    /* 4 products per row for extra-large screens */
-    .col-md-6.col-lg-4.col-xl-3 {
-        flex: 0 0 25%;
-        max-width: 25%;
-    }
-}
+            .category-item img {
+                width: 40px;
+            }
 
-/* Mobile Layout Adjustments */
-@media (max-width: 768px) {
-    /* 3 products per row on medium screens like tablets */
-    .col-md-6 {
-        flex: 0 0 33.33%;
-        max-width: 33.33%;
-    }
-    .product-card {
-        margin-bottom: 20px;
-    }
-    .product-content h5 {
-        font-size: 16px;
-    }
-    .product-content p {
-        font-size: 13px;
-    }
-    .product-price {
-        font-size: 14px;
-    }
-    .add-button {
-        font-size: 12px;
-    }
-}
+            .button-category {
+                padding: 8px 16px;
+            }
+        }
 
-/* Mobile Layout for screens under 576px (e.g., small smartphones) */
-@media (max-width: 576px) {
-    /* 3 products per row on small mobile devices */
-    .col-md-6 {
-        flex: 0 0 33.33%;
-        max-width: 33.33%;
-    }
-    .product-card {
-        margin-bottom: 20px;
-    }
-    .product-content h5 {
-        font-size: 14px;
-    }
-    .product-content p {
-        font-size: 12px;
-    }
-    .product-price {
-        font-size: 13px;
-    }
-    .add-button {
-        font-size: 12px;
-        padding: 6px 12px;
-    }
-}
+        /* Optional hover effect for larger screens */
+        .category-item:hover {
+            text-decoration: underline;
+            color: #44d2f6;
+            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+        }
 
-/* Smallest Devices (less than 500px) */
-@media (max-width: 500px) {
-    .col-md-6 {
-        flex: 0 0 33.33%;
-        max-width: 33.33%; /* Still show 3 cards per row on very small screens */
-    }
-    .product-img img {
-        height: 200px; /* Smaller image height */
-    }
-}
+        @media (min-width: 992px) {
+            /* 3 products per row for large screens */
+            .col-md-6.col-lg-4 {
+                flex: 0 0 33.3333%;
+                max-width: 33.3333%;
+            }
+        }
 
+        @media (min-width: 1200px) {
+            /* 4 products per row for extra-large screens */
+            .col-md-6.col-lg-4.col-xl-3 {
+                flex: 0 0 25%;
+                max-width: 25%;
+            }
+        }
 
-/* Mobile (up to 576px) */
-@media (max-width: 576px) {
-    .col-md-6 {
-        flex: 0 0 50%; /* 2 products per row on small screens */
-        max-width: 50%;
-    }
-}
+        /* Mobile Layout Adjustments */
+        @media (max-width: 768px) {
+            /* 3 products per row on medium screens like tablets */
+            .col-md-6 {
+                flex: 0 0 33.33%;
+                max-width: 33.33%;
+            }
+            .product-card {
+                margin-bottom: 20px;
+            }
+            .product-content h5 {
+                font-size: 16px;
+            }
+            .product-content p {
+                font-size: 13px;
+            }
+            .product-price {
+                font-size: 14px;
+            }
+            .add-button {
+                font-size: 12px;
+            }
+        }
 
-/* Tablet (576px - 768px) */
-@media (max-width: 768px) {
-    .col-md-6 {
-        flex: 0 0 50%; /* 2 products per row on tablet */
-        max-width: 50%;
-    }
-}
+        /* Mobile Layout for screens under 576px (e.g., small smartphones) */
+        @media (max-width: 576px) {
+            /* 3 products per row on small mobile devices */
+            .col-md-6 {
+                flex: 0 0 33.33%;
+                max-width: 33.33%;
+            }
+            .product-card {
+                margin-bottom: 20px;
+            }
+            .product-content h5 {
+                font-size: 14px;
+            }
+            .product-content p {
+                font-size: 12px;
+            }
+            .product-price {
+                font-size: 13px;
+            }
+            .add-button {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
 
-/* Desktop (above 768px) */
-@media (min-width: 768px) {
-    .col-md-6 {
-        flex: 0 0 33.33%; /* 3 products per row on desktop */
-        max-width: 33.33%;
-    }
-}
+        /* Smallest Devices (less than 500px) */
+        @media (max-width: 500px) {
+            .col-md-6 {
+                flex: 0 0 33.33%;
+                max-width: 33.33%; /* Still show 3 cards per row on very small screens */
+            }
+            .product-img img {
+                height: 200px; /* Smaller image height */
+            }
+        }
+
+        /* Mobile (up to 576px) */
+        @media (max-width: 576px) {
+            .col-md-6 {
+                flex: 0 0 50%; /* 2 products per row on small screens */
+                max-width: 50%;
+            }
+        }
+
+        /* Tablet (576px - 768px) */
+        @media (max-width: 768px) {
+            .col-md-6 {
+                flex: 0 0 50%; /* 2 products per row on tablet */
+                max-width: 50%;
+            }
+        }
+
+        /* Desktop (above 768px) */
+        @media (min-width: 768px) {
+            .col-md-6 {
+                flex: 0 0 33.33%; /* 3 products per row on desktop */
+                max-width: 33.33%;
+            }
+        }
 
     </style>
     </head>
@@ -427,7 +483,7 @@
                                     <a href="{% url 'services' %}" class="dropdown-item">All Items</a>
                                     <a href="{% url 'combo' %}" class="dropdown-item">Combo Set</a>
                                     <a href="{% url 'upto' %}" class="dropdown-item">Upto 22</a>
-                                    <a href="" class="dropdown-item">Coming Soon</a>
+                                    <a href="{% url 'coming_soon' %}" class="dropdown-item">Coming Soon</a>
                                     <!-- <a href="404.html" class="dropdown-item">404 Page</a> -->
                                 </div>
                             </div>
@@ -457,61 +513,83 @@
         </div>
         <!-- Header End -->
 
-            <!-- Add this right above the product listing section -->
-            <div id="no-results" style="display: none;">No products found</div>
-                <div class="row">
-                    <!-- Search Bar -->
-                    <div class="container mt-4">
-                        <form method="GET" action="{% url 'combo' %}" class="d-flex">
-                            <input type="text" name="q" id="search-input" class="form-control me-2" placeholder="Search for a product..." value="{{ query }}" oninput="showCategory()">
-                            <button type="button" id="search-button" class="btn btn-primary">Search</button>
-                        </form>
-            
-                        <select id="category-dropdown" class="category-dropdown" style="display: none;">
-                            <option value="" disabled selected>Select Category</option>
-                            <option value="mobiles">Mobiles</option>
-                            <option value="electronics">Electronics</option>
-                            <option value="home_kitchen">Home & Kitchen</option>
-                            <option value="fashion">Fashion</option>
-                            <option value="books">Books</option>
-                        </select>
-                    </div>
-                </div>
-            
-                {% for i in combo %}
-                <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;" data-category="{{ service.category }}">
-                    <div class="product-card shadow-sm bg-white rounded overflow-hidden position-relative">
-                        <!-- Image Section -->
-                        <div class="product-img position-relative">
-                            <img src="{{ i.img.url }}" class="img-fluid w-100 toggle-image" alt="{{ i.title }}" 
-                                style="height: 250px; object-fit: cover; cursor: pointer;">
-                            <div class="overlay d-flex align-items-center justify-content-center">
-                                <a href="{% url 'product_scheme_combo' %}?id={{ i.id }}&total={{ i.total }}" 
-                                class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
-                            </div>
-                        </div>
-                
-                        <!-- Product Title -->
-                        <div class="product-content p-3">
-                            <h5 class="mb-2 text-dark">{{ i.title }}</h5>
-                            
-                            <!-- <p class="text-muted small">Category: {{ service.get_category_display }}</p> -->
-                            <p class="h5 text-primary">₹{{ i.total }}</p>
-                
-                            <!-- Toggle Button -->
-                            <button class="toggle-btn btn btn-link w-100 text-primary" data-id="{{ forloop.counter }}">
-                                View Details 
-                            </button>
-                
-                            <!-- Collapsible Details Section -->
-                            <div class="details" id="details-{{ forloop.counter }}">
-                                <p class="text-muted small">{{ i.desc }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
+<!-- Add this right above the product listing section -->
+<div id="no-results" style="display: none;">No products found</div>
+
+    <div class="row">
+        <!-- Search Bar -->
+        <div class="container mt-4">
+            <form method="GET" action="{% url 'combo' %}" class="d-flex">
+                <input type="text" name="q" id="search-input" class="form-control me-2" placeholder="Search for a product..." value="{{ query }}" oninput="showCategory()">
+                <button type="button" id="search-button" class="btn btn-primary">Search</button>
+            </form>
+            <div id="category-list" class="mt-2"></div>
         </div>
+
+
+        <div id="category-container" style="display: none;">
+            <!-- Desktop view (flex display) -->
+            <div class="category-item button-category" data-category="mobiles">
+                <p>Mobiles</p>
+            </div>
+            <div class="category-item button-category" data-category="electronics">
+                <p>Electronics</p>
+            </div>
+            <div class="category-item button-category" data-category="home_kitchen">
+                <p>Home & Kitchen</p>
+            </div>
+            <div class="category-item button-category" data-category="fashion">
+                <p>Fashion</p>
+            </div>
+            <div class="category-item button-category" data-category="books">
+                <p>Books</p>
+            </div> 
+
+            <!-- Mobile view dropdown -->
+            <select id="category-dropdown" class="category-dropdown" style="display: none;">
+                <option value="" disabled selected>Select Category</option>
+                <option value="mobiles">Mobiles</option>
+                <option value="electronics">Electronics</option>
+                <option value="home_kitchen">Home & Kitchen</option>
+                <option value="fashion">Fashion</option>
+                <option value="books">Books</option>
+                <option value="others">Other</option>
+            </select>
+        </div>
+        
+        {% for i in combo %}
+        <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;" data-category="{{ service.category }}">
+            <div class="product-card shadow-sm bg-white rounded overflow-hidden position-relative">
+                <!-- Image Section -->
+                <div class="product-img position-relative">
+                    <img src="{{ i.img.url }}" class="img-fluid w-100 toggle-image" alt="{{ i.title }}" 
+                        style="height: 250px; object-fit: cover; cursor: pointer;">
+                    <div class="overlay d-flex align-items-center justify-content-center">
+                        <a href="{% url 'product_scheme_combo' %}?id={{ i.id }}&total={{ i.total }}" 
+                        class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
+                    </div>
+                </div>
+        
+                <!-- Product Title -->
+                <div class="product-content p-3">
+                    <h5 class="mb-2 text-dark">{{ i.title }}</h5>
+                    
+                    <!-- <p class="text-muted small">Category: {{ service.get_category_display }}</p> -->
+                    <p class="h5 text-primary">₹{{ i.total }}</p>
+        
+                    <!-- Toggle Button -->
+                    <button class="toggle-btn btn btn-link w-100 text-primary" data-id="{{ forloop.counter }}">
+                        View Details 
+                    </button>
+        
+                    <!-- Collapsible Details Section -->
+                    <div class="details" id="details-{{ forloop.counter }}">
+                        <p class="text-muted small">{{ i.desc }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
     </div>
 </div>
 
@@ -609,6 +687,7 @@
 
     <script src="{% static 'js/main.js' %}"></script>
     <script>
+
         document.addEventListener("DOMContentLoaded", function () {
             const searchInput = document.getElementById("search-input");
             const searchButton = document.getElementById("search-button");

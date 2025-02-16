@@ -22,6 +22,7 @@ urlpatterns = [
     path('plans/', views.plans_view, name='plans'),
     path('welcome/', views.welcome_page, name='welcome'),
     path('upto/', views.upto_view, name='upto'),
+    path('coming-soon/', views.comingsoon_view, name='coming_soon'),
     path('combo/', views.combo_view, name='combo'),
     path('payment-history/', views.payment_history, name="payment_history"),
     path('payment/<int:plan_id>/', views.paymentview, name='paymentview'),
