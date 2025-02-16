@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.contrib import admin
-from .models import Investment, Profile, Services, Referral, ProductScheme, Payment
+from .models import Combo, Investment, PaymentOrder, Profile, Services, Referral, ProductScheme
 
 # Register your models here.
 class ProfileAdmin(admin.ModelAdmin):
@@ -41,6 +41,11 @@ class ServicesAdmin(admin.ModelAdmin):
     search_fields = ('title', 'product_id')
     list_filter = ('total',)
 
+class ComboAdmin(admin.ModelAdmin):
+    list_display = ('title', 'product_id', 'total')
+    search_fields = ('title', 'product_id')
+    list_filter = ('total',)
+
 class ProductSchemeAdmin(admin.ModelAdmin):
     list_display = ('product_id', 'investment', 'start_date', 'end_date', 'days', 'total', 'profile')
     search_fields = ('product_id', 'investment', 'start_date', 'end_date', 'days', 'total', 'profile__user__username')
@@ -72,20 +77,34 @@ def approve_payments(modeladmin, request, queryset):
 def reject_payments(modeladmin, request, queryset):
     queryset.update(payment_status='rejected')
 
-class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('profile', 'product_scheme', 'transaction_id', 'payment_status', 'created_at')
-    list_filter = ('payment_status', 'created_at')
-    search_fields = ('profile__user__username', 'product_scheme__product_id')
-    actions = [approve_payments, reject_payments]
-
 class InvestmentAdmin(admin.ModelAdmin):
     list_display = ('product', 'referred_user', 'daily_investment', 'total_amount', 'days_to_complete')
     
     def product(self, obj):
         return obj.product.title if obj.product else "Unknown"
 
+class PaymentOrderAdmin(admin.ModelAdmin):
+    list_display = ('order_id', 'profile', 'amount', 'currency', 'payment_status', 'created_at', 'updated_at')
+    list_filter = ('payment_status', 'currency', 'created_at')
+    search_fields = ('order_id', 'payment_id', 'profile__user__username')  # Assuming Profile has a related User
+    ordering = ('-created_at',)
+    readonly_fields = ('order_id', 'created_at', 'updated_at')
+
+    fieldsets = (
+        ('Order Details', {
+            'fields': ('order_id', 'profile', 'product_id', 'amount', 'currency')
+        }),
+        ('Payment Details', {
+            'fields': ('payment_id', 'payment_status')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+admin.site.register(PaymentOrder,PaymentOrderAdmin)
 admin.site.register(Investment, InvestmentAdmin)
-admin.site.register(Payment, PaymentAdmin)
 admin.site.register(Services,ServicesAdmin)
+admin.site.register(Combo,ComboAdmin)
 admin.site.register(ProductScheme,ProductSchemeAdmin)
+
 

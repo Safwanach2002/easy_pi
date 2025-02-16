@@ -6,35 +6,44 @@
     <title>Payment History</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="container mt-5">
+<body>
+
+<div class="container mt-4">
     <h2 class="text-center mb-4">Payment History</h2>
-    <table class="table table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>Product ID</th>
-                <th>Product Name</th>
-                <th>Investment Amount</th>
-                <th>Balance</th>
-                <th>Transaction ID</th>
-                <th>Payment Paid Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for payment in history %}
-            <tr>
-                <td>{{ payment.product_id }}</td>
-                <td>{{ payment.title }}</td>
-                <td>₹{{ payment.investment }}</td>
-                <td>₹{{ payment.balance  }}</td>
-                <td>{{ payment.transaction_id }}</td>
-                <td>{{ payment.payment_paid_date }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" class="text-center">No payments found</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    
+    {% if payment_history %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Product Title</th>
+                        <th>Investment (₹)</th>
+                        <th>Balance (₹)</th>
+                        <th>Remaining Days</th>
+                        <th>Service Total (₹)</th>
+                        <th>Last Payment Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payment_history %}
+                    <tr>
+                        <td>{{ payment.plan.title }}</td>
+                        <td>₹{{ payment.plan.investment }}</td>
+                        <td>₹{{ payment.plan.balance }}</td>
+                        <td>{{ payment.plan.remaining_days }}</td>
+                        <td>₹{{ payment.service_total }}</td>
+                        <td>{{ payment.plan.last_payment_date|date:"d M Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            No payment history available.
+        </div>
+    {% endif %}
+</div>
+
 </body>
 </html>

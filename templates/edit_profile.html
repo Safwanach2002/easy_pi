@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.3s ease-in-out;
+        }
+        .profile-container {
+            max-width: 450px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: 0.3s ease-in-out;
+        }
+        h2 {
+            font-weight: 700;
+            color: #333;
+            font-size: 1.8rem;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 5px;
+        }
+        .form-control {
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            transition: all 0.3s ease-in-out;
+        }
+        .form-control:focus {
+            border-color: #28a745;
+            box-shadow: 0px 0px 5px rgba(40, 167, 69, 0.5);
+        }
+        .btn {
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+            width: 100%;
+        }
+        .btn-success:hover, .btn-secondary:hover {
+            transform: translateY(-2px);
+        }
+        /* Profile Photo Styling */
+        .profile-photo-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .profile-photo-preview {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #ddd;
+            transition: 0.3s ease-in-out;
+        }
+        .profile-photo-preview:hover {
+            border-color: #28a745;
+            transform: scale(1.05);
+        }
+        .profile-photo-label {
+            margin-top: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            color: #007bff;
+            text-decoration: underline;
+        }
+        .profile-photo-label:hover {
+            color: #0056b3;
+        }
+        /* Mobile Responsive */
+        @media (max-width: 576px) {
+            .profile-container {
+                max-width: 95%;
+                padding: 20px;
+                margin-top: 20px;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            .btn {
+                font-size: 14px;
+                padding: 10px 16px;
+                width: 100%;
+            }
+            .profile-photo-preview {
+                width: 100px;
+                height: 100px;
+            }
+        }
+        /* Dark Mode */
+        .dark-mode {
+            background-color: #121212;
+            color: #fff;
+        }
+        .dark-mode .profile-container {
+            background-color: #1e1e1e;
+            color: #fff;
+            box-shadow: none;
+        }
+        .dark-mode .form-control {
+            background-color: #2a2a2a;
+            color: white;
+            border: 1px solid #555;
+        }
+        .dark-mode .profile-photo-preview {
+            border-color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="profile-container">
+        <!-- Dark Mode Toggle -->
+        <div class="text-end">
+            <button class="btn btn-dark btn-sm" onclick="toggleDarkMode()">
+                <i class="fa fa-moon"></i> Dark Mode
+            </button>
+        </div>
+
+        <h2 class="mb-4"><i class="fa fa-user-edit"></i> Edit Profile</h2>
+        
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Profile Photo Upload with Preview -->
+            <div class="profile-photo-wrapper">
+                <label for="profile_photo">
+                    <img id="photoPreview" class="profile-photo-preview" 
+                         src="{% if form.profile_photo.value %}{{ form.profile_photo.value.url }}{% else %}https://via.placeholder.com/120{% endif %}" 
+                         alt="Profile Photo">
+                </label>
+                <input type="file" class="form-control mt-2 d-none" id="profile_photo" name="profile_photo" accept="image/*" onchange="previewPhoto(event)">
+                <label for="profile_photo" class="profile-photo-label">Change Profile Picture</label>
+                </button>
+            </div>
+
+            <!-- Form Fields -->
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label" for="{{ field.id_for_label }}">
+                    <i class="fa fa-edit"></i> {{ field.label }}
+                </label>
+                {{ field }}
+            </div>
+            {% endfor %}
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success mb-2"><i class="fa fa-save"></i> Save Changes</button>
+                <a href="{% url 'profile' %}" class="btn btn-secondary"><i class="fa fa-times"></i> Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- JavaScript for Image Preview & Dark Mode -->
+<script>
+    function previewPhoto(event) {
+        const file = event.target.files[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) { // Limit to 2MB
+                alert("File size should be less than 2MB!");
+                event.target.value = "";
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById('photoPreview').src = reader.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function removePhoto() {
+        document.getElementById('photoPreview').src = "https://via.placeholder.com/120";
+        document.getElementById('profile_photo').value = "";
+    }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+        document.querySelector(".profile-container").classList.toggle("dark-mode");
+        document.querySelectorAll(".form-control").forEach(el => el.classList.toggle("dark-mode"));
+    }
+</script>
+
+</body>
+</html>

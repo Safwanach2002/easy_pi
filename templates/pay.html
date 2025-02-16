@@ -71,7 +71,7 @@
             order_id: "{{ payment_data.order_id }}",
             callback_url: "{{ payment_data.callback_url }}",
             prefill: {
-                name: "{{ user.get_full_name|default:user.username }}",
+                name: "{{ payment_data.profile }}",
                 email: "{{ user.email }}",
                 contact: "{{ user.profile.phone_number|default:'' }}"
             },

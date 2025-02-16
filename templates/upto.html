@@ -4,7 +4,7 @@
 
     <head>
         <meta charset="utf-8">
-        <title>EPI-Your plans</title>
+        <title>Easy Purchase Investment - Products</title>
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <meta content="" name="keywords">
         <meta content="" name="description">
@@ -30,127 +30,157 @@
 
         <!-- Template Stylesheet -->
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
-        <style>
-            /* 🔹 Responsive Grid System */
-        
-            /* Default Bootstrap Grid for Desktop */
-            .col-md-4 {
-                flex: 0 0 33.3333%;
-                max-width: 33.3333%;
-            }
-
-            /* Payment History Floating Button */
-            .payment-history-btn {
-                position: fixed;
-                bottom: 80px;
-                right: 20px;
-                background: #44d2f6 ;
-                color: white;
-                width: 50px; /* Set equal width and height */
-                height: 50px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 50%; /* Makes it a perfect circle */
-                font-size: 22px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                transition: background 0.3s ease;
-                text-align: center;
-            }
-
-            .payment-history-btn:hover {
-                background: #102147;
-                text-decoration: none;
-            }
-        
-            @media (min-width: 992px) {
-                /* 3 products per row for large screens */
-                .col-md-4 {
-                    flex: 0 0 33.3333%;
-                    max-width: 33.3333%;
-                }
-            }
-        
-            @media (min-width: 1200px) {
-                /* 4 products per row for extra-large screens */
-                .col-md-4 {
-                    flex: 0 0 25%;
-                    max-width: 25%;
-                }
-            }
-        
-            /* Mobile Layout Adjustments */
-            @media (max-width: 768px) {
-                /* 2 products per row on medium screens like tablets */
-                .col-md-4 {
-                    flex: 0 0 50%;
-                    max-width: 50%;
-                }
-                .card {
-                    margin-bottom: 20px;
-                }
-                .card-title {
-                    font-size: 16px;
-                }
-                .card-text {
-                    font-size: 14px;
-                }
-                .badge {
-                    font-size: 12px;
-                }
-                .btn {
-                    font-size: 14px;
-                    padding: 6px 12px;
-                }
-            }
-        
-            /* Mobile Layout for screens under 576px (e.g., small smartphones) */
-            @media (max-width: 576px) {
-                /* 2 products per row on small mobile devices */
-                .col-md-4 {
-                    flex: 0 0 50%;
-                    max-width: 50%;
-                }
-                .card {
-                    margin-bottom: 15px;
-                }
-                .card-title {
-                    font-size: 14px;
-                }
-                .card-text {
-                    font-size: 12px;
-                }
-                .badge {
-                    font-size: 10px;
-                }
-                .btn {
-                    font-size: 12px;
-                    padding: 5px 10px;
-                }
-            }
-        
-            /* Smallest Devices (less than 500px) */
-            @media (max-width: 500px) {
-                .col-md-4 {
-                    flex: 0 0 50%;
-                    max-width: 50%; /* Still show 2 cards per row on very small screens */
-                }
-                .card-img-top {
-                    height: 150px; /* Smaller image height */
-                }
-            }
-        </style>
     </head>
+    <style>
+        #category-container {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 20px;
+
+        }
+
+        .category-item {
+            
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .category-item img {
+            width: 10px; /* Adjust size */
+            height: 80px;
+        }
+
+        .category-item:hover {
+            transform: scale(1.1);
+        }
+        .button-category {
+            cursor: pointer; /* Makes it behave like a button */
+            user-select: none; /* Prevents text selection */
+        }
+
+        /* Optional: Add a click effect */
+        .button-category:active {
+            transform: scale(0.95); /* Slightly shrink on click for a press effect */
+        }
+
+        .category-item {
+            padding: 5px 16px; /* Less vertical padding */
+            color: #FFFFFF(216, 214, 214); /* Ensure text is visible */
+            font-weight: bold;
+            text-align: center;
+            margin: 5px;
+            width: auto; /* Adjust width dynamically */
+            min-width: 100px; /* Ensures button doesn't become too small */
+            min-height: 40px; /* Set a standard height */
+            display: flex;
+            flex-direction: column; /* Stack content vertically */
+            align-items: center; /* Center items horizontally */
+            justify-content: center; /* Center content vertically */
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            line-height: 1.2; /* Adjust line height */
+        }
+
+        /* Ensure the text inside is centered */
+        .category-item p {
+            margin: 0; /* Remove default margins */
+            padding: 0;
+            text-align: center;
+            font-size: 14px; /* Adjust text size */
+        }
+
+        /* Optional: Add a hover effect */
+        .category-item:hover {
+            text-decoration: underline;/* Slightly darker blue */
+            color: #44d2f6;
+        box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3); /* Enhanced shadow effect */
+        }
+
+        /* Category section */
+        #category-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .category-item {
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            width: auto;
+            min-width: 100px;
+            margin: 5px;
+        }
+
+        .category-item img {
+            width: 40px;
+            height: auto;
+            max-width: 100%;
+        }
+
+        .category-item:hover {
+            transform: scale(1.1);
+        }
+
+        .button-category {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .button-category:active {
+            transform: scale(0.95);
+        }
+
+        /* Mobile adjustments */
+        @media screen and (max-width: 768px) {
+            .category-item {
+                display: none;
+            }
+            #category-dropdown {
+                display: block;
+                width: 100%;
+                padding: 10px;
+                font-size: 14px;
+                border: 1px solid #ddd;
+                background-color: #fff;
+            }
+        }
+
+        /* Desktop view - Hide the dropdown */
+        @media screen and (min-width: 769px) {
+            #category-dropdown {
+                display: none;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .category-item {
+                font-size: 12px;
+                padding: 6px 12px;
+                min-width: 80px;
+            }
+
+            .category-item img {
+                width: 40px;
+            }
+
+            .button-category {
+                padding: 8px 16px;
+            }
+        }
+
+        /* Optional hover effect for larger screens */
+        .category-item:hover {
+            text-decoration: underline;
+            color: #44d2f6;
+            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+        }
+    </style>
     <body>
-
-        <!-- Spinner Start -->
-        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
-        <!-- Spinner End -->
-
 
         <!-- Topbar Start -->
         <div class="container-fluid topbar px-0 d-none d-lg-block">
@@ -196,8 +226,8 @@
                             <a href="{% url 'about' %}" class="nav-item nav-link">About</a>
                             <!-- <a href="{% url 'services' %}" class="nav-item nav-link">Products</a> -->
                             <a href="{% url 'reference' %}" class="nav-item nav-link">Reference</a>
-                            <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Products</a>
+                            <div class="nav-item dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">Products</a>
                                 <div class="dropdown-menu m-0">
                                     <a href="{% url 'services' %}" class="dropdown-item">All Items</a>
                                     <a href="{% url 'combo' %}" class="dropdown-item">Combo Set</a>
@@ -206,7 +236,7 @@
                                     <!-- <a href="404.html" class="dropdown-item">404 Page</a> -->
                                 </div>
                             </div>
-                            <a href="{% url 'plans' %}" class="nav-item nav-link active">Plans</a>
+                            <a href="{% url 'plans' %}" class="nav-item nav-link">Plans</a>
                             <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
                         </div>
                         <div class="d-flex align-items-center flex-nowrap pt-xl-0">
@@ -223,66 +253,34 @@
         <div class="container-fluid bg-breadcrumb">
             <div class="bg-breadcrumb-single"></div>
             <div class="container text-center py-5" style="max-width: 900px;">
-                <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">Our Plans</h4>
+                <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">Upto 22</h4>
                 <ol class="breadcrumb justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
                     <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-                    <li class="breadcrumb-item active text-primary">Plans</li>
+                    <li class="breadcrumb-item active text-primary">Upto 22</li>
                 </ol>    
             </div>
         </div>
+        <!-- Header End -->
 
-        {% block content %}
-        <div class="container mt-4">
-            {% if plans %}
-                <div class="row">
-                    {% for plan in plans %}
-                    <div class="col-md-4">
-                        <div class="card mb-4 shadow-sm">
-                            {% if plan.img %}
-                                <img src="{{ plan.img }}" class="card-img-top" alt="{{ plan.title }}">
-                            {% endif %}
-                            <div class="card-body">
-                                <h5 class="card-title">{{ plan.title }}</h5>
-                                <button class="btn btn-link toggle-details w-100" data-bs-toggle="collapse" data-bs-target="#details-{{ forloop.counter }}">
-                                    View Details 
-                                </button>
-                                <div class="collapse" id="details-{{ forloop.counter }}">
-                                    <p><strong>Investment:</strong> ₹{{ plan.investment }}</p>
-                                    <p><strong>Balance:</strong> ₹{{ plan.balance }}</p>
-                                    <p><strong>Remaining Days:</strong> {{ plan.remaining_days }} Day(s)</p>
-                                    <p>
-                                        <strong>Last Payment Status:</strong>
-                                        {% if plan.payment_status == "SUCCESSFUL" %}
-                                            <span class="badge bg-success">Successful</span>
-                                        {% elif plan.payment_status == "FAILED" %}
-                                            <span class="badge bg-warning text-dark">Failed</span>
-                                        {% elif plan.payment_status == "NOT_PAID" %}
-                                            <span class="badge bg-danger">Not Paid</span>
-                                        {% else %}
-                                            <span class="badge bg-secondary">Pending</span>
-                                        {% endif %}
-                                    </p>
-                                    
-                                    <p><strong>Last Payment Date:</strong>{{ plan.last_payment_date }}</p>
-                                </div>
-                            </div>
-                            <div class="card-footer text-center">
-                                <a href="{% url 'paymentview' plan.id %}?product_id={{ plan.product_id }}&profile_id={{profile_id}}" class="btn btn-primary w-100">
-                                    Pay Now (₹{{ plan.investment }})
-                                </a>
-                            </div>                           
-                        </div>
-                    </div>
-                {% endfor %}
-                
-                </div>
-            {% else %}
-                <div class="alert alert-info text-center" role="alert">
-                    Invest your money in our products to view your plans here.
-                </div>
-            {% endif %}
+        <div id="category-container">
+            <div class="category-item button-category" data-category="kids">
+                <p>Kids</p>
+            </div>
+            <div class="category-item button-category" data-category="teenagers">
+                <p>Teenagers</p>
+            </div>
+            <div class="category-item button-category" data-category="youth">
+                <p>Youth</p>
+            </div>
+           
+            <!-- Mobile view dropdown -->        
+            <select id="category-dropdown" class="category-dropdown">
+                <option value="" disabled selected>Select Category</option>
+                <option value="mobiles">Kids</option>
+                <option value="electronics">Teenagers</option>
+                <option value="home_kitchen">Youth</option>
+            </select>
         </div>
-        {% endblock %}
 
         <!-- Footer Start -->
         <div class="container-fluid footer py-5 wow fadeIn" data-wow-delay="0.2s">
@@ -379,24 +377,5 @@
     <script src="{% static 'lib/counterup/counterup.min.js' %}"></script>
     <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
     <script src="{% static 'lib/lightbox/js/lightbox.min.js' %}"></script>
-    
-
-    <!-- Template Javascript -->
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll('.toggle-details').forEach(button => {
-                button.addEventListener('click', function () {
-                    if (this.innerHTML.includes("View Details")) {
-                        this.innerHTML = "Hide Details ";
-                    } else {
-                        this.innerHTML = "View Details ";
-                    }
-                });
-            });
-        });
-    </script>
-    <script src="{% static 'js/main.js' %}"></script>
     </body>
-
 </html>

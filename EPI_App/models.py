@@ -85,15 +85,66 @@ class Referral(models.Model):
 
 
 class Services(models.Model):
+    ELECTRONICS = 'electronics'
+    MOBILES = 'mobiles'
+    HOME_KITCHEN = 'home_kitchen'
+    FASHION = 'fashion'
+    BOOKS = 'books'
+    OTHERS = 'others'
+
+    CATEGORY_CHOICES = [
+        (ELECTRONICS, 'Electronics'),
+        (MOBILES, 'Mobiles'),
+        (HOME_KITCHEN, 'Home & Kitchen'),
+        (FASHION, 'Fashion'),
+        (BOOKS, 'Books'),
+        (OTHERS, 'Others'),
+    ]
+
     product_id = models.CharField(max_length=100, null=True)
     title = models.CharField(max_length=50)
     total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     img = models.ImageField(upload_to="pics")
     desc = models.CharField(max_length=500, null=True)
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        default=OTHERS,  # Default to 'Others' if no category is selected
+    )
 
-    def __str__(self):
+    def _str_(self):
         return self.title
 
+class Combo(models.Model):
+    ELECTRONICS = 'electronics'
+    MOBILES = 'mobiles'
+    HOME_KITCHEN = 'home_kitchen'
+    FASHION = 'fashion'
+    BOOKS = 'books'
+    OTHERS = 'others'
+
+    CATEGORY_CHOICES = [
+        (ELECTRONICS, 'Electronics'),
+        (MOBILES, 'Mobiles'),
+        (HOME_KITCHEN, 'Home & Kitchen'),
+        (FASHION, 'Fashion'),
+        (BOOKS, 'Books'),
+        (OTHERS, 'Others'),
+    ]
+
+    product_id = models.CharField(max_length=100, null=True)
+    title = models.CharField(max_length=50)
+    total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    img = models.ImageField(upload_to="pics")
+    desc = models.CharField(max_length=500, null=True)
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        default=OTHERS,  # Default to 'Others' if no category is selected
+    )
+
+    def _str_(self):
+        return self.title
 
 class ProductScheme(models.Model):
     product_id = models.CharField(max_length=100, null=True)
@@ -117,7 +168,6 @@ class ProductScheme(models.Model):
             self.end_date = self.calculate_end_date()
         super().save(*args, **kwargs)
 
-
 class Payment(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -132,9 +182,8 @@ class Payment(models.Model):
     payment_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(default=now)
 
-    def __str__(self):
+    def _str_(self):
         return f"Payment for {self.product_scheme.product_id} by {self.profile.user.username}"
-
 
 class Investment(models.Model):
     product = models.ForeignKey(Services, on_delete=models.CASCADE)

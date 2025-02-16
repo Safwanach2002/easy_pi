@@ -166,101 +166,28 @@
     padding: 5px;
     text-align: center;
 }
-
-/* Default Bootstrap Grid for Desktop */
-.col-md-6 {
-    flex: 0 0 50%;
-    max-width: 50%;
-}
-
-#category-container {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    margin-bottom: 20px;
-
-}
-
-.category-item {
-    
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-}
-
-.category-item img {
-    width: 10px; /* Adjust size */
-    height: 80px;
-}
-
-.category-item:hover {
-    transform: scale(1.1);
-}
-.button-category {
-    cursor: pointer; /* Makes it behave like a button */
-    user-select: none; /* Prevents text selection */
-}
-
-/* Optional: Add a click effect */
-.button-category:active {
-    transform: scale(0.95); /* Slightly shrink on click for a press effect */
-}
-
-.category-item {
-    padding: 5px 16px; /* Less vertical padding */
-    color: #FFFFFF(216, 214, 214); /* Ensure text is visible */
-    font-weight: bold;
-    text-align: center;
-    margin: 5px;
-    width: auto; /* Adjust width dynamically */
-    min-width: 100px; /* Ensures button doesn't become too small */
-    min-height: 40px; /* Set a standard height */
-    display: flex;
-    flex-direction: column; /* Stack content vertically */
-    align-items: center; /* Center items horizontally */
-    justify-content: center; /* Center content vertically */
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    line-height: 1.2; /* Adjust line height */
-}
-
-/* Ensure the text inside is centered */
-.category-item p {
-    margin: 0; /* Remove default margins */
-    padding: 0;
-    text-align: center;
-    font-size: 14px; /* Adjust text size */
-}
-
-/* Optional: Add a hover effect */
-.category-item:hover {
-    text-decoration: underline;/* Slightly darker blue */
-    color: #44d2f6;
-   box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3); /* Enhanced shadow effect */
-}
-
 /* Category section */
 #category-container {
     display: flex;
     gap: 20px;
     justify-content: center;
     margin-bottom: 20px;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
 }
 
 .category-item {
     text-align: center;
     cursor: pointer;
     transition: transform 0.3s ease;
-    width: auto;
-    min-width: 100px;
+    width: auto; /* Adjust width dynamically */
+    min-width: 100px; /* Ensures button doesn't become too small */
     margin: 5px;
 }
 
 .category-item img {
-    width: 40px;
+    width: 40px; /* Adjusted for mobile view */
     height: auto;
-    max-width: 100%;
+    max-width: 100%; /* Makes sure it scales correctly */
 }
 
 .category-item:hover {
@@ -278,15 +205,18 @@
 
 /* Mobile adjustments */
 @media screen and (max-width: 768px) {
+    /* Hide category items on mobile */
     .category-item {
         display: none;
     }
+
+    /* Show the dropdown on mobile */
     #category-dropdown {
         display: block;
         width: 100%;
         padding: 10px;
         font-size: 14px;
-        border: 1px solid #ddd;
+        border: 1px solid #ddd; /* Optional, to match the button style */
         background-color: #fff;
     }
 }
@@ -294,23 +224,24 @@
 /* Desktop view - Hide the dropdown */
 @media screen and (min-width: 769px) {
     #category-dropdown {
-        display: none;
+        display: none; /* Hide dropdown on desktop */
     }
 }
 
 @media screen and (max-width: 480px) {
     .category-item {
-        font-size: 12px;
-        padding: 6px 12px;
-        min-width: 80px;
+        font-size: 12px; /* Adjust text size for smaller screens */
+        padding: 6px 12px; /* Adjust padding for tighter space */
+        min-width: 80px; /* Ensure items don't shrink too much */
     }
 
     .category-item img {
-        width: 40px;
+        width: 40px; /* Even smaller size for images */
     }
 
+    /* Optionally adjust button styles for mobile */
     .button-category {
-        padding: 8px 16px;
+        padding: 8px 16px; /* Adjust button size for smaller screens */
     }
 }
 
@@ -320,6 +251,18 @@
     color: #44d2f6;
     box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
 }
+
+
+
+/* 🔹 Responsive Grid System */
+
+/* Default Bootstrap Grid for Desktop */
+.col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+
 
 @media (min-width: 992px) {
     /* 3 products per row for large screens */
@@ -397,6 +340,7 @@
     }
 }
 
+
 /* Mobile (up to 576px) */
 @media (max-width: 576px) {
     .col-md-6 {
@@ -424,7 +368,7 @@
     </style>
     </head>
     <body>
-        <!-- Spinner Start -->
+<!-- Spinner Start -->
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                 <span class="sr-only">Loading...</span>
@@ -504,94 +448,70 @@
         <div class="container-fluid bg-breadcrumb">
             <div class="bg-breadcrumb-single"></div>
             <div class="container text-center py-5" style="max-width: 900px;">
-                <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">Our Products</h4>
+                <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">Combo Set</h4>
                 <ol class="breadcrumb justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
                     <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-                    <li class="breadcrumb-item active text-primary">Products</li>
+                    <li class="breadcrumb-item active text-primary">Combo Set</li>
                 </ol>    
             </div>
         </div>
         <!-- Header End -->
 
-<!-- Add this right above the product listing section -->
-<div id="no-results" style="display: none;">No products found</div>
-
-<div class="row">
-    <!-- Search Bar -->
-    <div class="row">
-        <!-- Search Bar -->
-        <div class="container mt-4">
-            <form method="GET" action="{% url 'services' %}" class="d-flex">
-                <input type="text" name="q" id="search-input" class="form-control me-2" placeholder="Search for a product..." value="{{ query }}" oninput="showCategory()">
-                <button type="button" id="search-button" class="btn btn-primary">Search</button>
-            </form>
-            <div id="category-list" class="mt-2"></div>
-        </div>
-
-
-        <div id="category-container">
-            <!-- Desktop view (flex display) -->
-            <div class="category-item button-category" data-category="mobiles">
-                <p>Mobiles</p>
-            </div>
-            <div class="category-item button-category" data-category="electronics">
-                <p>Electronics</p>
-            </div>
-            <div class="category-item button-category" data-category="home_kitchen">
-                <p>Home & Kitchen</p>
-            </div>
-            <div class="category-item button-category" data-category="fashion">
-                <p>Fashion</p>
-            </div>
-            <div class="category-item button-category" data-category="books">
-                <p>Books</p>
-            </div> 
-
-            <!-- Mobile view dropdown -->
-            <select id="category-dropdown" class="category-dropdown">
-                <option value="" disabled selected>Select Category</option>
-                <option value="mobiles">Mobiles</option>
-                <option value="electronics">Electronics</option>
-                <option value="home_kitchen">Home & Kitchen</option>
-                <option value="fashion">Fashion</option>
-                <option value="books">Books</option>
-                <option value="others">Other</option>
-            </select>
-        </div>
-        
-        {% for service in services %}
-        <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;" data-category="{{ service.category }}">
-            <div class="product-card shadow-sm bg-white rounded overflow-hidden position-relative">
-                <!-- Image Section -->
-                <div class="product-img position-relative">
-                    <img src="{{ service.img.url }}" class="img-fluid w-100 toggle-image" alt="{{ service.title }}" 
-                        style="height: 250px; object-fit: cover; cursor: pointer;">
-                    <div class="overlay d-flex align-items-center justify-content-center">
-                        <a href="{% url 'product_scheme_manage' %}?id={{ service.id }}&total={{ service.total }}" 
-                        class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
+            <!-- Add this right above the product listing section -->
+            <div id="no-results" style="display: none;">No products found</div>
+                <div class="row">
+                    <!-- Search Bar -->
+                    <div class="container mt-4">
+                        <form method="GET" action="{% url 'combo' %}" class="d-flex">
+                            <input type="text" name="q" id="search-input" class="form-control me-2" placeholder="Search for a product..." value="{{ query }}" oninput="showCategory()">
+                            <button type="button" id="search-button" class="btn btn-primary">Search</button>
+                        </form>
+            
+                        <select id="category-dropdown" class="category-dropdown" style="display: none;">
+                            <option value="" disabled selected>Select Category</option>
+                            <option value="mobiles">Mobiles</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="home_kitchen">Home & Kitchen</option>
+                            <option value="fashion">Fashion</option>
+                            <option value="books">Books</option>
+                        </select>
                     </div>
                 </div>
-        
-                <!-- Product Title -->
-                <div class="product-content p-3">
-                    <h5 class="mb-2 text-dark">{{ service.title }}</h5>
-                    
-                    <!-- <p class="text-muted small">Category: {{ service.get_category_display }}</p> -->
-                    <p class="h5 text-primary">₹{{ service.total }}</p>
-        
-                    <!-- Toggle Button -->
-                    <button class="toggle-btn btn btn-link w-100 text-primary" data-id="{{ forloop.counter }}">
-                        View Details 
-                    </button>
-        
-                    <!-- Collapsible Details Section -->
-                    <div class="details" id="details-{{ forloop.counter }}">
-                        <p class="text-muted small">{{ service.desc }}</p>
+            
+                {% for i in combo %}
+                <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;" data-category="{{ service.category }}">
+                    <div class="product-card shadow-sm bg-white rounded overflow-hidden position-relative">
+                        <!-- Image Section -->
+                        <div class="product-img position-relative">
+                            <img src="{{ i.img.url }}" class="img-fluid w-100 toggle-image" alt="{{ i.title }}" 
+                                style="height: 250px; object-fit: cover; cursor: pointer;">
+                            <div class="overlay d-flex align-items-center justify-content-center">
+                                <a href="{% url 'product_scheme_combo' %}?id={{ i.id }}&total={{ i.total }}" 
+                                class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
+                            </div>
+                        </div>
+                
+                        <!-- Product Title -->
+                        <div class="product-content p-3">
+                            <h5 class="mb-2 text-dark">{{ i.title }}</h5>
+                            
+                            <!-- <p class="text-muted small">Category: {{ service.get_category_display }}</p> -->
+                            <p class="h5 text-primary">₹{{ i.total }}</p>
+                
+                            <!-- Toggle Button -->
+                            <button class="toggle-btn btn btn-link w-100 text-primary" data-id="{{ forloop.counter }}">
+                                View Details 
+                            </button>
+                
+                            <!-- Collapsible Details Section -->
+                            <div class="details" id="details-{{ forloop.counter }}">
+                                <p class="text-muted small">{{ i.desc }}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endfor %}
         </div>
-    {% endfor %}
     </div>
 </div>
 
@@ -612,7 +532,6 @@
                             <h4 class="text-white mb-4">Explore</h4>
                             <a href="{% url 'index' %}"><i class="fas fa-angle-right me-2"></i> Home</a>
                             <a href="{% url 'about' %}"><i class="fas fa-angle-right me-2"></i> About</a>
-                            <a href="{% url 'services' %}"><i class="fas fa-angle-right me-2"></i> Products</a>
                             <a href="{% url 'reference' %}"><i class="fas fa-angle-right me-2"></i> Reference</a>
                             <a href="{% url 'plans' %}"><i class="fas fa-angle-right me-2"></i> Plans</a>
                             <a href="{% url 'contact' %}"><i class="fas fa-angle-right me-2"></i> Contact</a>
@@ -666,13 +585,12 @@
             <div class="container">
                 <div class="row g-4 align-items-center">
                     <div class="col-md-6 text-center text-md-start mb-md-0">
-                        <span class="text-body"><a href="#" class="border-bottom text-primary"><i class="fas fa-copyright text-light me-2"></i>2025</a>, All right reserved.<br><span class="d-block mt-2">ELIO is a legally registered company under license number [ACE-4958]</span></span>
+                        <span class="text-body"><a href="#" class="border-bottom text-primary"><i class="fas fa-copyright text-light me-2"></i>Easy Purchase Investment</a>, All right reserved.</span>
                     </div>
                 </div>
             </div>
         </div>
         <!-- Copyright End -->
-
 
         <!-- Back to Top -->
         <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="fa fa-arrow-up"></i></a>   

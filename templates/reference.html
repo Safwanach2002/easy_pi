@@ -51,17 +51,17 @@
                 <div class="row gx-0 align-items-center" style="height: 45px;">
                     <div class="col-lg-8 text-center text-lg-start mb-lg-0">
                         <div class="d-flex flex-wrap">
-                            <a href="#" class="text-muted me-4"><i class="fas fa-map-marker-alt text-primary me-2"></i>Kannur, Kerala</a>
+                            <a href="#" class="text-muted me-4"><i class="fas fa-map-marker-alt text-primary me-2"></i>Gopal Street, Kannur, Kerala</a>
                             <a href="#" class="text-muted me-4"><i class="fas fa-phone-alt text-primary me-2"></i>+91 87143 99951</a>
-                            <a href="#" class="text-muted me-0"><i class="fas fa-envelope text-primary me-2"></i>epielio2025@gmail.com</a>
+                            <a href="#" class="text-muted me-0"><i class="fas fa-envelope text-primary me-2"></i>epielio.com@gmail.com</a>
                         </div>
                     </div>
                     <div class="col-lg-4 text-center text-lg-end">
                         <div class="d-flex align-items-center justify-content-end">
                             <a href="#" class="btn btn-primary btn-square rounded-circle nav-fill me-3"><i class="fab fa-facebook-f text-white"></i></a>
                             <a href="#" class="btn btn-primary btn-square rounded-circle nav-fill me-3"><i class="fab fa-twitter text-white"></i></a>
-                            <a href="#" class="btn btn-primary btn-square rounded-circle nav-fill me-3"><i class="fab fa-instagram text-white"></i></a>
-                            <a href="#" class="btn btn-primary btn-square rounded-circle nav-fill me-0"><i class="fab fa-linkedin-in text-white"></i></a>
+                            <a href="https://www.instagram.com/epielio?igsh=MW14OHBkd3BmOTVvdg==" class="btn btn-primary btn-square rounded-circle nav-fill me-3"><i class="fab fa-instagram text-white"></i></a>
+                            <a href="https://www.linkedin.com/in/saoirse-it-solutions-llp-355879341/" class="btn btn-primary btn-square rounded-circle nav-fill me-0"><i class="fab fa-linkedin-in text-white"></i></a>
                         </div>
                     </div>
                 </div>
@@ -87,19 +87,19 @@
                         <div class="navbar-nav ms-auto py-0">
                             <a href="{% url 'index' %}" class="nav-item nav-link">Home</a>
                             <a href="{% url 'about' %}" class="nav-item nav-link">About</a>
-                            <a href="{% url 'services' %}" class="nav-item nav-link">Products</a>
+                            <!-- <a href="{% url 'services' %}" class="nav-item nav-link">Products</a> -->
                             <a href="{% url 'reference' %}" class="nav-item nav-link active">Reference</a>
-                            <a href="{% url 'plans' %}" class="nav-item nav-link">Plans</a>
-                            <!-- <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+                            <div class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Products</a>
                                 <div class="dropdown-menu m-0">
-                                    <a href="blog.html" class="dropdown-item">Our Blog</a>
-                                    <a href="team.html" class="dropdown-item">Our Team</a>
-                                    <a href="testimonial.html" class="dropdown-item">Testimonial</a>
-                                    <a href="faqs.html" class="dropdown-item">FAQs</a>
-                                    <a href="404.html" class="dropdown-item">404 Page</a>
+                                    <a href="{% url 'services' %}" class="dropdown-item">All Items</a>
+                                    <a href="{% url 'combo' %}" class="dropdown-item">Combo Set</a>
+                                    <a href="{% url 'upto' %}" class="dropdown-item">Upto 22</a>
+                                    <a href="" class="dropdown-item">Coming Soon</a>
+                                    <!-- <a href="404.html" class="dropdown-item">404 Page</a> -->
                                 </div>
-                            </div> -->
+                            </div>
+                            <a href="{% url 'plans' %}" class="nav-item nav-link">Plans</a>
                             <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
                         </div>
                         <div class="d-flex align-items-center flex-nowrap pt-xl-0">
@@ -420,15 +420,15 @@ function copyToClipboard(text) {
                     <div class="col-md-6 col-lg-6 col-xl-3">
                         <div class="footer-item d-flex flex-column">
                             <h4 class="text-white mb-4">Contact Info</h4>
-                            <a href=""><i class="fa fa-map-marker-alt me-2"></i>Kannur, Kerala</a>
-                            <a href=""><i class="fas fa-envelope me-2"></i> epielio2025@gmail.com</a>
+                            <a href=""><i class="fa fa-map-marker-alt me-2"></i>Gopal Sreet, Kannur, Kerala</a>
+                            <a href=""><i class="fas fa-envelope me-2"></i> epielio.com@gmail.com</a>
                             <a href=""><i class="fas fa-phone me-2"></i>+91 87143 99951</a>
                             <div>
                                 <div class="d-flex align-items-center">
                                 <a class="btn btn-light btn-md-square me-2" href="https://www.facebook.com/"><i class="fab fa-facebook-f"></i></a>
                                 <a class="btn btn-light btn-md-square me-2" href="https://x.com/?lang=en-in"><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-light btn-md-square me-2" href="https://www.instagram.com/"><i class="fab fa-instagram"></i></a>
-                                <a class="btn btn-light btn-md-square me-0" href="https://www.linkedin.com/"><i class="fab fa-linkedin-in"></i></a>
+                                <a class="btn btn-light btn-md-square me-2" href="https://www.instagram.com/epielio?igsh=MW14OHBkd3BmOTVvdg=="><i class="fab fa-instagram"></i></a>
+                                <a class="btn btn-light btn-md-square me-0" href="https://www.linkedin.com/in/saoirse-it-solutions-llp-355879341/"><i class="fab fa-linkedin-in"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -463,7 +463,7 @@ function copyToClipboard(text) {
             <div class="container">
                 <div class="row g-4 align-items-center">
                     <div class="col-md-6 text-center text-md-start mb-md-0">
-                        <span class="text-body"><a href="#" class="border-bottom text-primary"><i class="fas fa-copyright text-light me-2"></i>Easy Purchase Investment</a>, All right reserved.</span>
+                        <span class="text-body"><a href="#" class="border-bottom text-primary"><i class="fas fa-copyright text-light me-2"></i>2025</a>, All right reserved.<br><span class="d-block mt-2">ELIO is a legally registered company under license number [ACE-4958]</span></span>
                     </div>
                 </div>
             </div>

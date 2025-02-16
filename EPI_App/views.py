@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import SignupForm, ProductSchemeForm, PaymentForm
+from .forms import ProfileUpdateForm, SignupForm, ProductSchemeForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
 from django.contrib import messages
@@ -9,13 +9,14 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from .models import Investment, Payment, Referral, Profile, ProductScheme, Services
-from datetime import datetime, timedelta, date
+from .models import Combo, Investment, Referral, Profile, ProductScheme, Services
+from datetime import datetime, timedelta, date, timezone
 from django.views.decorators.csrf import csrf_exempt
 import json
 from decimal import Decimal
 from django.db.models import Sum
 from django.utils.timezone import now
+from django.utils.timezone import get_current_timezone
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseBadRequest, JsonResponse
@@ -25,7 +26,7 @@ from .models import PaymentOrder
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponseBadRequest
-from .models import PaymentOrder, ProductScheme, Services, Payment
+from .models import PaymentOrder, ProductScheme, Services
 from datetime import date
 from datetime import date
 from django.shortcuts import render
@@ -188,19 +189,6 @@ def services_view(request):
     return render(request, 'services.html', {'services': services})
 
 @login_required
-def payment_view(request):
-    if request.method == 'POST':
-        form = PaymentForm(request.POST, request.FILES)
-        if form.is_valid():
-            payment = form.save(commit=False)
-            payment.profile = request.user.profile
-            payment.save()
-            return redirect('payment_success')
-    else:
-        form = PaymentForm(user=request.user)
-    return render(request, 'payment.html', {'form': form})
-
-@login_required
 def payment_success(request):
     return render(request, 'payment_success.html')
 
@@ -251,163 +239,111 @@ def product_scheme_manage(request):
         'total': total,
     })
 
+def product_scheme_combo(request):
+    product_id = request.GET.get('id')  # Fetch id (service ID) from the request
+    total = request.GET.get('total')  # Fetch total from the request
+
+    # Fetch the product_id and total from the Services model
+    if product_id:
+        try:
+            combo = Combo.objects.get(id=product_id)  # Fetch service based on ID
+            product_id = combo.product_id  # Extract product_id from the service
+            total = combo.total  # Extract total from the service
+        except Combo.DoesNotExist:
+            product_id = None  # Reset to None if the service is not found
+            total = None
+
+    if request.method == 'POST':
+        form = ProductSchemeForm(request.POST)
+        if form.is_valid():
+            scheme = form.save(commit=False)
+
+            # Set the profile to the currently logged-in user's profile
+            profile = Profile.objects.get(user=request.user)
+            scheme.profile = profile  # Automatically set the profile field
+
+            # Explicitly set product_id and total to ensure they are saved
+            scheme.product_id = product_id
+            scheme.total = total
+            scheme.start_date = datetime.now()  # Set start date to current date
+
+            # The end_date will be automatically calculated in the model during save
+            scheme.save()  # Save the scheme, which will also calculate the end_date
+
+            return redirect('plans')  # Redirect to the payment page
+    else:
+        # Pass initial values for product_id and total to the form
+        form = ProductSchemeForm(initial={
+            'product_id': product_id,
+            'total': total,
+        })
+
+    # Render the template with the form and context
+    return render(request, 'product_scheme_combo.html', {
+        'form': form,
+        'product_id': product_id,
+        'total': total,
+    })
+
 def privacy_view(request):
    return render(request, 'privacy.html')
 
-# @login_required
-# def plans_view(request):
-#     profile = request.user.profile
-#     product_schemes = ProductScheme.objects.filter(profile=profile)
+def combo_view(request):
+    combo = Combo.objects.all()
+    return render(request, 'combo.html', {'combo': combo})
 
-#     plans = []
-#     for scheme in product_schemes:
-#         try:
-#             service = Services.objects.get(product_id=scheme.product_id)
-#             approved_payments = Payment.objects.filter(product_scheme=scheme, payment_status='approved')
-            
-#             # Calculate payment status and needs_payment
-#             latest_payment = Payment.objects.filter(product_scheme=scheme).order_by('-created_at').first()
-#             today = date.today()
-            
-#             # Default values
-#             payment_status = 'pending'
-#             needs_payment = False
-#             total_paid = approved_payments.count() * scheme.investment
-#             balance = max(0, scheme.total - total_paid)
-            
-#             if latest_payment:
-#                 payment_status = latest_payment.payment_status
-#                 last_payment_date = latest_payment.created_at.date()
-                
-#                 # Enable payment if:
-#                 # 1. Payment was rejected
-#                 # 2. Approved payment is older than today
-#                 # 3. No approved payments yet
-#                 if payment_status == 'rejected':
-#                     needs_payment = True
-#                 elif payment_status == 'approved' and last_payment_date < today:
-#                     needs_payment = True
-#             else:
-#                 # No payments made yet
-#                 payment_status = 'not_paid'
-#                 needs_payment = True
-            
-#             # Calculate remaining days
-#             total_duration = (scheme.end_date - scheme.start_date).days
-#             remaining_days = max(0, total_duration - approved_payments.count())
-
-#             plans.append({
-#                 'id': scheme.id,  # Add scheme ID for payment URL
-#                 'img': service.img.url if service.img else None,
-#                 'product_id': scheme.product_id,
-#                 'title': service.title,
-#                 'investment': scheme.investment,
-#                 'balance': balance,
-#                 'remaining_days': remaining_days,
-#                 'payment_status': payment_status,
-#                 'needs_payment': needs_payment,
-#             })
-#         except Services.DoesNotExist:
-#             continue
-
-#     context = {'plans': plans}
-#     return render(request, 'plans.html', context)
+@login_required
+def upto_view(request):
+   return render(request, 'upto.html')
 
 @login_required
 def payment_history(request):
-    profile = request.user.profile  # Get logged-in user's profile
+    profile = request.user.profile  # Get the logged-in user's profile
 
-    # Fetch all approved payments for the user
-    payments = Payment.objects.filter(profile=profile, payment_status='approved').select_related('product_scheme')
+    # Fetch all successful payments for the user
+    payments = PaymentOrder.objects.filter(profile=profile, payment_status='SUCCESSFUL').order_by('created_at')
 
     history = []
+
     for payment in payments:
-        scheme = payment.product_scheme
-        if scheme:
-            try:
-                service = Services.objects.get(product_id=scheme.product_id)  # Fetch service details
-                
-                # Fetch the count of approved payments up to the current payment date
-                approved_payments_count = Payment.objects.filter(
-                    product_scheme=scheme, 
-                    payment_status='approved',
-                    created_at__lte=payment.created_at  # Count payments made up to the current payment date
-                ).count()
+        try:
+            scheme = ProductScheme.objects.get(product_id=payment.product_id)
+            service = Services.objects.get(product_id=payment.product_id)
 
-                # Calculate the balance considering only the payments made up to the current date
-                total_paid = approved_payments_count * scheme.investment  # Approved payments till now
-                balance = max(0, scheme.total - total_paid)  # Correct balance calculation
-                
-                history.append({
-                    'product_id': service.product_id,
+            # Get the date of this specific payment
+            payment_date = payment.created_at.astimezone(get_current_timezone()).date()
+
+            # Fetch only successful payments **made up to this date**
+            approved_payments = PaymentOrder.objects.filter(
+                product_id=scheme.product_id,
+                payment_status='SUCCESSFUL',
+                created_at__date__lte=payment_date  # Only payments made up to this date
+            )
+
+            # Calculate total paid as of this payment date
+            total_paid = sum(p.amount for p in approved_payments)
+            balance = max(0, scheme.total - total_paid)
+
+            # Calculate remaining days as of this payment date
+            total_duration = (scheme.end_date - scheme.start_date).days
+            remaining_days = max(0, total_duration - approved_payments.count())
+
+            history.append({
+                'payment_date': payment_date,  # Show actual payment date
+                'plan': {
                     'title': service.title,
-                    'investment': scheme.investment,
-                    'balance': balance,
-                    'transaction_id': payment.transaction_id,
-                    'payment_paid_date': payment.created_at,
-                })
-            except Services.DoesNotExist:
-                continue
+                    'investment': scheme.investment,  
+                    'balance': balance,  # Balance based on the payment date
+                    'remaining_days': remaining_days,  # Remaining days based on the payment date
+                    'last_payment_date': payment_date,
+                },
+                'service_total': scheme.total,
+            })
 
-    return render(request, "payment_history.html", {"history": history})
+        except (Services.DoesNotExist, ProductScheme.DoesNotExist):
+            continue
 
-# @login_required
-# def plans_view(request):
-#     profile = request.user.profile
-#     product_schemes = ProductScheme.objects.filter(profile=profile)
-
-#     plans = []
-#     for scheme in product_schemes:
-#         try:
-#             service = Services.objects.get(product_id=scheme.product_id)
-#             approved_payments = PaymentOrder.objects.filter(product_id=scheme.product_id, payment_status='SUCCESSFUL')
-
-#             # Fetch the latest payment
-#             latest_payment = PaymentOrder.objects.filter(product_id=scheme.product_id).order_by('-created_at').first()
-#             today = date.today()
-            
-#             # Default values
-#             payment_status = 'PENDING'
-#             needs_payment = False
-#             total_paid = approved_payments.count() * scheme.investment
-#             balance = max(0, scheme.total - total_paid)
-#             last_payment_date = None 
-            
-#             if latest_payment:
-#                 payment_status = latest_payment.payment_status
-#                 last_payment_date = latest_payment.created_at.date()
-                
-#                 # Enable payment if:
-#                 # 1. Payment was failed
-#                 # 2. Last successful payment is older than today
-#                 if payment_status == 'FAILED' or (payment_status == 'SUCCESSFUL' and last_payment_date < today):
-#                     needs_payment = True
-#             else:
-#                 # No payments made yet
-#                 payment_status = 'NOT_PAID'
-#                 needs_payment = True
-            
-#             # Calculate remaining days
-#             total_duration = (scheme.end_date - scheme.start_date).days
-#             remaining_days = max(0, total_duration - approved_payments.count())
-
-#             plans.append({
-#                 'id': scheme.id,
-#                 'img': service.img.url if service.img else None,
-#                 'product_id': scheme.product_id,
-#                 'title': service.title,
-#                 'investment': scheme.investment,
-#                 'balance': balance,
-#                 'remaining_days': remaining_days,
-#                 'payment_status': payment_status,
-#                 'needs_payment': needs_payment,
-#                 'last_payment_date': last_payment_date,
-#             })
-#         except Services.DoesNotExist:
-#             continue
-
-#     context = {'plans': plans}
-#     return render(request, 'plans.html', context)
+    return render(request, "payment_history.html", {"payment_history": history})
 
 def paymentview(request, plan_id):
     if request.method == 'GET':
@@ -415,7 +351,13 @@ def paymentview(request, plan_id):
             # Get the plan and amount
             plan = ProductScheme.objects.get(id=plan_id)
             product_id = request.GET.get('product_id')
-            profile = request.GET.get('profile')
+            
+            # Get the profile of the logged-in user
+            if request.user.is_authenticated:
+                profile = get_object_or_404(Profile, user=request.user)  
+            else:
+                return JsonResponse({'error': 'User not authenticated'}, status=403)
+            
             amount = int(plan.investment * 100)  # Convert to paise
             
             # Create Razorpay client and order
@@ -476,7 +418,8 @@ def plans_view(request):
 
             if latest_payment:
                 payment_status = latest_payment.payment_status
-                last_payment_date = latest_payment.created_at.date()
+                # last_payment_date = latest_payment.created_at.date()
+                last_payment_date = latest_payment.created_at.astimezone(tz = get_current_timezone()).date()
 
                 # Enable payment if:
                 # 1. Payment failed
@@ -509,6 +452,21 @@ def plans_view(request):
             continue
 
     return render(request, 'plans.html', {'plans': plans})
+
+@login_required
+def edit_profile(request):
+    profile = request.user.profile  # Get the logged-in user's profile
+
+    if request.method == "POST":
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect('profile')
+    else:
+        form = ProfileUpdateForm(instance=profile)
+
+    return render(request, "edit_profile.html", {"form": form})
 
 @csrf_exempt
 def payment_callback(request):

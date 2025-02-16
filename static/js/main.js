@@ -114,15 +114,12 @@
         }
     });
 
-
     // Facts counter
     $('[data-toggle="counter-up"]').counterUp({
         delay: 5,
         time: 2000
     });
 
-
-    
    // Back to top button
    $(window).scroll(function () {
     if ($(this).scrollTop() > 300) {

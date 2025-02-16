@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from razorpay import Payment
 from .models import Profile, ProductScheme, Payment
 
 class SignupForm(forms.ModelForm):
@@ -126,6 +127,11 @@ class SignupForm(forms.ModelForm):
             user.save()
         return user
 
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['profile_photo', 'kyc_document_type', 'kyc_document', 'pan_card', 'bank_passbook']
+
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
@@ -151,10 +157,10 @@ class PaymentForm(forms.ModelForm):
         model = Payment
         fields = ['product_scheme', 'transaction_id', 'payment_proof']
     
-    def __init__(self, *args, **kwargs):
+    def _init_(self, *args, **kwargs):
         # Get the user from the kwargs
         user = kwargs.pop('user', None)  # This removes the 'user' key from kwargs
-        super().__init__(*args, **kwargs)
+        super()._init_(*args, **kwargs)
         if user:
             # Filter product schemes by the logged-in user's profile
             self.fields['product_scheme'].queryset = ProductScheme.objects.filter(profile=user.profile)

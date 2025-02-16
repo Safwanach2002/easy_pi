@@ -850,6 +850,40 @@
 .team .team-item:hover .team-content .team-content-inner h4 {
     color: var(--bs-dark) !important;
 }
+
+/* Paragraph Styling */
+.col-lg-8 p {
+    font-size: 13px; /* Adjust this value as needed */
+    line-height: 1.6;
+    font-weight: 400;
+    text-align: justify;
+    color: #333; /* Optional: Change text color if needed */
+}
+
+/* Strong Text */
+.col-lg-8 p strong {
+    font-size: 15px; /* Slightly larger for emphasis */
+    font-weight: 700;
+    color: #000;
+}
+
+/* No Wrap for Important Text */
+.col-lg-8 .nowrap {
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .col-lg-8 p {
+        font-size: 16px; /* Smaller font size for mobile */
+        line-height: 1.5;
+    }
+
+    .col-lg-8 p strong {
+        font-size: 18px;
+    }
+}
 /*** Team End ***/
 
 /*** Testimonial Start ***/
@@ -880,6 +914,7 @@
     width: 40px;
     background: var(--bs-primary);
 }
+
 /*** Testimonial End ***/
 
 /*** FAQ'S Start ***/
@@ -954,3 +989,4 @@
     background: var(--bs-dark) !important;
 }
 /*** copyright end ***/
+
