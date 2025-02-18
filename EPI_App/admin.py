@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.contrib import admin
-from .models import Combo, Investment, PaymentOrder, Profile, Services, Referral, ProductScheme
+from .models import Combo, ComboImage, Investment, PaymentOrder, Profile, ServiceImage, Services, Referral, ProductScheme
 
 # Register your models here.
 class ProfileAdmin(admin.ModelAdmin):
@@ -41,10 +41,18 @@ class ServicesAdmin(admin.ModelAdmin):
     search_fields = ('title', 'product_id')
     list_filter = ('total',)
 
+class ServiceImageInline(admin.TabularInline):
+    model = ServiceImage
+    extra = 1  # Add one extra empty form for adding new images
+
 class ComboAdmin(admin.ModelAdmin):
     list_display = ('title', 'product_id', 'total')
     search_fields = ('title', 'product_id')
     list_filter = ('total',)
+
+class ComboImageInline(admin.TabularInline):
+    model = ComboImage
+    extra = 1  # Add one extra empty form for adding new images
 
 class ProductSchemeAdmin(admin.ModelAdmin):
     list_display = ('product_id', 'investment', 'start_date', 'end_date', 'days', 'total', 'profile')
@@ -101,6 +109,9 @@ class PaymentOrderAdmin(admin.ModelAdmin):
             'fields': ('created_at', 'updated_at')
         }),
     )
+
+admin.site.register(ServiceImage)
+admin.site.register(ComboImage)
 admin.site.register(PaymentOrder,PaymentOrderAdmin)
 admin.site.register(Investment, InvestmentAdmin)
 admin.site.register(Services,ServicesAdmin)

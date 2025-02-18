@@ -275,7 +275,7 @@
                 <p>Share your referral link on:</p>
                 <div class="d-flex justify-content-center gap-3">
                     <!-- WhatsApp -->
-                    <a href="https://api.whatsapp.com/send?text=Join%20and%20earn%20rewards!%20Use%20my%20referral%20code%3A%20{{ referral_link }}"
+                    <a href="https://api.whatsapp.com/send?text=Earn 25% commission on every sale! 🎉 Share your referral code ZO8K3HD8 and get rewarded when your friends buy. Start earning today! 🚀 https://epielio.com?code=ZO8K3HD8"
                        class="btn btn-success" data-platform="whatsapp" target="_blank">
                        <i class="fab fa-whatsapp"></i>
                     </a>
@@ -351,7 +351,7 @@ document.getElementById("convert-icon").addEventListener("click", function () {
 
 function shareReferralCode(platform, code) {
     const referralLink = `https://epielio.com?code=${encodeURIComponent(code)}`;
-    const message = encodeURIComponent(`(Join and earn rewards! Use my referral code: ${code})`);
+    const message = `Earn 25% commission on every sale! 🎉 Share your referral code ${code} and get rewarded when your friends buy. Start earning today! 🚀;`;
     let url = '';
 
     switch(platform) {

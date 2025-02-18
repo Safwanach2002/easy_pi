@@ -104,7 +104,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -140,3 +139,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 RAZOR_KEY_ID = 'rzp_test_qMOzQiig3dXfhl'
 RAZOR_KEY_SECRET = 'Ux8MA6HhnyQlMVO4BgRLOVFk'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'epielio.com@gmail.com'
+EMAIL_HOST_PASSWORD = 'ljzctodtrbdrwqks'
+DEFAULT_FROM_EMAIL = 'webmaster@localhost'

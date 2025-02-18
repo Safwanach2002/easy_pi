@@ -507,8 +507,11 @@
                 <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">Combo Set</h4>
                 <ol class="breadcrumb justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
                     <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'services' %}">All Items</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'upto' %}">Upto 22</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'coming_soon' %}">coming Soon</a></li>
                     <li class="breadcrumb-item active text-primary">Combo Set</li>
-                </ol>    
+                </ol>     
             </div>
         </div>
         <!-- Header End -->
@@ -558,23 +561,38 @@
         </div>
         
         {% for i in combo %}
-        <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;" data-category="{{ service.category }}">
+        <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;" data-category="{{ i.category }}">
             <div class="product-card shadow-sm bg-white rounded overflow-hidden position-relative">
-                <!-- Image Section -->
+                
+                <!-- Image Section with Carousel -->
                 <div class="product-img position-relative">
-                    <img src="{{ i.img.url }}" class="img-fluid w-100 toggle-image" alt="{{ i.title }}" 
-                        style="height: 250px; object-fit: cover; cursor: pointer;">
+                    <div id="carousel-combo-{{ i.id }}" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for image in i.images.all %}
+                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                    <img src="{{ image.image.url }}" class="d-block w-100" style="height: 250px; object-fit: cover;">
+                                </div>
+                            {% endfor %}
+                        </div>
+        
+                        <!-- Carousel Controls -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-combo-{{ i.id }}" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-combo-{{ i.id }}" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Add Now Button in the Center of Image -->
                     <div class="overlay d-flex align-items-center justify-content-center">
-                        <a href="{% url 'product_scheme_combo' %}?id={{ i.id }}&total={{ i.total }}" 
-                        class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
+                        <a href="{% url 'product_scheme_combo' %}?id={{ i.id }}&total={{ i.total }}" class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
                     </div>
                 </div>
         
-                <!-- Product Title -->
+                <!-- Product Title and Price -->
                 <div class="product-content p-3">
                     <h5 class="mb-2 text-dark">{{ i.title }}</h5>
-                    
-                    <!-- <p class="text-muted small">Category: {{ service.get_category_display }}</p> -->
                     <p class="h5 text-primary">₹{{ i.total }}</p>
         
                     <!-- Toggle Button -->
@@ -589,9 +607,8 @@
                 </div>
             </div>
         </div>
-    {% endfor %}
+        {% endfor %}
     </div>
-</div>
 
         <!-- Footer Start -->
         <div class="container-fluid footer py-5 wow fadeIn" data-wow-delay="0.2s">

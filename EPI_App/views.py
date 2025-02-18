@@ -151,48 +151,6 @@ def login_view(request):
         
     return render(request, 'login.html', {'form': form})
 
-def about(request):
-    return render(request,'about.html')
-
-def about1(request):
-    return render(request,'about1.html')
-
-def contact(request):
-    return render(request,'contact.html')
-
-def contact1(request):
-    return render(request,'contact1.html')
-
-def reference(request):
-    return render(request,'reference.html')
-
-def index(request):
-    return render(request, 'index.html')
-
-def welcome_page(request):
-    return render(request, 'welcome.html')
- 
-def terms(request):
-    return render(request,'terms.html')
-
-@login_required
-def profile_view(request):
-    # Fetch user profile data
-    profile = request.user.profile
-    return render(request, 'profile.html', {'profile': request.user.profile})
-
-def logout_view(request):
-    logout(request)
-    return redirect('welcome')
-
-def services_view(request):
-    services = Services.objects.all()
-    return render(request, 'services.html', {'services': services})
-
-@login_required
-def payment_success(request):
-    return render(request, 'payment_success.html')
-
 @login_required 
 def product_scheme_manage(request):
     product_id = request.GET.get('id')  # Fetch `id` (service ID) from the request
@@ -290,7 +248,7 @@ def privacy_view(request):
    return render(request, 'privacy.html')
 
 def combo_view(request):
-    combo = Combo.objects.all()
+    combo = Combo.objects.prefetch_related('images').all()
     return render(request, 'combo.html', {'combo': combo})
 
 @login_required
@@ -301,6 +259,48 @@ def upto_view(request):
 def comingsoon_view(request):
    return render(request, 'coming_soon.html')
 
+def about(request):
+    return render(request,'about.html')
+
+def about1(request):
+    return render(request,'about1.html')
+
+def contact(request):
+    return render(request,'contact.html')
+
+def contact1(request):
+    return render(request,'contact1.html')
+
+def reference(request):
+    return render(request,'reference.html')
+
+def index(request):
+    return render(request, 'index.html')
+
+def welcome_page(request):
+    return render(request, 'welcome.html')
+ 
+def terms(request):
+    return render(request,'terms.html')
+
+@login_required
+def profile_view(request):
+    # Fetch user profile data
+    profile = request.user.profile
+    return render(request, 'profile.html', {'profile': request.user.profile})
+
+def logout_view(request):
+    logout(request)
+    return redirect('welcome')
+
+def services_view(request):
+    services = Services.objects.prefetch_related('images').all()  # Fetch services with images
+    return render(request, 'services.html', {'services':services})
+
+@login_required
+def payment_success(request):
+    return render(request, 'payment_success.html')
+
 @login_required
 def payment_history(request):
     profile = request.user.profile  # Get the logged-in user's profile
@@ -310,6 +310,7 @@ def payment_history(request):
 
     history = []
     daily_payment_tracker = defaultdict(int)  # Tracks total paid on each day
+    today = date.today()
 
     for payment in payments:
         try:
@@ -330,16 +331,15 @@ def payment_history(request):
             # Track daily payments
             daily_payment_tracker[payment_date] += payment.amount
 
-            # Get all unique dates where payments were made
-            unique_payment_dates = sorted(daily_payment_tracker.keys())
-
-            # Compute cumulative balance and remaining days
-            total_paid = sum(daily_payment_tracker[d] for d in unique_payment_dates if d <= payment_date)
+             # Fetch all successful payments for the scheme
+            approved_payments = PaymentOrder.objects.filter(product_id=scheme.product_id, payment_status='SUCCESSFUL')
+            total_paid = approved_payments.count() * scheme.investment  # Correct calculation of total paid
             balance = max(0, scheme.total - total_paid)
 
-            # Remaining days based on payments made
+            # Calculate remaining days based on approved payments
             total_duration = (scheme.end_date - scheme.start_date).days
-            remaining_days = max(0, total_duration - len(unique_payment_dates))
+            remaining_days = max(0, total_duration - approved_payments.count())
+
 
             history.append({
                 'payment_date': payment_date,
@@ -448,7 +448,7 @@ def plans_view(request):
         plans.append({
             'id': scheme.id,
             'profile': profile,
-            'img': service.img.url if service.img else None,
+            'img':service.images.first().image.url if service.images.exists()else None,
             'product_id': scheme.product_id,
             'title': service.title,
             'investment': scheme.investment,

@@ -104,16 +104,22 @@ class Services(models.Model):
     product_id = models.CharField(max_length=100, null=True)
     title = models.CharField(max_length=50)
     total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    img = models.ImageField(upload_to="pics")
     desc = models.CharField(max_length=500, null=True)
     category = models.CharField(
         max_length=20,
         choices=CATEGORY_CHOICES,
-        default=OTHERS,  # Default to 'Others' if no category is selected
+        default=OTHERS,
     )
 
     def _str_(self):
         return self.title
+
+class ServiceImage(models.Model):
+    service = models.ForeignKey(Services, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to="pics")
+
+    def _str_(self):
+        return f"Image for {self.service.title}"
 
 class Combo(models.Model):
     ELECTRONICS = 'electronics'
@@ -135,7 +141,6 @@ class Combo(models.Model):
     product_id = models.CharField(max_length=100, null=True)
     title = models.CharField(max_length=50)
     total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    img = models.ImageField(upload_to="pics")
     desc = models.CharField(max_length=500, null=True)
     category = models.CharField(
         max_length=20,
@@ -145,6 +150,13 @@ class Combo(models.Model):
 
     def _str_(self):
         return self.title
+    
+class ComboImage(models.Model):
+    Combo = models.ForeignKey(Combo, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to="pics")
+
+    def _str_(self):
+        return f"Image for {self.service.title}"
 
 class ProductScheme(models.Model):
     product_id = models.CharField(max_length=100, null=True)

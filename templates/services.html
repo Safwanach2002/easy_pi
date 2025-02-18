@@ -507,17 +507,18 @@
                 <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">Our Products</h4>
                 <ol class="breadcrumb justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
                     <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-                    <li class="breadcrumb-item active text-primary">Products</li>
+                    <li class="breadcrumb-item"><a href="{% url 'combo' %}">Combo Set</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'upto' %}">Upto 22</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'coming_soon' %}">coming Soon</a></li>
+                    <li class="breadcrumb-item active text-primary">All Items</li>
                 </ol>    
             </div>
-        </div>
+        </div>
         <!-- Header End -->
 
 <!-- Add this right above the product listing section -->
 <div id="no-results" style="display: none;">No products found</div>
 
-<div class="row">
-    <!-- Search Bar -->
     <div class="row">
         <!-- Search Bar -->
         <div class="container mt-4">
@@ -562,28 +563,43 @@
         {% for service in services %}
         <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;" data-category="{{ service.category }}">
             <div class="product-card shadow-sm bg-white rounded overflow-hidden position-relative">
+                
                 <!-- Image Section -->
                 <div class="product-img position-relative">
-                    <img src="{{ service.img.url }}" class="img-fluid w-100 toggle-image" alt="{{ service.title }}" 
-                        style="height: 250px; object-fit: cover; cursor: pointer;">
+                    <div id="carousel-{{ service.id }}" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for image in service.images.all %}
+                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                    <img src="{{ image.image.url }}" class="d-block w-100" style="height: 250px; object-fit: cover;">
+                                </div>
+                            {% endfor %}
+                        </div>
+    
+                        <!-- Carousel Controls -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ service.id }}" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ service.id }}" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Add Now Button in the Center of Image -->
                     <div class="overlay d-flex align-items-center justify-content-center">
-                        <a href="{% url 'product_scheme_manage' %}?id={{ service.id }}&total={{ service.total }}" 
-                        class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
+                        <a href="{% url 'product_scheme_manage' %}?id={{ service.id }}&total={{ service.total }}" class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
                     </div>
                 </div>
-        
-                <!-- Product Title -->
+    
+                <!-- Product Title and Price -->
                 <div class="product-content p-3">
                     <h5 class="mb-2 text-dark">{{ service.title }}</h5>
-                    
-                    <!-- <p class="text-muted small">Category: {{ service.get_category_display }}</p> -->
                     <p class="h5 text-primary">₹{{ service.total }}</p>
-        
+    
                     <!-- Toggle Button -->
                     <button class="toggle-btn btn btn-link w-100 text-primary" data-id="{{ forloop.counter }}">
                         View Details 
                     </button>
-        
+    
                     <!-- Collapsible Details Section -->
                     <div class="details" id="details-{{ forloop.counter }}">
                         <p class="text-muted small">{{ service.desc }}</p>
@@ -593,7 +609,6 @@
         </div>
     {% endfor %}
     </div>
-</div>
 
         <!-- Footer Start -->
         <div class="container-fluid footer py-5 wow fadeIn" data-wow-delay="0.2s">
