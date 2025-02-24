@@ -83,7 +83,6 @@ class Referral(models.Model):
             raise ValidationError("You cannot refer yourself.")
         super().save(*args, **kwargs)
 
-
 class Services(models.Model):
     ELECTRONICS = 'electronics'
     MOBILES = 'mobiles'
@@ -111,15 +110,59 @@ class Services(models.Model):
         default=OTHERS,
     )
 
-    def _str_(self):
+    def __str__(self):
         return self.title
 
 class ServiceImage(models.Model):
     service = models.ForeignKey(Services, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to="pics")
 
-    def _str_(self):
+    def __str__(self):
         return f"Image for {self.service.title}"
+    
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    service = models.ForeignKey(Services, on_delete=models.CASCADE)  # Correct reference
+
+    class Meta:
+        unique_together = ('user','service')
+
+class Upto(models.Model):
+    KIDS = 'kids'
+    TEENS = 'teens'
+    YOUTHS = 'youths'
+    # FASHION = 'fashion'
+    # BOOKS = 'books'
+    OTHERS = 'others'
+
+    CATEGORY_CHOICES = [
+        (KIDS, 'Kids'),
+        (TEENS, 'Teens'),
+        (YOUTHS, 'Youths'),
+        # (FASHION, 'Fashion'),
+        # (BOOKS, 'Books'),
+        (OTHERS, 'Others'),
+    ]
+
+    product_id = models.CharField(max_length=100, null=True)
+    title = models.CharField(max_length=50)
+    total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    desc = models.CharField(max_length=500, null=True)
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        default=OTHERS,
+    )
+
+    def __str__(self):
+        return self.title
+
+class UptoImage(models.Model):
+    upto = models.ForeignKey(Upto, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to="pics")
+
+    def __str__(self):
+        return f"Image for {self.upto.title}"
 
 class Combo(models.Model):
     ELECTRONICS = 'electronics'
@@ -148,15 +191,15 @@ class Combo(models.Model):
         default=OTHERS,  # Default to 'Others' if no category is selected
     )
 
-    def _str_(self):
+    def __str__(self):
         return self.title
     
 class ComboImage(models.Model):
     Combo = models.ForeignKey(Combo, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to="pics")
 
-    def _str_(self):
-        return f"Image for {self.service.title}"
+    def __str__(self):
+        return f"Image for {self.Combo.title}"
 
 class ProductScheme(models.Model):
     product_id = models.CharField(max_length=100, null=True)
@@ -194,7 +237,7 @@ class Payment(models.Model):
     payment_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(default=now)
 
-    def _str_(self):
+    def __str__(self):
         return f"Payment for {self.product_scheme.product_id} by {self.profile.user.username}"
 
 class Investment(models.Model):
@@ -256,3 +299,27 @@ class PaymentOrder(models.Model):
 
     def __str__(self):
         return f"{self.order_id} - {self.payment_status}"
+    
+class WithdrawalRequest(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('success', 'Success'),
+    ]
+    METHOD_CHOICES = [
+        ('bank', 'Bank Transfer'),
+        ('upi', 'UPI Transfer'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    tds_deduction = models.DecimalField(max_digits=10, decimal_places=2)
+    final_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    method = models.CharField(max_length=10, choices=METHOD_CHOICES)
+    account_number = models.CharField(max_length=50, blank=True, null=True)
+    upi_id = models.CharField(max_length=50, blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def _str_(self):
+        return f"{self.user.username} - {self.amount} - {self.status}"

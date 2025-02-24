@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw Rewards</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #e0e5ec;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .withdraw-container {
+            max-width: 450px;
+            padding: 30px;
+            background: #e0e5ec;
+            border-radius: 15px;
+            box-shadow: 8px 8px 16px #b8bcc4, -8px -8px 16px #ffffff;
+            transition: all 0.3s ease-in-out;
+        }
+        .withdraw-container:hover {
+            box-shadow: 6px 6px 12px #b8bcc4, -6px -6px 12px #ffffff;
+        }
+        h2 {
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+        }
+        p {
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #e0e5ec;
+            box-shadow: inset 6px 6px 12px #b8bcc4, inset -6px -6px 12px #ffffff;
+            color: #333;
+            transition: all 0.3s ease-in-out;
+        }
+        input:focus, select:focus {
+            outline: none;
+            box-shadow: inset 4px 4px 8px #b8bcc4, inset -4px -4px 8px #ffffff;
+        }
+        .btn-primary {
+            width: 100%;
+            background: #e0e5ec;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 10px;
+            box-shadow: 6px 6px 12px #b8bcc4, -6px -6px 12px #ffffff;
+            transition: all 0.3s ease-in-out;
+            color: #333;
+        }
+        .btn-primary:hover {
+            box-shadow: 4px 4px 8px #b8bcc4, -4px -4px 8px #ffffff;
+            transform: scale(1.02);
+        }
+        .btn-primary:active {
+            box-shadow: inset 4px 4px 8px #b8bcc4, inset -4px -4px 8px #ffffff;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="withdraw-container">
+        <h2>Withdraw Rewards</h2>
+        <p><strong>Total Rewards:</strong> ₹{{ total_rewards|floatformat:2 }}</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                {% for field in form %}
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    <div class="error-message">{{ field.errors }}</div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Withdrawal</button>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

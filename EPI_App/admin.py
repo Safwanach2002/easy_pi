@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.contrib import admin
-from .models import Combo, ComboImage, Investment, PaymentOrder, Profile, ServiceImage, Services, Referral, ProductScheme
+from .models import Combo, ComboImage, Investment, PaymentOrder, Profile, ServiceImage, Services, Referral, ProductScheme, UptoImage, Upto, WithdrawalRequest
 
 # Register your models here.
 class ProfileAdmin(admin.ModelAdmin):
@@ -110,6 +110,33 @@ class PaymentOrderAdmin(admin.ModelAdmin):
         }),
     )
 
+class UptoImageInline(admin.TabularInline):
+    model = UptoImage
+    extra = 1  # Add one extra empty form for adding new images
+
+class UptoAdmin(admin.ModelAdmin):
+    list_display = ('title', 'product_id', 'total')
+    search_fields = ('title', 'product_id')
+    list_filter = ('total',)
+    inlines = [UptoImageInline]  # Add ServiceImageInline to manage images
+
+class WithdrawalRequestAdmin(admin.ModelAdmin):
+    list_display = ('user', 'amount', 'tds_deduction', 'final_amount', 'method', 'status', 'created_at')
+    list_filter = ('status', 'method', 'created_at')
+    search_fields = ('user__username', 'account_number', 'upi_id')
+    actions = ['mark_as_processing', 'mark_as_success']
+
+    def mark_as_processing(self, request, queryset):
+        queryset.update(status='processing')
+    mark_as_processing.short_description = "Mark selected requests as Processing"
+
+    def mark_as_success(self, request, queryset):
+        queryset.update(status='success')
+    mark_as_success.short_description = "Mark selected requests as Success"
+
+admin.site.register(WithdrawalRequest, WithdrawalRequestAdmin)
+admin.site.register(Upto,UptoAdmin)
+admin.site.register(UptoImage)
 admin.site.register(ServiceImage)
 admin.site.register(ComboImage)
 admin.site.register(PaymentOrder,PaymentOrderAdmin)

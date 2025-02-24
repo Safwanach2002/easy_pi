@@ -1,6 +1,6 @@
 from collections import defaultdict
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import ProfileUpdateForm, SignupForm, ProductSchemeForm
+from .forms import ProfileUpdateForm, SignupForm, ProductSchemeForm, WithdrawalForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
 from django.contrib import messages
@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from .models import Combo, Investment, Referral, Profile, ProductScheme, Services
+from .models import Combo, Investment, Referral, Profile, ProductScheme, Services, Upto, WithdrawalRequest
 from datetime import datetime, timedelta, date, timezone
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -28,7 +28,6 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponseBadRequest
 from .models import PaymentOrder, ProductScheme, Services
-from datetime import date
 from datetime import date
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -153,17 +152,17 @@ def login_view(request):
 
 @login_required 
 def product_scheme_manage(request):
-    product_id = request.GET.get('id')  # Fetch `id` (service ID) from the request
-    total = request.GET.get('total')  # Fetch `total` from the request
+    product_id = request.GET.get('id') # Fetch `id` (service ID) from the request
+    total = request.GET.get('total') # Fetch `total` from the request
 
     # Fetch the product_id and total from the Services model
     if product_id:
         try:
-            service = Services.objects.get(id=product_id)  # Fetch service based on ID
-            product_id = service.product_id  # Extract product_id from the service
-            total = service.total  # Extract total from the service
+            service = Services.objects.get(id=product_id) # Fetch service based on ID
+            product_id = service.product_id # Extract product_id from the service
+            total = service.total # Extract total from the service
         except Services.DoesNotExist:
-            product_id = None  # Reset to None if the service is not found
+            product_id = None # Reset to None if the service is not found
             total = None
 
     if request.method == 'POST':
@@ -173,7 +172,7 @@ def product_scheme_manage(request):
 
             # Set the profile to the currently logged-in user's profile
             profile = Profile.objects.get(user=request.user)
-            scheme.profile = profile  # Automatically set the profile field
+            scheme.profile = profile # Automatically set the profile field
 
             # Explicitly set product_id and total to ensure they are saved
             scheme.product_id = product_id
@@ -181,9 +180,9 @@ def product_scheme_manage(request):
             scheme.start_date = datetime.now()  # Set start date to current date
 
             # The end_date will be automatically calculated in the model during save
-            scheme.save()  # Save the scheme, which will also calculate the end_date
+            scheme.save() # Save the scheme, which will also calculate the end_date
 
-            return redirect('plans')  # Redirect to the payment page
+            return redirect('plans') # Redirect to the payment page
     else:
         # Pass initial values for product_id and total to the form
         form = ProductSchemeForm(initial={
@@ -199,17 +198,17 @@ def product_scheme_manage(request):
     })
 
 def product_scheme_combo(request):
-    product_id = request.GET.get('id')  # Fetch id (service ID) from the request
-    total = request.GET.get('total')  # Fetch total from the request
+    product_id = request.GET.get('id') # Fetch id (service ID) from the request
+    total = request.GET.get('total') # Fetch total from the request
 
     # Fetch the product_id and total from the Services model
     if product_id:
         try:
-            combo = Combo.objects.get(id=product_id)  # Fetch service based on ID
-            product_id = combo.product_id  # Extract product_id from the service
-            total = combo.total  # Extract total from the service
+            combo = Combo.objects.get(id=product_id) # Fetch service based on ID
+            product_id = combo.product_id # Extract product_id from the service
+            total = combo.total # Extract total from the service
         except Combo.DoesNotExist:
-            product_id = None  # Reset to None if the service is not found
+            product_id = None # Reset to None if the service is not found
             total = None
 
     if request.method == 'POST':
@@ -224,12 +223,12 @@ def product_scheme_combo(request):
             # Explicitly set product_id and total to ensure they are saved
             scheme.product_id = product_id
             scheme.total = total
-            scheme.start_date = datetime.now()  # Set start date to current date
+            scheme.start_date = datetime.now() # Set start date to current date
 
             # The end_date will be automatically calculated in the model during save
-            scheme.save()  # Save the scheme, which will also calculate the end_date
+            scheme.save() # Save the scheme, which will also calculate the end_date
 
-            return redirect('plans')  # Redirect to the payment page
+            return redirect('plans') # Redirect to the payment page
     else:
         # Pass initial values for product_id and total to the form
         form = ProductSchemeForm(initial={
@@ -244,6 +243,52 @@ def product_scheme_combo(request):
         'total': total,
     })
 
+@login_required
+def product_scheme_upto(request):
+    product_id = request.GET.get('id')  # Fetch id (service ID) from the request
+    total = request.GET.get('total')  # Fetch total from the request
+
+    # Fetch the product object and category
+    upto22 = None
+    category = None
+    if product_id:
+        try:
+            upto22 = Upto.objects.get(id=product_id)  # Fetch product
+            product_id = upto22.product_id  # Extract product_id
+            total = upto22.total  # Extract total
+            category = upto22.category  # Extract category
+        except Upto.DoesNotExist:
+            product_id = None
+            total = None
+            category = None
+
+    if request.method == 'POST':
+        form = ProductSchemeForm(request.POST)
+        if form.is_valid():
+            scheme = form.save(commit=False)
+            profile = Profile.objects.get(user=request.user)
+            scheme.profile = profile  # Assign user profile
+            scheme.product_id = product_id
+            scheme.total = total
+            scheme.start_date = datetime.now()
+            scheme.save()
+
+            return redirect('plans')  # Redirect to plans page
+
+    else:
+        form = ProductSchemeForm(initial={
+            'product_id': product_id,
+            'total': total,
+        })
+
+    # Pass the category to the template
+    return render(request, 'product_scheme_upto.html', {
+        'form': form,
+        'product_id': product_id,
+        'total': total,
+        'category': category,  # Now category is available in the template
+    })
+
 def privacy_view(request):
    return render(request, 'privacy.html')
 
@@ -253,7 +298,8 @@ def combo_view(request):
 
 @login_required
 def upto_view(request):
-   return render(request, 'upto.html')
+   upto = Upto.objects.prefetch_related('images').all()  # Fetch services with images
+   return render(request, 'upto.html', {'upto': upto})
 
 @login_required
 def comingsoon_view(request):
@@ -294,8 +340,83 @@ def logout_view(request):
     return redirect('welcome')
 
 def services_view(request):
-    services = Services.objects.prefetch_related('images').all()  # Fetch services with images
+    services = Services.objects.prefetch_related('images').all()
     return render(request, 'services.html', {'services':services})
+
+def services_view(request):
+    services = Services.objects.all()
+    return render(request, 'services.html', {'services': services})
+
+def toggle_favorite(request, item_type, item_id):
+    """Handles adding/removing services, upto22, and combo items from session-based favorites."""
+    
+    # Map item types to models
+    model_map = {
+        'service': Services,
+        'upto22': Upto,
+        'combo': Combo
+    }
+    
+    if item_type not in model_map:
+        return JsonResponse({"error": "Invalid item type"}, status=400)
+    
+    model = model_map[item_type]
+    item = get_object_or_404(model, id=item_id)
+
+    # Ensure session favorites is a dictionary
+    if not isinstance(request.session.get('favorites'), dict):
+        print("ERROR: request.session['favorites'] is not a dictionary! Resetting to default.")
+        request.session['favorites'] = {"service": [], "upto22": [], "combo": []}
+
+    # Ensure the category exists in the dictionary
+    if item_type not in request.session['favorites']:
+        request.session['favorites'][item_type] = []
+
+    # Toggle favorite: Add if not present, else remove
+    favorites = request.session['favorites'][item_type]
+    item_id = int(item_id)
+
+    if item_id in favorites:
+        favorites.remove(item_id)
+        favorited = False
+    else:
+        favorites.append(item_id)
+        favorited = True
+
+    # Update session and save changes
+    request.session['favorites'][item_type] = favorites
+    request.session.modified = True
+
+    # Handle AJAX requests for real-time updates
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({"favorited": favorited})
+
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+def favorite_list(request):
+    """Retrieves all items added to session-based favorites and displays them."""
+    
+    # Debugging print statement
+    print("DEBUG: request.session.get('favorites') =", request.session.get('favorites'))
+
+    # Retrieve favorite item IDs from session
+    favorite_data = request.session.get('favorites', {"service": [], "upto22": [], "combo": []})
+
+    # Ensure favorite_data is a dictionary
+    if not isinstance(favorite_data, dict):
+        print("ERROR: favorite_data is not a dictionary! Resetting to default.")
+        favorite_data = {"service": [], "upto22": [], "combo": []}
+
+    # Fetch corresponding objects from each model
+    favorites_services = Services.objects.filter(id__in=favorite_data.get("service", []))
+    favorites_upto22 = Upto.objects.filter(id__in=favorite_data.get("upto22", []))
+    favorites_combo = Combo.objects.filter(id__in=favorite_data.get("combo", []))
+
+    return render(request, 'favorites_page.html', {
+        'favorites_services': favorites_services,
+        'favorites_upto22': favorites_upto22,
+        'favorites_combo': favorites_combo
+    })
 
 @login_required
 def payment_success(request):
@@ -305,16 +426,18 @@ def payment_success(request):
 def payment_history(request):
     profile = request.user.profile  # Get the logged-in user's profile
 
-    # Fetch all successful payments for the user
+    # Fetch all successful payments for the user in ascending order
     payments = PaymentOrder.objects.filter(profile=profile, payment_status='SUCCESSFUL').order_by('created_at')
 
     history = []
-    daily_payment_tracker = defaultdict(int)  # Tracks total paid on each day
-    today = date.today()
+    scheme_balances = {}  # Store remaining balance per scheme
+    scheme_remaining_days = {}  # Store remaining days per scheme
 
     for payment in payments:
         try:
             scheme = ProductScheme.objects.get(product_id=payment.product_id)
+
+            # Identify scheme type
             try:
                 service = Services.objects.get(product_id=payment.product_id)
                 scheme_type = 'service'
@@ -323,31 +446,35 @@ def payment_history(request):
                     service = Combo.objects.get(product_id=payment.product_id)
                     scheme_type = 'combo'
                 except Combo.DoesNotExist:
-                    continue
+                    try:
+                        service = Upto.objects.get(product_id=payment.product_id)
+                        scheme_type = 'upto'
+                    except Upto.DoesNotExist:
+                        continue
 
-            # Get the payment date (converted to local timezone)
             payment_date = payment.created_at.astimezone(get_current_timezone()).date()
+            product_id = scheme.product_id
 
-            # Track daily payments
-            daily_payment_tracker[payment_date] += payment.amount
+            # Set initial balance and remaining days for the scheme if not already set
+            if product_id not in scheme_balances:
+                scheme_balances[product_id] = scheme.total  # Initial total balance
+                scheme_remaining_days[product_id] = (scheme.end_date - scheme.start_date).days  # Total duration
 
-             # Fetch all successful payments for the scheme
-            approved_payments = PaymentOrder.objects.filter(product_id=scheme.product_id, payment_status='SUCCESSFUL')
-            total_paid = approved_payments.count() * scheme.investment  # Correct calculation of total paid
-            balance = max(0, scheme.total - total_paid)
+            # Store previous balance & days for history tracking
+            previous_balance = scheme_balances[product_id]
+            previous_days = scheme_remaining_days[product_id]
 
-            # Calculate remaining days based on approved payments
-            total_duration = (scheme.end_date - scheme.start_date).days
-            remaining_days = max(0, total_duration - approved_payments.count())
-
+            # Deduct investment amount per payment
+            scheme_balances[product_id] -= scheme.investment  # Reduce by investment, not payment amount
+            scheme_remaining_days[product_id] = max(0, scheme_remaining_days[product_id] - 1)  # Decrease remaining days
 
             history.append({
                 'payment_date': payment_date,
                 'plan': {
                     'title': service.title,
                     'investment': scheme.investment,
-                    'balance': balance,  # Updated balance as of this payment date
-                    'remaining_days': remaining_days,  # Remaining days updates dynamically
+                    'balance': scheme_balances[product_id], # Store updated balance after deduction
+                    'remaining_days': scheme_remaining_days[product_id], # Store updated remaining days
                     'last_payment_date': payment_date,
                 },
                 'service_total': scheme.total,
@@ -356,7 +483,7 @@ def payment_history(request):
 
         except (ProductScheme.DoesNotExist, Services.DoesNotExist, Combo.DoesNotExist):
             continue
-
+    
     return render(request, "payment_history.html", {"payment_history": history})
 
 def paymentview(request, plan_id):
@@ -424,7 +551,11 @@ def plans_view(request):
                 service = Combo.objects.get(product_id=scheme.product_id)
                 scheme_type = 'combo'
             except Combo.DoesNotExist:
-                continue
+                try:
+                    service = Upto.objects.get(product_id=scheme.product_id)
+                    scheme_type = 'upto'
+                except Upto.DoesNotExist:
+                    continue
 
         approved_payments = PaymentOrder.objects.filter(product_id=scheme.product_id, payment_status='SUCCESSFUL')
         latest_payment = PaymentOrder.objects.filter(product_id=scheme.product_id).order_by('-created_at').first()
@@ -448,7 +579,7 @@ def plans_view(request):
         plans.append({
             'id': scheme.id,
             'profile': profile,
-            'img':service.images.first().image.url if service.images.exists()else None,
+            'img':service.images.first().image.url if service.images.exists() else None,  #
             'product_id': scheme.product_id,
             'title': service.title,
             'investment': scheme.investment,
@@ -461,7 +592,6 @@ def plans_view(request):
         })
 
     return render(request, 'plans.html', {'plans': plans})
-
 
 @login_required
 def edit_profile(request):
@@ -514,3 +644,29 @@ def payment_callback(request):
             return JsonResponse({'error': str(e)}, status=400)
             
     return HttpResponseBadRequest()
+
+@login_required
+def withdraw_request(request):
+    total_rewards = request.user.profile.rewards_earned  # Corrected field name
+    if request.method == "POST":
+        form = WithdrawalForm(request.POST)
+        if form.is_valid():
+            withdrawal = form.save(commit=False)
+            withdrawal.user = request.user
+            if withdrawal.amount > total_rewards:
+                form.add_error("amount", "You do not have enough rewards to withdraw this amount.")
+            elif withdrawal.amount < Decimal('10.00'):
+                form.add_error("amount", "Minimum withdrawal amount is ₹10.")
+            else:
+                withdrawal.tds_deduction = withdrawal.amount * Decimal('0.1')  # Use Decimal instead of float
+                withdrawal.final_amount = withdrawal.amount - withdrawal.tds_deduction
+                withdrawal.save()
+                return redirect("withdrawal_history")
+    else:
+        form = WithdrawalForm()
+    return render(request, "withdraw.html", {"form": form, "total_rewards": total_rewards})
+
+@login_required
+def withdrawal_history(request):
+    withdrawals = WithdrawalRequest.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, "history.html", {"withdrawals": withdrawals})

@@ -33,394 +33,438 @@
 
     <style>
         /* General Product Card Styling */
-.product-card {
-    border-radius: 10px;
-    overflow: hidden;
-    background: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    margin-bottom: 20px;
-}
+        .product-card {
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            margin-bottom: 20px;
+        }
 
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-}
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
 
-/* Product Image */
-.product-img {
-    position: relative;
-    overflow: hidden;
-    border-bottom: 2px solid #ddd;
-}
+        /* Product Image */
+        .product-img {
+            position: relative;
+            overflow: hidden;
+            border-bottom: 2px solid #ddd;
+        }
 
-.product-img img {
-    width: 100%;
-    height: auto; /* Ensure image scales properly */
-    object-fit: cover;
-    transition: transform 0.3s ease-in-out;
-}
+        .product-img img {
+            width: 100%;
+            height: auto; /* Ensure image scales properly */
+            object-fit: cover;
+            transition: transform 0.3s ease-in-out;
+        }
 
-.product-card:hover .product-img img {
-    transform: scale(1.05);
-}
+        .product-card:hover .product-img img {
+            transform: scale(1.05);
+        }
 
-/* Hover Overlay */
-.product-img .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        /* Hover Overlay */
+        .product-img .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5; /* Lower than favorite-icon */
+        }
 
-.product-card:hover .overlay {
-    opacity: 1;
-}
+        .product-card:hover .overlay {
+            opacity: 1;
+        }
 
-/* Overlay Button */
-.product-img .overlay a {
-    color: white;
-    background: #007bff;
-    padding: 8px 16px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-weight: bold;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-    transform: translateY(10px);
-}
+        /* Overlay Button */
+        .product-img .overlay a {
+            color: white;
+            background: #007bff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transform: translateY(10px);
+        }
 
-.product-card:hover .overlay a {
-    opacity: 1;
-    transform: translateY(0);
-}
+        .product-card:hover .overlay a {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-/* Product Content */
-.product-content {
-    text-align: center;
-    padding: 15px;
-}
+        /* Product Content */
+        .product-content {
+            text-align: center;
+            padding: 15px;
+        }
 
-.product-content h5 {
-    font-weight: 600;
-    font-size: 18px;
-    margin-bottom: 8px;
-}
+        .product-content h5 {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
 
-.product-content p {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 10px;
-}
+        .product-content p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+        }
 
-/* Product Price */
-.product-price {
-    font-size: 16px;
-    font-weight: bold;
-    color: #007bff;
-}
+        /* Product Price */
+        .product-price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #007bff;
+        }
 
-/* Add Button */
-.add-button {
-    display: inline-block;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    border-radius: 20px;
-    background: #007bff;
-    color: white;
-    text-decoration: none;
-    transition: background 0.3s ease-in-out;
-}
+        /* Add Button */
+        .add-button {
+            display: inline-block;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-radius: 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s ease-in-out;
+        }
 
-.add-button:hover {
-    background: #0056b3;
-}
+        .add-button:hover {
+            background: #0056b3;
+        }
 
-.details {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out, padding 0.3s ease;
-    padding: 0 15px;
-}
+        /* Favorite Icon Styling */
+        .favorite-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 32px;
+            color: #44d2f6;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
+            z-index: 10; /* Higher than .overlay */
+        }
 
-.details.show {
-    max-height: 200px;
-    padding: 10px 15px;
-}
+        .favorite-icon i {
+            transition: transform 0.3s ease-in-out;
+        }
 
-.toggle-btn {
-    background: none;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    outline: none;
-    padding: 5px;
-    text-align: center;
-}
+        .favorite-icon:hover {
+            transform: scale(1.1);
+        }
 
-/* Default Bootstrap Grid for Desktop */
-.col-md-6 {
-    flex: 0 0 50%;
-    max-width: 50%;
-}
+        .favorite-icon i.far {
+            color: #44d2f6; /* Outlined Heart */
+        }
 
-#category-container {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    margin-bottom: 20px;
+        .favorite-icon i.fas {
+            color: #44d2f6; /* Filled Heart */
+        }
 
-}
+        .details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            padding: 0 15px;
+        }
 
-.category-item {
-    
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-}
+        .details.show {
+            max-height: 200px;
+            padding: 10px 15px;
+        }
 
-.category-item img {
-    width: 10px; /* Adjust size */
-    height: 80px;
-}
+        .toggle-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            outline: none;
+            padding: 5px;
+            text-align: center;
+        }
 
-.category-item:hover {
-    transform: scale(1.1);
-}
-.button-category {
-    cursor: pointer; /* Makes it behave like a button */
-    user-select: none; /* Prevents text selection */
-}
+        /* Default Bootstrap Grid for Desktop */
+        .col-md-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
 
-/* Optional: Add a click effect */
-.button-category:active {
-    transform: scale(0.95); /* Slightly shrink on click for a press effect */
-}
+        #category-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
 
-.category-item {
-    padding: 5px 16px; /* Less vertical padding */
-    color: #FFFFFF(216, 214, 214); /* Ensure text is visible */
-    font-weight: bold;
-    text-align: center;
-    margin: 5px;
-    width: auto; /* Adjust width dynamically */
-    min-width: 100px; /* Ensures button doesn't become too small */
-    min-height: 40px; /* Set a standard height */
-    display: flex;
-    flex-direction: column; /* Stack content vertically */
-    align-items: center; /* Center items horizontally */
-    justify-content: center; /* Center content vertically */
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    line-height: 1.2; /* Adjust line height */
-}
+        }
 
-/* Ensure the text inside is centered */
-.category-item p {
-    margin: 0; /* Remove default margins */
-    padding: 0;
-    text-align: center;
-    font-size: 14px; /* Adjust text size */
-}
+        .category-item {
+            
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
 
-/* Optional: Add a hover effect */
-.category-item:hover {
-    text-decoration: underline;/* Slightly darker blue */
-    color: #44d2f6;
-   box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3); /* Enhanced shadow effect */
-}
+        .category-item img {
+            width: 10px; /* Adjust size */
+            height: 80px;
+        }
 
-/* Category section */
-#category-container {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
+        .category-item:hover {
+            transform: scale(1.1);
+        }
+        
+        .button-category {
+            cursor: pointer; /* Makes it behave like a button */
+            user-select: none; /* Prevents text selection */
+        }
 
-.category-item {
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-    width: auto;
-    min-width: 100px;
-    margin: 5px;
-}
+        /* Optional: Add a click effect */
+        .button-category:active {
+            transform: scale(0.95); /* Slightly shrink on click for a press effect */
+        }
 
-.category-item img {
-    width: 40px;
-    height: auto;
-    max-width: 100%;
-}
+        .category-item {
+            padding: 5px 16px; /* Less vertical padding */
+            color: #FFFFFF(216, 214, 214); /* Ensure text is visible */
+            font-weight: bold;
+            text-align: center;
+            margin: 5px;
+            width: auto; /* Adjust width dynamically */
+            min-width: 100px; /* Ensures button doesn't become too small */
+            min-height: 40px; /* Set a standard height */
+            display: flex;
+            flex-direction: column; /* Stack content vertically */
+            align-items: center; /* Center items horizontally */
+            justify-content: center; /* Center content vertically */
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            line-height: 1.2; /* Adjust line height */
+        }
 
-.category-item:hover {
-    transform: scale(1.1);
-}
+        /* Ensure the text inside is centered */
+        .category-item p {
+            margin: 0; /* Remove default margins */
+            padding: 0;
+            text-align: center;
+            font-size: 14px; /* Adjust text size */
+        }
 
-.button-category {
-    cursor: pointer;
-    user-select: none;
-}
+        /* Optional: Add a hover effect */
+        .category-item:hover {
+            text-decoration: underline;/* Slightly darker blue */
+            color: #44d2f6;
+            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3); /* Enhanced shadow effect */
+        }
 
-.button-category:active {
-    transform: scale(0.95);
-}
+        /* Category section */
+        #category-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
 
-/* Mobile adjustments */
-@media screen and (max-width: 768px) {
-    .category-item {
-        display: none;
-    }
-    #category-dropdown {
-        display: block;
-        width: 100%;
-        padding: 10px;
-        font-size: 14px;
-        border: 1px solid #ddd;
-        background-color: #fff;
-    }
-}
+        .category-item {
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            width: auto;
+            min-width: 100px;
+            margin: 5px;
+        }
 
-/* Desktop view - Hide the dropdown */
-@media screen and (min-width: 769px) {
-    #category-dropdown {
-        display: none;
-    }
-}
+        .category-item img {
+            width: 40px;
+            height: auto;
+            max-width: 100%;
+        }
 
-@media screen and (max-width: 480px) {
-    .category-item {
-        font-size: 12px;
-        padding: 6px 12px;
-        min-width: 80px;
-    }
+        .category-item:hover {
+            transform: scale(1.1);
+        }
 
-    .category-item img {
-        width: 40px;
-    }
+        .button-category {
+            cursor: pointer;
+            user-select: none;
+        }
 
-    .button-category {
-        padding: 8px 16px;
-    }
-}
+        .button-category:active {
+            transform: scale(0.95);
+        }
 
-/* Optional hover effect for larger screens */
-.category-item:hover {
-    text-decoration: underline;
-    color: #44d2f6;
-    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
-}
+        /* Mobile adjustments */
+        @media screen and (max-width: 768px) {
+            .category-item {
+                display: none;
+            }
+            #category-dropdown {
+                display: block;
+                width: 100%;
+                padding: 10px;
+                font-size: 14px;
+                border: 1px solid #ddd;
+                background-color: #fff;
+            }
+        }
 
-@media (min-width: 992px) {
-    /* 3 products per row for large screens */
-    .col-md-6.col-lg-4 {
-        flex: 0 0 33.3333%;
-        max-width: 33.3333%;
-    }
-}
+        /* Desktop view - Hide the dropdown */
+        @media screen and (min-width: 769px) {
+            #category-dropdown {
+                display: none;
+            }
+        }
 
-@media (min-width: 1200px) {
-    /* 4 products per row for extra-large screens */
-    .col-md-6.col-lg-4.col-xl-3 {
-        flex: 0 0 25%;
-        max-width: 25%;
-    }
-}
+        @media screen and (max-width: 480px) {
+            .category-item {
+                font-size: 12px;
+                padding: 6px 12px;
+                min-width: 80px;
+            }
 
-/* Mobile Layout Adjustments */
-@media (max-width: 768px) {
-    /* 3 products per row on medium screens like tablets */
-    .col-md-6 {
-        flex: 0 0 33.33%;
-        max-width: 33.33%;
-    }
-    .product-card {
-        margin-bottom: 20px;
-    }
-    .product-content h5 {
-        font-size: 16px;
-    }
-    .product-content p {
-        font-size: 13px;
-    }
-    .product-price {
-        font-size: 14px;
-    }
-    .add-button {
-        font-size: 12px;
-    }
-}
+            .category-item img {
+                width: 40px;
+            }
 
-/* Mobile Layout for screens under 576px (e.g., small smartphones) */
-@media (max-width: 576px) {
-    /* 3 products per row on small mobile devices */
-    .col-md-6 {
-        flex: 0 0 33.33%;
-        max-width: 33.33%;
-    }
-    .product-card {
-        margin-bottom: 20px;
-    }
-    .product-content h5 {
-        font-size: 14px;
-    }
-    .product-content p {
-        font-size: 12px;
-    }
-    .product-price {
-        font-size: 13px;
-    }
-    .add-button {
-        font-size: 12px;
-        padding: 6px 12px;
-    }
-}
+            .button-category {
+                padding: 8px 16px;
+            }
+        }
 
-/* Smallest Devices (less than 500px) */
-@media (max-width: 500px) {
-    .col-md-6 {
-        flex: 0 0 33.33%;
-        max-width: 33.33%; /* Still show 3 cards per row on very small screens */
-    }
-    .product-img img {
-        height: 200px; /* Smaller image height */
-    }
-}
+        /* Optional hover effect for larger screens */
+        .category-item:hover {
+            text-decoration: underline;
+            color: #44d2f6;
+            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+        }
 
-/* Mobile (up to 576px) */
-@media (max-width: 576px) {
-    .col-md-6 {
-        flex: 0 0 50%; /* 2 products per row on small screens */
-        max-width: 50%;
-    }
-}
+        @media (min-width: 992px) {
+            /* 3 products per row for large screens */
+            .col-md-6.col-lg-4 {
+                flex: 0 0 33.3333%;
+                max-width: 33.3333%;
+            }
+        }
 
-/* Tablet (576px - 768px) */
-@media (max-width: 768px) {
-    .col-md-6 {
-        flex: 0 0 50%; /* 2 products per row on tablet */
-        max-width: 50%;
-    }
-}
+        @media (min-width: 1200px) {
+            /* 4 products per row for extra-large screens */
+            .col-md-6.col-lg-4.col-xl-3 {
+                flex: 0 0 25%;
+                max-width: 25%;
+            }
+        }
 
-/* Desktop (above 768px) */
-@media (min-width: 768px) {
-    .col-md-6 {
-        flex: 0 0 33.33%; /* 3 products per row on desktop */
-        max-width: 33.33%;
-    }
-}
+        /* Mobile Layout Adjustments */
+        @media (max-width: 768px) {
+            /* 3 products per row on medium screens like tablets */
+            .col-md-6 {
+                flex: 0 0 33.33%;
+                max-width: 33.33%;
+            }
+            .product-card {
+                margin-bottom: 20px;
+            }
+            .product-content h5 {
+                font-size: 16px;
+            }
+            .product-content p {
+                font-size: 13px;
+            }
+            .product-price {
+                font-size: 14px;
+            }
+            .add-button {
+                font-size: 12px;
+            }
+        }
 
+        /* Desktop: Show overlay on hover */
+        @media (hover: hover) {
+            .product-img:hover .overlay {
+                opacity: 1;
+            }
+        }
+
+        /* Mobile: Show overlay when tapped */
+        @media (max-width: 768px) {
+            .product-img.touch-active .overlay {
+                opacity: 1;
+            }
+        }
+
+        /* Mobile Layout for screens under 576px (e.g., small smartphones) */
+        @media (max-width: 576px) {
+            /* 3 products per row on small mobile devices */
+            .col-md-6 {
+                flex: 0 0 33.33%;
+                max-width: 33.33%;
+            }
+            .product-card {
+                margin-bottom: 20px;
+            }
+            .product-content h5 {
+                font-size: 14px;
+            }
+            .product-content p {
+                font-size: 12px;
+            }
+            .product-price {
+                font-size: 13px;
+            }
+            .add-button {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+
+        /* Smallest Devices (less than 500px) */
+        @media (max-width: 500px) {
+            .col-md-6 {
+                flex: 0 0 33.33%;
+                max-width: 33.33%; /* Still show 3 cards per row on very small screens */
+            }
+            .product-img img {
+                height: 200px; /* Smaller image height */
+            }
+        }
+
+        /* Mobile (up to 576px) */
+        @media (max-width: 576px) {
+            .col-md-6 {
+                flex: 0 0 50%; /* 2 products per row on small screens */
+                max-width: 50%;
+            }
+        }
+
+        /* Tablet (576px - 768px) */
+        @media (max-width: 768px) {
+            .col-md-6 {
+                flex: 0 0 50%; /* 2 products per row on tablet */
+                max-width: 50%;
+            }
+        }
+
+        /* Desktop (above 768px) */
+        @media (min-width: 768px) {
+            .col-md-6 {
+                flex: 0 0 33.33%; /* 3 products per row on desktop */
+                max-width: 33.33%;
+            }
+        }
+        
     </style>
     </head>
     <body>
@@ -491,8 +535,13 @@
                             <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
                         </div>
                         <div class="d-flex align-items-center flex-nowrap pt-xl-0">
+                            <a href="{% url 'favorite_list' %}" class="btn btn-primary rounded-pill text-white py-2 px-4 ms-2 flex-wrap flex-sm-shrink-0">
+                                <i class="fas fa-heart"></i> 
+                            </a>
                             <!--button class="btn btn-primary btn-md-square mx-2" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search"></i></button-->
-                            <a href="{% url 'profile' %}" class="btn btn-primary rounded-pill text-white py-2 px-4 ms-2 flex-wrap flex-sm-shrink-0">Profile</a>
+                            <a href="{% url 'profile' %}" class="btn btn-primary rounded-pill text-white py-2 px-4 ms-2 flex-wrap flex-sm-shrink-0">
+                                <i class="fas fa-user me-2"></i> 
+                            </a>
                         </div>
                     </div>
                 </nav>
@@ -516,99 +565,110 @@
         </div>
         <!-- Header End -->
 
-<!-- Add this right above the product listing section -->
-<div id="no-results" style="display: none;">No products found</div>
+        <!-- Add this right above the product listing section -->
+        <div id="no-results" style="display: none;">No products found</div>
 
-    <div class="row">
-        <!-- Search Bar -->
-        <div class="container mt-4">
-            <form method="GET" action="{% url 'services' %}" class="d-flex">
-                <input type="text" name="q" id="search-input" class="form-control me-2" placeholder="Search for a product..." value="{{ query }}" oninput="showCategory()">
-                <button type="button" id="search-button" class="btn btn-primary">Search</button>
-            </form>
-            <div id="category-list" class="mt-2"></div>
-        </div>
+        <div class="row">
+            <!-- Search Bar -->
+            <div class="container mt-4">
+                <form method="GET" action="{% url 'services' %}" class="d-flex">
+                    <input type="text" name="q" id="search-input" class="form-control me-2" placeholder="Search for a product..." value="{{ query }}" oninput="showCategory()">
+                    <button type="button" id="search-button" class="btn btn-primary">Search</button>
+                </form>
+                <div id="category-list" class="mt-2"></div>
+            </div>
 
 
-        <div id="category-container">
-            <!-- Desktop view (flex display) -->
-            <div class="category-item button-category" data-category="mobiles">
-                <p>Mobiles</p>
-            </div>
-            <div class="category-item button-category" data-category="electronics">
-                <p>Electronics</p>
-            </div>
-            <div class="category-item button-category" data-category="home_kitchen">
-                <p>Home & Kitchen</p>
-            </div>
-            <div class="category-item button-category" data-category="fashion">
-                <p>Fashion</p>
-            </div>
-            <div class="category-item button-category" data-category="books">
-                <p>Books</p>
-            </div> 
+            <div id="category-container">
+                <!-- Desktop view (flex display) -->
+                <div class="category-item button-category" data-category="mobiles">
+                    <p>Mobiles</p>
+                </div>
+                <div class="category-item button-category" data-category="electronics">
+                    <p>Electronics</p>
+                </div>
+                <div class="category-item button-category" data-category="home_kitchen">
+                    <p>Home & Kitchen</p>
+                </div>
+                <div class="category-item button-category" data-category="fashion">
+                    <p>Fashion</p>
+                </div>
+                <div class="category-item button-category" data-category="books">
+                    <p>Books</p>
+                </div> 
 
-            <!-- Mobile view dropdown -->
-            <select id="category-dropdown" class="category-dropdown">
-                <option value="" disabled selected>Select Category</option>
-                <option value="mobiles">Mobiles</option>
-                <option value="electronics">Electronics</option>
-                <option value="home_kitchen">Home & Kitchen</option>
-                <option value="fashion">Fashion</option>
-                <option value="books">Books</option>
-                <option value="others">Other</option>
-            </select>
-        </div>
-        
-        {% for service in services %}
-        <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;" data-category="{{ service.category }}">
-            <div class="product-card shadow-sm bg-white rounded overflow-hidden position-relative">
-                
-                <!-- Image Section -->
-                <div class="product-img position-relative">
-                    <div id="carousel-{{ service.id }}" class="carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-inner">
-                            {% for image in service.images.all %}
-                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                    <img src="{{ image.image.url }}" class="d-block w-100" style="height: 250px; object-fit: cover;">
-                                </div>
-                            {% endfor %}
-                        </div>
-    
-                        <!-- Carousel Controls -->
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ service.id }}" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ service.id }}" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        </button>
-                    </div>
+                <!-- Mobile view dropdown -->
+                <select id="category-dropdown" class="category-dropdown">
+                    <option value="" disabled selected>Select Category</option>
+                    <option value="mobiles">Mobiles</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="home_kitchen">Home & Kitchen</option>
+                    <option value="fashion">Fashion</option>
+                    <option value="books">Books</option>
+                    <option value="others">Other</option>
+                </select>
+            </div>
+            
+            {% for service in services %}
+            <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 35px; margin-bottom: 35px;" data-category="{{ service.category }}">
+                <div class="product-card shadow-sm bg-white rounded overflow-hidden position-relative">
                     
-                    <!-- Add Now Button in the Center of Image -->
-                    <div class="overlay d-flex align-items-center justify-content-center">
-                        <a href="{% url 'product_scheme_manage' %}?id={{ service.id }}&total={{ service.total }}" class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
+                    <!-- Image Section -->
+                    <div class="product-img position-relative">
+                        <div id="carousel-{{ service.id }}" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                {% for image in service.images.all %}
+                                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                        <img src="{{ image.image.url }}" class="d-block w-100" style="height: 250px; object-fit: cover;">
+                                    </div>
+                                {% endfor %}
+                            </div>
+        
+                            <!-- Carousel Controls -->
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ service.id }}" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ service.id }}" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            </button>
+                        </div>
+
+                        <!-- Favorite Icon -->
+                        <a href="{% url 'toggle_favorite' 'service' service.id %}" 
+                        class="favorite-icon" 
+                        data-service-id="{{ service.id }}">
+                            {% if service.id in user_favorites %}
+                                <i class="fas fa-heart"></i> <!-- Filled Heart -->
+                            {% else %}
+                                <i class="far fa-heart"></i> <!-- Empty Heart -->
+                            {% endif %}
+                        </a>
+
+                        <!-- Add Now Button in the Center of Image -->
+                        <div class="overlay d-flex align-items-center justify-content-center">
+                            <a href="{% url 'product_scheme_manage' %}?id={{ service.id }}&total={{ service.total }}" class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
+                        </div>
                     </div>
-                </div>
-    
-                <!-- Product Title and Price -->
-                <div class="product-content p-3">
-                    <h5 class="mb-2 text-dark">{{ service.title }}</h5>
-                    <p class="h5 text-primary">₹{{ service.total }}</p>
-    
-                    <!-- Toggle Button -->
-                    <button class="toggle-btn btn btn-link w-100 text-primary" data-id="{{ forloop.counter }}">
-                        View Details 
-                    </button>
-    
-                    <!-- Collapsible Details Section -->
-                    <div class="details" id="details-{{ forloop.counter }}">
-                        <p class="text-muted small">{{ service.desc }}</p>
+        
+                    <!-- Product Title and Price -->
+                    <div class="product-content p-3">
+                        <h5 class="mb-2 text-dark">{{ service.title }}</h5>
+                        <p class="h5 text-primary">₹{{ service.total }}</p>
+        
+                        <!-- Toggle Button -->
+                        <button class="toggle-btn btn btn-link w-100 text-primary" data-id="{{ forloop.counter }}">
+                            View Details 
+                        </button>
+        
+                        <!-- Collapsible Details Section -->
+                        <div class="details" id="details-{{ forloop.counter }}">
+                            <p class="text-muted small">{{ service.desc }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
+        {% endfor %}
         </div>
-    {% endfor %}
-    </div>
 
         <!-- Footer Start -->
         <div class="container-fluid footer py-5 wow fadeIn" data-wow-delay="0.2s">
@@ -774,7 +834,32 @@
                 searchInput.value = "";
                 filterProducts();
             });
-        
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const productImages = document.querySelectorAll(".product-img");
+
+                productImages.forEach(img => {
+                    img.addEventListener("touchstart", function () {
+                        // Add "touch-active" class to show overlay
+                        img.classList.add("touch-active");
+
+                        // Remove "touch-active" from other images
+                        productImages.forEach(otherImg => {
+                            if (otherImg !== img) {
+                                otherImg.classList.remove("touch-active");
+                            }
+                        });
+                    });
+                });
+
+                // Close overlay when tapping outside
+                document.addEventListener("touchstart", function (event) {
+                    if (!event.target.closest(".product-img")) {
+                        productImages.forEach(img => img.classList.remove("touch-active"));
+                    }
+                });
+            });
+
             // Toggle View Details Functionality
             document.querySelectorAll(".toggle-btn").forEach(button => {
                 button.addEventListener("click", function () {

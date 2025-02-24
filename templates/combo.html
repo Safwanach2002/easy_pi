@@ -145,6 +145,34 @@
             background: #0056b3;
         }
 
+        /* Favorite Icon Styling */
+        .favorite-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 32px;
+            color: #44d2f6;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
+            z-index: 10; /* Higher than .overlay */
+        }
+
+        .favorite-icon i {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .favorite-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .favorite-icon i.far {
+            color: #44d2f6; /* Outlined Heart */
+        }
+
+        .favorite-icon i.fas {
+            color: #44d2f6; /* Filled Heart */
+        }
+
         .details {
             max-height: 0;
             overflow: hidden;
@@ -424,7 +452,7 @@
     </style>
     </head>
     <body>
-<!-- Spinner Start -->
+        <!-- Spinner Start -->
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                 <span class="sr-only">Loading...</span>
@@ -491,8 +519,13 @@
                             <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
                         </div>
                         <div class="d-flex align-items-center flex-nowrap pt-xl-0">
+                            <a href="{% url 'favorite_list' %}" class="btn btn-primary rounded-pill text-white py-2 px-4 ms-2 flex-wrap flex-sm-shrink-0">
+                                <i class="fas fa-heart"></i> 
+                            </a>
                             <!--button class="btn btn-primary btn-md-square mx-2" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search"></i></button-->
-                            <a href="{% url 'profile' %}" class="btn btn-primary rounded-pill text-white py-2 px-4 ms-2 flex-wrap flex-sm-shrink-0">Profile</a>
+                            <a href="{% url 'profile' %}" class="btn btn-primary rounded-pill text-white py-2 px-4 ms-2 flex-wrap flex-sm-shrink-0">
+                                <i class="fas fa-user me-2"></i> 
+                            </a>
                         </div>
                     </div>
                 </nav>
@@ -583,6 +616,17 @@
                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         </button>
                     </div>
+
+                    <!-- Favorite Icon -->
+                    <a href="{% url 'toggle_favorite' 'combo' i.id %}" 
+                    class="favorite-icon" 
+                    data-service-id="{{ i.id }}">
+                        {% if i.id in user_favorites %}
+                            <i class="fas fa-heart"></i> <!-- Filled Heart -->
+                        {% else %}
+                            <i class="far fa-heart"></i> <!-- Empty Heart -->
+                        {% endif %}
+                    </a>
                     
                     <!-- Add Now Button in the Center of Image -->
                     <div class="overlay d-flex align-items-center justify-content-center">
@@ -772,6 +816,33 @@
                 selectedCategory = this.value.toLowerCase();
                 searchInput.value = "";
                 filterProducts();
+            });
+
+            document.addEventListener("DOMContentLoaded", function () {
+                document.querySelectorAll(".favorite-icon").forEach(icon => {
+                    icon.addEventListener("click", function (event) {
+                        event.preventDefault(); // Prevent default link behavior
+
+                        let heartIcon = this.querySelector("i");
+                        let url = this.href;
+
+                        fetch(url, { 
+                            method: "POST", 
+                            headers: { "X-Requested-With": "XMLHttpRequest" } 
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.favorited) {
+                                heartIcon.classList.remove("far");
+                                heartIcon.classList.add("fas");
+                            } else {
+                                heartIcon.classList.remove("fas");
+                                heartIcon.classList.add("far");
+                            }
+                        })
+                        .catch(error => console.error("Error:", error));
+                    });
+                });
             });
         
             // Toggle View Details Functionality

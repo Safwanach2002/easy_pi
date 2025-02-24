@@ -14,6 +14,8 @@ urlpatterns = [
     path('contact/', views.contact,name='contact'),
     path('contact1/', views.contact1,name='contact1'),
     path('services/', views.services_view, name='services'),
+    path('favorite/<str:item_type>/<int:item_id>/', views.toggle_favorite, name='toggle_favorite'),
+    path('favorites/', views.favorite_list, name='favorite_list'),
     path('terms/', views.terms,name='terms'),
     path('logout/', views.logout_view, name='logout'),
     path('payment-success/', views.payment_success, name='payment_success'),
@@ -28,10 +30,15 @@ urlpatterns = [
     path('payment-history/', views.payment_history, name="payment_history"),
     path('payment/<int:plan_id>/', views.paymentview, name='paymentview'),
     path('edit-profile/', views.edit_profile, name='edit_profile'),
+    path('product-scheme-upto/', views.product_scheme_upto, name='product_scheme_upto'),
 
     # Password Reset URLs
     path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
     path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
+    # withdraw urls 
+    path('withdraw/', views.withdraw_request, name='withdraw'),
+    path('history/', views.withdrawal_history, name='withdrawal_history'),
 ]

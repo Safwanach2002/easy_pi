@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from razorpay import Payment
-from .models import Profile, ProductScheme, Payment
+from .models import Profile, ProductScheme, Payment, WithdrawalRequest
 
 class SignupForm(forms.ModelForm):
     accept_terms = forms.BooleanField(
@@ -164,3 +164,21 @@ class PaymentForm(forms.ModelForm):
         if user:
             # Filter product schemes by the logged-in user's profile
             self.fields['product_scheme'].queryset = ProductScheme.objects.filter(profile=user.profile)
+
+class WithdrawalForm(forms.ModelForm):
+    class Meta:
+        model = WithdrawalRequest
+        fields = ['amount', 'method', 'account_number', 'upi_id']
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        method = cleaned_data.get("method")
+        account_number = cleaned_data.get("account_number")
+        upi_id = cleaned_data.get("upi_id")
+        
+        if method == "bank" and not account_number:
+            self.add_error("account_number", "Account number is required for bank transfer.")
+        elif method == "upi" and not upi_id:
+            self.add_error("upi_id", "UPI ID is required for UPI transfer.")
+        
+        return cleaned_data
