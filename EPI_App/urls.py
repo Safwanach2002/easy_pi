@@ -14,8 +14,8 @@ urlpatterns = [
     path('contact/', views.contact,name='contact'),
     path('contact1/', views.contact1,name='contact1'),
     path('services/', views.services_view, name='services'),
-    path('favorite/<str:item_type>/<int:item_id>/', views.toggle_favorite, name='toggle_favorite'),
-    path('favorites/', views.favorite_list, name='favorite_list'),
+    # path('favorite/<str:product_type>/<int:product_id>/', views.toggle_favorite, name='toggle_favorite'),
+    # path('favorites/', views.favorite_list, name='favorite_list'),
     path('terms/', views.terms,name='terms'),
     path('logout/', views.logout_view, name='logout'),
     path('payment-success/', views.payment_success, name='payment_success'),
@@ -41,4 +41,9 @@ urlpatterns = [
     # withdraw urls 
     path('withdraw/', views.withdraw_request, name='withdraw'),
     path('history/', views.withdrawal_history, name='withdrawal_history'),
+
+    # wishlist 
+    path('wishlist/', views.wishlist_view, name='wishlist'),
+    path('wishlist/add/<str:product_type>/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('wishlist/remove/<int:wishlist_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
 ]

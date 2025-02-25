@@ -1,4 +1,5 @@
 from collections import defaultdict
+from django.db import IntegrityError
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import ProfileUpdateForm, SignupForm, ProductSchemeForm, WithdrawalForm
 from django.contrib.auth.forms import AuthenticationForm
@@ -10,7 +11,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from .models import Combo, Investment, Referral, Profile, ProductScheme, Services, Upto, WithdrawalRequest
+from .models import Combo, Investment, Referral, Profile, ProductScheme, Services, Upto, Wishlist, WithdrawalRequest
 from datetime import datetime, timedelta, date, timezone
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -20,6 +21,7 @@ from django.utils.timezone import now
 from django.utils.timezone import get_current_timezone
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.conf import settings
 import razorpay
@@ -347,76 +349,49 @@ def services_view(request):
     services = Services.objects.all()
     return render(request, 'services.html', {'services': services})
 
-def toggle_favorite(request, item_type, item_id):
-    """Handles adding/removing services, upto22, and combo items from session-based favorites."""
-    
-    # Map item types to models
-    model_map = {
-        'service': Services,
-        'upto22': Upto,
-        'combo': Combo
-    }
-    
-    if item_type not in model_map:
-        return JsonResponse({"error": "Invalid item type"}, status=400)
-    
-    model = model_map[item_type]
-    item = get_object_or_404(model, id=item_id)
+# @csrf_exempt  # For security, replace with proper CSRF handling
+# @require_POST
+# def toggle_favorite(request, product_type, product_id):
+#     if not request.user.is_authenticated:
+#         return JsonResponse({'error': 'User not authenticated'}, status=403)
 
-    # Ensure session favorites is a dictionary
-    if not isinstance(request.session.get('favorites'), dict):
-        print("ERROR: request.session['favorites'] is not a dictionary! Resetting to default.")
-        request.session['favorites'] = {"service": [], "upto22": [], "combo": []}
+#     # Toggle favorite for any type (service, upto22, combo)
+#     favorite, created = Favorite.objects.get_or_create(
+#         user=request.user,
+#         item_id=product_id,
+#         item_type=product_type
+#     )
 
-    # Ensure the category exists in the dictionary
-    if item_type not in request.session['favorites']:
-        request.session['favorites'][item_type] = []
+#     if not created:
+#         favorite.delete()
+#         favorited = False
+#     else:
+#         favorited = True
 
-    # Toggle favorite: Add if not present, else remove
-    favorites = request.session['favorites'][item_type]
-    item_id = int(item_id)
+#     return JsonResponse({'favorited': favorited})
 
-    if item_id in favorites:
-        favorites.remove(item_id)
-        favorited = False
-    else:
-        favorites.append(item_id)
-        favorited = True
 
-    # Update session and save changes
-    request.session['favorites'][item_type] = favorites
-    request.session.modified = True
+# @login_required
+# def favorite_list(request):
+#     """Fetches the favorite items of a user and categorizes them."""
 
-    # Handle AJAX requests for real-time updates
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return JsonResponse({"favorited": favorited})
+#     favorite_data = Favorite.objects.filter(user=request.user)
 
-    return redirect(request.META.get('HTTP_REFERER', 'home'))
+#     item_ids = {
+#         'service': list(favorite_data.filter(item_type='service').values_list('item_id', flat=True)),
+#         'upto22': list(favorite_data.filter(item_type='upto22').values_list('item_id', flat=True)),
+#         'combo': list(favorite_data.filter(item_type='combo').values_list('item_id', flat=True))
+#     }
 
-def favorite_list(request):
-    """Retrieves all items added to session-based favorites and displays them."""
-    
-    # Debugging print statement
-    print("DEBUG: request.session.get('favorites') =", request.session.get('favorites'))
+#     favorites_services = Services.objects.filter(id__in=item_ids['service'])
+#     favorites_upto22 = Upto.objects.filter(id__in=item_ids['upto22'])
+#     favorites_combo = Combo.objects.filter(id__in=item_ids['combo'])
 
-    # Retrieve favorite item IDs from session
-    favorite_data = request.session.get('favorites', {"service": [], "upto22": [], "combo": []})
-
-    # Ensure favorite_data is a dictionary
-    if not isinstance(favorite_data, dict):
-        print("ERROR: favorite_data is not a dictionary! Resetting to default.")
-        favorite_data = {"service": [], "upto22": [], "combo": []}
-
-    # Fetch corresponding objects from each model
-    favorites_services = Services.objects.filter(id__in=favorite_data.get("service", []))
-    favorites_upto22 = Upto.objects.filter(id__in=favorite_data.get("upto22", []))
-    favorites_combo = Combo.objects.filter(id__in=favorite_data.get("combo", []))
-
-    return render(request, 'favorites_page.html', {
-        'favorites_services': favorites_services,
-        'favorites_upto22': favorites_upto22,
-        'favorites_combo': favorites_combo
-    })
+#     return render(request, 'favorites_page.html', {
+#         'favorites_services': favorites_services,
+#         'favorites_upto22': favorites_upto22,
+#         'favorites_combo': favorites_combo
+#     })
 
 @login_required
 def payment_success(request):
@@ -670,3 +645,30 @@ def withdraw_request(request):
 def withdrawal_history(request):
     withdrawals = WithdrawalRequest.objects.filter(user=request.user).order_by('-created_at')
     return render(request, "history.html", {"withdrawals": withdrawals})
+
+@login_required
+def add_to_wishlist(request, product_type, product_id):
+    user = request.user
+
+    if product_type == 'service':
+        product = get_object_or_404(Services, id=product_id)
+        Wishlist.objects.get_or_create(user=user, service=product)
+    elif product_type == 'upto':
+        product = get_object_or_404(Upto, id=product_id)
+        Wishlist.objects.get_or_create(user=user, upto=product)
+    elif product_type == 'combo':
+        product = get_object_or_404(Combo, id=product_id)
+        Wishlist.objects.get_or_create(user=user, combo=product)
+
+    return redirect('wishlist')
+
+@login_required
+def remove_from_wishlist(request, wishlist_id):
+    wishlist_item = get_object_or_404(Wishlist, id=wishlist_id, user=request.user)
+    wishlist_item.delete()
+    return redirect('wishlist')
+
+@login_required
+def wishlist_view(request):
+    wishlist_items = Wishlist.objects.filter(user=request.user)
+    return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})

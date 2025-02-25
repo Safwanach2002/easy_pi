@@ -120,27 +120,29 @@ class ServiceImage(models.Model):
     def __str__(self):
         return f"Image for {self.service.title}"
     
-class Favorite(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    service = models.ForeignKey(Services, on_delete=models.CASCADE)  # Correct reference
+# class Favorite(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     item_id = models.PositiveBigIntegerField(default=0)  # Set a default value
+#     item_type = models.CharField(max_length=50, default='service')  # Default type (change if needed)
 
-    class Meta:
-        unique_together = ('user','service')
+#     class Meta:
+#         constraints = [
+#             models.UniqueConstraint(fields=['user', 'item_id', 'item_type'], name='unique_favorite')
+#         ]
+
+#     def __str__(self):
+#         return f"{self.user} - {self.item_type} ({self.item_id})"
 
 class Upto(models.Model):
     KIDS = 'kids'
     TEENS = 'teens'
     YOUTHS = 'youths'
-    # FASHION = 'fashion'
-    # BOOKS = 'books'
     OTHERS = 'others'
 
     CATEGORY_CHOICES = [
         (KIDS, 'Kids'),
         (TEENS, 'Teens'),
         (YOUTHS, 'Youths'),
-        # (FASHION, 'Fashion'),
-        # (BOOKS, 'Books'),
         (OTHERS, 'Others'),
     ]
 
@@ -321,5 +323,19 @@ class WithdrawalRequest(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     
-    def _str_(self):
+    def __str__(self):
         return f"{self.user.username} - {self.amount} - {self.status}"
+    
+class Wishlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    service = models.ForeignKey('Services', on_delete=models.CASCADE, null=True, blank=True)
+    upto = models.ForeignKey('Upto', on_delete=models.CASCADE, null=True, blank=True)
+    combo = models.ForeignKey('Combo', on_delete=models.CASCADE, null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'service', 'upto', 'combo')
+
+    def _str_(self):
+        return f"{self.user.username}'s Wishlist"

@@ -151,7 +151,7 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            font-size: 32px;
+            font-size: 20px;
             color: #44d2f6;
             text-decoration: none;
             transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
@@ -535,7 +535,7 @@
                             <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
                         </div>
                         <div class="d-flex align-items-center flex-nowrap pt-xl-0">
-                            <a href="{% url 'favorite_list' %}" class="btn btn-primary rounded-pill text-white py-2 px-4 ms-2 flex-wrap flex-sm-shrink-0">
+                            <a href="{% url 'wishlist' %}" class="btn btn-primary rounded-pill text-white py-2 px-4 ms-2 flex-wrap flex-sm-shrink-0">
                                 <i class="fas fa-heart"></i> 
                             </a>
                             <!--button class="btn btn-primary btn-md-square mx-2" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search"></i></button-->
@@ -556,9 +556,6 @@
                 <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">Our Products</h4>
                 <ol class="breadcrumb justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
                     <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'combo' %}">Combo Set</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'upto' %}">Upto 22</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'coming_soon' %}">coming Soon</a></li>
                     <li class="breadcrumb-item active text-primary">All Items</li>
                 </ol>    
             </div>
@@ -634,7 +631,7 @@
                         </div>
 
                         <!-- Favorite Icon -->
-                        <a href="{% url 'toggle_favorite' 'service' service.id %}" 
+                        <a href="{% url 'add_to_wishlist' 'service' service.id %}" 
                         class="favorite-icon" 
                         data-service-id="{{ service.id }}">
                             {% if service.id in user_favorites %}
@@ -643,7 +640,7 @@
                                 <i class="far fa-heart"></i> <!-- Empty Heart -->
                             {% endif %}
                         </a>
-
+                     
                         <!-- Add Now Button in the Center of Image -->
                         <div class="overlay d-flex align-items-center justify-content-center">
                             <a href="{% url 'product_scheme_manage' %}?id={{ service.id }}&total={{ service.total }}" class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
@@ -667,7 +664,7 @@
                     </div>
                 </div>
             </div>
-        {% endfor %}
+            {% endfor %}
         </div>
 
         <!-- Footer Start -->
@@ -687,7 +684,6 @@
                             <h4 class="text-white mb-4">Explore</h4>
                             <a href="{% url 'index' %}"><i class="fas fa-angle-right me-2"></i> Home</a>
                             <a href="{% url 'about' %}"><i class="fas fa-angle-right me-2"></i> About</a>
-                            <a href="{% url 'services' %}"><i class="fas fa-angle-right me-2"></i> Products</a>
                             <a href="{% url 'reference' %}"><i class="fas fa-angle-right me-2"></i> Reference</a>
                             <a href="{% url 'plans' %}"><i class="fas fa-angle-right me-2"></i> Plans</a>
                             <a href="{% url 'contact' %}"><i class="fas fa-angle-right me-2"></i> Contact</a>
@@ -834,32 +830,7 @@
                 searchInput.value = "";
                 filterProducts();
             });
-
-            document.addEventListener("DOMContentLoaded", function () {
-                const productImages = document.querySelectorAll(".product-img");
-
-                productImages.forEach(img => {
-                    img.addEventListener("touchstart", function () {
-                        // Add "touch-active" class to show overlay
-                        img.classList.add("touch-active");
-
-                        // Remove "touch-active" from other images
-                        productImages.forEach(otherImg => {
-                            if (otherImg !== img) {
-                                otherImg.classList.remove("touch-active");
-                            }
-                        });
-                    });
-                });
-
-                // Close overlay when tapping outside
-                document.addEventListener("touchstart", function (event) {
-                    if (!event.target.closest(".product-img")) {
-                        productImages.forEach(img => img.classList.remove("touch-active"));
-                    }
-                });
-            });
-
+        
             // Toggle View Details Functionality
             document.querySelectorAll(".toggle-btn").forEach(button => {
                 button.addEventListener("click", function () {
@@ -871,6 +842,7 @@
         });
         
     </script>
+    
     </body>
 
 </html>

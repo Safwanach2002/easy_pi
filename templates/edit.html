@@ -1,50 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- Services -->
+<button class="toggle-btn btn btn-link w-100 text-primary" data-id="service-{{ service.id }}">
+    View Details 
+</button>
+<div class="details" id="details-service-{{ service.id }}">
+    <p class="text-muted small">{{ service.desc }}</p>
+</div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MY FAVORITE</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-</head>
+<!-- Upto22 Products -->
+<button class="toggle-btn btn btn-link w-100 text-primary" data-id="upto-{{ upto.id }}">
+    View Details 
+</button>
+<div class="details" id="details-upto-{{ upto.id }}">
+    <p class="text-muted small">{{ upto.desc }}</p>
+</div>
 
-<body>
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Your Favorites</h1>
+<!-- Combo Products -->
+<button class="toggle-btn btn btn-link w-100 text-primary" data-id="combo-{{ combo.id }}">
+    View Details 
+</button>
+<div class="details" id="details-combo-{{ combo.id }}">
+    <p class="text-muted small">{{ combo.desc }}</p>
+</div>
 
-        <div class="row">
-            {% for service in favorites %}
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
-                    <!-- Image Section -->
-                    <img src="{{ service.img.url }}" class="card-img-top" alt="{{ service.title }}" style="height: 250px; object-fit: cover;">
-
-                    <div class="card-body">
-                        <h5 class="card-title">{{ service.title }}</h5>
-                        <p class="card-text">{{ service.desc }}</p>
-                        <p class="text-primary h5">₹{{ service.total }}</p>
-
-                        <!-- Remove from Favorites Button -->
-                        <a href="{% url 'toggle_favorite' service.id %}" class="btn btn-danger">
-                            <i class="fas fa-heart-broken"></i> Remove
-                        </a>
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-            <p class="text-center">No favorites yet.</p>
-            {% endfor %}
-        </div>
-
-        <!-- Back to Home Link -->
-        <div class="text-center mt-4">
-            <a href="favorites_page.html"></a>
-        </div>
-
-    </div>
-</body>
-
-
-
-</html>
+<script>
+    // Toggle View Details Functionality
+    document.querySelectorAll(".toggle-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            let details = document.getElementById("details-" + this.dataset.id);
+            if (details) {
+                details.classList.toggle("show");
+                this.textContent = details.classList.contains("show") ? "Hide Details" : "View Details";
+            }
+        });
+    });
+</script>

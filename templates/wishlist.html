@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <title>Easy Purchase Investment - Products</title>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <meta content="" name="keywords">
+        <meta content="" name="description">
+
+        <!-- Google Web Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"> 
+
+        <!-- Icon Font Stylesheet -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+        <!-- Libraries Stylesheet -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+        <link href="{% static 'lib/animate/animate.min.css' %}" rel="stylesheet">
+        <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+        <link href="{% static 'lib/lightbox/css/lightbox.min.css' %}" rel="stylesheet">
+
+
+        <!-- Customized Bootstrap Stylesheet -->
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+        <!-- Template Stylesheet -->
+        <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    <style>
+        .wishlist-title {
+            text-align: center; 
+            align-items: center;
+            font-weight: 600; 
+            font-size: 32px; 
+            color: #222; 
+            text-transform: capitalize; 
+            letter-spacing: 1px; 
+            margin-bottom: 40px; 
+            padding-bottom: 10px; 
+            border-bottom: 2px solid #44d2f6;
+            display: inline-block; 
+        }
+
+        /* General Product Card Styling */
+        .product-card {
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            margin-bottom: 20px;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Product Image */
+        .product-img {
+            position: relative;
+            overflow: hidden;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .product-img img {
+            width: 100%;
+            height: auto; /* Ensure image scales properly */
+            object-fit: cover;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .product-card:hover .product-img img {
+            transform: scale(1.05);
+        }
+
+        /* Hover Overlay */
+        .product-img .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5; /* Lower than favorite-icon */
+        }
+
+        .product-card:hover .overlay {
+            opacity: 1;
+        }
+
+        /* Overlay Button */
+        .product-img .overlay a {
+            color: white;
+            background: #44d2f6;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transform: translateY(10px);
+        }
+
+        .product-card:hover .overlay a {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Product Content */
+        .product-content {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .product-content h5 {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .product-content p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        /* Product Price */
+        .product-price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #44d2f6;
+        }
+
+        /* Add Button */
+        .add-button {
+            display: inline-block;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-radius: 20px;
+            background: #44d2f6;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s ease-in-out;
+        }
+
+        .add-button:hover {
+            background: #44d2f6;
+        }
+
+        .details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            padding: 0 15px;
+        }
+
+        .details.show {
+            max-height: 200px;
+            padding: 10px 15px;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            outline: none;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .back-button {
+        font-size: 18px;
+        font-weight: 600;
+        padding: 12px 24px;
+        border-radius: 30px;
+        text-decoration: none;
+        transition: all 0.3s ease-in-out;
+        }
+
+        /* Hover & Focus Effects */
+        .back-button:hover,
+        .back-button:focus {
+            background-color: #44d2f6;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Default Bootstrap Grid for Desktop */
+        .col-md-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+
+        /* Heart Icon (Like Button) Styling */
+        .like-button {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .like-button:hover {
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .like-button i {
+            color: red;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .like-button:hover i {
+            color: darkred;
+        }
+
+
+        @media (min-width: 992px) {
+            /* 3 products per row for large screens */
+            .col-md-6.col-lg-4 {
+                flex: 0 0 33.3333%;
+                max-width: 33.3333%;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            /* 4 products per row for extra-large screens */
+            .col-md-6.col-lg-4.col-xl-3 {
+                flex: 0 0 25%;
+                max-width: 25%;
+            }
+        }
+
+        /* Mobile Layout Adjustments */
+        @media (max-width: 768px) {
+            /* 3 products per row on medium screens like tablets */
+            .col-md-6 {
+                flex: 0 0 33.33%;
+                max-width: 33.33%;
+            }
+            .product-card {
+                margin-bottom: 20px;
+            }
+            .product-content h5 {
+                font-size: 16px;
+            }
+            .product-content p {
+                font-size: 13px;
+            }
+            .product-price {
+                font-size: 14px;
+            }
+            .add-button {
+                font-size: 12px;
+            }
+        }
+
+        /* Mobile Layout for screens under 576px (e.g., small smartphones) */
+        @media (max-width: 576px) {
+            /* 3 products per row on small mobile devices */
+            .col-md-6 {
+                flex: 0 0 33.33%;
+                max-width: 33.33%;
+            }
+            .product-card {
+                margin-bottom: 20px;
+            }
+            .product-content h5 {
+                font-size: 14px;
+            }
+            .product-content p {
+                font-size: 12px;
+            }
+            .product-price {
+                font-size: 13px;
+            }
+            .add-button {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+
+        /* Smallest Devices (less than 500px) */
+        @media (max-width: 500px) {
+            .col-md-6 {
+                flex: 0 0 33.33%;
+                max-width: 33.33%; /* Still show 3 cards per row on very small screens */
+            }
+            .product-img img {
+                height: 200px; /* Smaller image height */
+            }
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 576px) {
+            .back-button {
+                width: 100%;
+                font-size: 16px;
+                padding: 10px;
+            }
+        }
+
+        /* Mobile (up to 576px) */
+        @media (max-width: 576px) {
+            .col-md-6 {
+                flex: 0 0 50%; /* 2 products per row on small screens */
+                max-width: 50%;
+            }
+        }
+
+        /* Tablet (576px - 768px) */
+        @media (max-width: 768px) {
+            .col-md-6 {
+                flex: 0 0 50%; /* 2 products per row on tablet */
+                max-width: 50%;
+            }
+        }
+
+        /* Desktop (above 768px) */
+        @media (min-width: 768px) {
+            .col-md-6 {
+                flex: 0 0 33.33%; /* 3 products per row on desktop */
+                max-width: 33.33%;
+            }
+        }
+
+    </style>
+<body>
+    {% block content %}
+    <div class="container mt-4">
+        <h2 style="text-align: center; align-items: center; font-weight: 600; font-size: 32px; color: #222; text-transform: capitalize; letter-spacing: 1px; margin-bottom: 40px; padding-bottom: 10px;">Favourites</h2>
+        
+        {% if wishlist_items %}
+            <div class="row">
+                {% for item in wishlist_items %}
+                <div class="col-md-6 col-lg-4 col-xl-3">
+                    <div class="product-card shadow-sm bg-white rounded overflow-hidden position-relative">
+                        <!-- Product Image -->
+                        <div class="product-img position-relative">
+                            {% if item.service %}
+                                <img src="{{ item.service.images.first.image.url }}" class="d-block w-100" style="height: 250px; object-fit: cover;">
+                                <div class="overlay d-flex align-items-center justify-content-center">
+                                    <a href="{% url 'product_scheme_manage' %}?id={{ item.service.id }}&total={{ item.service.total }}" class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
+                                </div>
+                            {% elif item.upto %}
+                                <img src="{{ item.upto.images.first.image.url }}" class="d-block w-100" style="height: 250px; object-fit: cover;">
+                                <div class="overlay d-flex align-items-center justify-content-center">
+                                    <a href="{% url 'product_scheme_upto' %}?id={{ item.upto.id }}&total={{ item.upto.total }}" class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
+                                </div>
+                            {% elif item.combo %}
+                                <img src="{{ item.combo.images.first.image.url }}" class="d-block w-100" style="height: 250px; object-fit: cover;">
+                                <div class="overlay d-flex align-items-center justify-content-center">
+                                    <a href="{% url 'product_scheme_combo' %}?id={{ item.combo.id }}&total={{ item.combo.total }}" class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
+                                </div>
+                            {% endif %}
+                        </div>
+    
+                        <!-- Product Details -->
+                        <div class="product-content p-3">
+                            {% if item.service %}
+                                <h5 class="mb-2 text-dark">{{ item.service.title }}</h5>
+                                <p class="h5 text-primary">₹{{ item.service.total }}</p>
+                            {% elif item.upto %}
+                                <h5 class="mb-2 text-dark">{{ item.upto.title }}</h5>
+                                <p class="h5 text-primary">₹{{ item.upto.total }}</p>
+                            {% elif item.combo %}
+                                <h5 class="mb-2 text-dark">{{ item.combo.title }}</h5>
+                                <p class="h5 text-primary">₹{{ item.combo.total }}</p>
+                            {% endif %}
+    
+                            <!-- View Details Button -->
+                            {% if item.service %}
+                                <!-- Toggle Button -->
+                                <button class="toggle-btn btn btn-link w-100 text-primary" data-id="{{ forloop.counter }}">
+                                    View Details 
+                                </button>
+
+                                <!-- Collapsible Details Section -->
+                                <div class="details" id="details-{{ forloop.counter }}">
+                                    <p class="text-muted small">{{ item.service.desc }}</p>
+                                </div>
+                            {% elif item.upto %}
+                                <!-- Toggle Button -->
+                                <button class="toggle-btn btn btn-link w-100 text-primary" data-id="{{ forloop.counter }}">
+                                    View Details 
+                                </button>
+
+                                <!-- Collapsible Details Section -->
+                                <div class="details" id="details-{{ forloop.counter }}">
+                                    <p class="text-muted small">{{ item.upto.desc }}</p>
+                                </div>
+                            {% elif item.combo %}
+                                <!-- Toggle Button -->
+                                <button class="toggle-btn btn btn-link w-100 text-primary" data-id="{{ forloop.counter }}">
+                                    View Details 
+                                </button>
+
+                                <!-- Collapsible Details Section -->
+                                <div class="details" id="details-{{ forloop.counter }}">
+                                    <p class="text-muted small">{{ item.combo.desc }}</p>
+                                </div>
+                            {% endif %}
+    
+                            <!-- Remove Button Below Price -->
+                            <a href="{% url 'remove_from_wishlist' item.id %}" class="btn btn-danger w-100 mt-2">
+                                <i class="fas fa-heart-broken"></i> Remove
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">Your wishlist is empty.</p>
+        {% endif %}
+    
+        <!-- Back to Home Link -->
+        <div class="text-center mt-4">
+            <a href="{% url 'index' %}" class="btn" style="color: #fff; background-color: #44d2f6;">
+                <i class="fas fa-arrow-left"></i> Back to home
+            </a>
+        </div>
+    </div>
+    {% endblock %}
+    
+    <script>
+        // Toggle View Details Functionality
+        document.querySelectorAll(".toggle-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let details = document.getElementById("details-" + this.dataset.id);
+                details.classList.toggle("show");
+                this.textContent = details.classList.contains("show") ? "Hide Details" : "View Details";
+            });
+        });
+    </script>
+    
+</body>
+    
+</html>

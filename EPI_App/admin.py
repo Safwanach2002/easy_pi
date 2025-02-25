@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.contrib import admin
-from .models import Combo, ComboImage, Investment, PaymentOrder, Profile, ServiceImage, Services, Referral, ProductScheme, UptoImage, Upto, WithdrawalRequest
+from .models import Combo, ComboImage, Investment, PaymentOrder, Profile, ServiceImage, Services, Referral, ProductScheme, UptoImage, Upto, Wishlist, WithdrawalRequest
 
 # Register your models here.
 class ProfileAdmin(admin.ModelAdmin):
@@ -134,6 +134,24 @@ class WithdrawalRequestAdmin(admin.ModelAdmin):
         queryset.update(status='success')
     mark_as_success.short_description = "Mark selected requests as Success"
 
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'get_product', 'created_at')  # Display in admin panel
+    search_fields = ('user__username',)  # Search by username
+    list_filter = ('created_at',)  # Filter by date
+
+    def get_product(self, obj):
+        """Show the related product name (service, upto, or combo)."""
+        if obj.service:
+            return f"Service: {obj.service.title}"
+        elif obj.upto:
+            return f"Upto: {obj.upto.title}"
+        elif obj.combo:
+            return f"Combo: {obj.combo.title}"
+        return "No Product"
+
+    get_product.short_description = "Product"
+
+admin.site.register(Wishlist, WishlistAdmin)
 admin.site.register(WithdrawalRequest, WithdrawalRequestAdmin)
 admin.site.register(Upto,UptoAdmin)
 admin.site.register(UptoImage)
