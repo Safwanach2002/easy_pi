@@ -119,19 +119,6 @@ class ServiceImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.service.title}"
-    
-# class Favorite(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     item_id = models.PositiveBigIntegerField(default=0)  # Set a default value
-#     item_type = models.CharField(max_length=50, default='service')  # Default type (change if needed)
-
-#     class Meta:
-#         constraints = [
-#             models.UniqueConstraint(fields=['user', 'item_id', 'item_type'], name='unique_favorite')
-#         ]
-
-#     def __str__(self):
-#         return f"{self.user} - {self.item_type} ({self.item_id})"
 
 class Upto(models.Model):
     KIDS = 'kids'
