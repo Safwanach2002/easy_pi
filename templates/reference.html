@@ -33,6 +33,64 @@
         <!-- Template Stylesheet -->
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
     </head>
+    <style>
+        .card {
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        .card-header, .modal-header {
+            background-color: rgba(233, 235, 237, 0.8); /* Transparent blue */
+            color: #fff;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            color: #333;
+        }
+        .btn-primary {
+            background-color: rgba(0, 123, 255, 0.8); /* Transparent blue */
+            border-color: rgba(0, 123, 255, 0.8); /* Transparent blue */
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .badge.bg-success {
+            background-color: rgba(0, 123, 255, 0.8); /* Transparent blue */
+            color: #fff;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f9f9f9;
+        }
+        .table-striped tbody tr:nth-of-type(even) {
+            background-color: #fff;
+        }
+        #withdraw-icon {
+            margin-left: 10px; /* Adds space between the rewards text and icon */
+            font-size: 1.2rem; /* Adjusts the icon size (default size is fa-sm) */
+        }
+        .modal-body .btn {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body .btn i {
+            margin-right: 5px;  /* Space between icon and text */
+        }
+
+        /* Adjust button size */
+        .modal-body .btn {
+            padding: 8px 16px;
+            font-size: 16px;
+        }
+    </style>
 
     <body>
 
@@ -43,7 +101,6 @@
             </div>
         </div>
         <!-- Spinner End -->
-
 
         <!-- Topbar Start -->
         <div class="container-fluid topbar px-0 d-none d-lg-block">
@@ -117,25 +174,6 @@
         </div>
         <!-- Navbar & Hero End -->
 
-        <!-- Modal Search Start -->
-        <!-- <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-fullscreen">
-                <div class="modal-content rounded-0">
-                    <div class="modal-header">
-                        <h4 class="modal-title mb-0" id="exampleModalLabel">Search by keyword</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body d-flex align-items-center">
-                        <div class="input-group w-75 mx-auto d-flex">
-                            <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1">
-                            <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-        <!-- Modal Search End -->
-
         <!-- Header Start -->
         <div class="container-fluid bg-breadcrumb">
             <div class="bg-breadcrumb-single"></div>
@@ -149,172 +187,113 @@
         </div>
         <!-- Header End -->
 
-    <style>
-        .card {
-            margin-bottom: 20px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            background-color: #fff;
-        }
-        .card-header, .modal-header {
-            background-color: rgba(233, 235, 237, 0.8); /* Transparent blue */
-            color: #fff;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .card-body {
-            padding: 20px;
-        }
-        .card-title {
-            font-size: 1.25rem;
-            color: #333;
-        }
-        .btn-primary {
-            background-color: rgba(0, 123, 255, 0.8); /* Transparent blue */
-            border-color: rgba(0, 123, 255, 0.8); /* Transparent blue */
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-        }
-        .badge.bg-success {
-            background-color: rgba(0, 123, 255, 0.8); /* Transparent blue */
-            color: #fff;
-        }
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: #f9f9f9;
-        }
-        .table-striped tbody tr:nth-of-type(even) {
-            background-color: #fff;
-        }
-        #withdraw-icon {
-            margin-left: 10px; /* Adds space between the rewards text and icon */
-            font-size: 1.2rem; /* Adjusts the icon size (default size is fa-sm) */
-        }
-        .modal-body .btn {
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        {% block content %}
+        <div class="container mt-5">
+            <!-- Referral Details Section -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h4 class="card-title">Referral Details</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Referral Code:</strong> <span id="referral-code">{{ referral_code }}</span></p>
+                    <p><strong>Referrals Made:</strong> <span id="referrals-made" class="badge" style="background-color: #0dcaf0; color: white;">{{ referrals_made }}</span>
+                    <p><strong>Total Rewards Earned:</strong> ₹<span id="rewards-earned">{{ total_rewards|floatformat:2 }}</span>
+                        <a href="{% url 'withdraw' %}" id="withdraw-icon" style="cursor: pointer; color: #0dcaf0;" title="Withdraw" data-bs-toggle="tooltip" data-bs-placement="top">
+                            <i class="fas fa-wallet fa-sm"></i></a>
+                        <i class="fas fa-exchange-alt fa-sm ms-2" id="convert-icon" style="cursor: pointer; color: #0dcaf0;" title="Convert" data-bs-toggle="tooltip" data-bs-placement="top"></i>  
+                    </p>
+                    <p id="conversion-message" class="text-muted small d-none">
+                        <i class="fas fa-info-circle"></i> Your rewards convert into your investment.
+                    </p>
+                    <button id="copy-link-btn" class="btn btn-primary me-2">Copy Referral Code</button>
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#shareModal">Share</button>
+                </div>
+            </div>
 
-        .modal-body .btn i {
-            margin-right: 5px;  /* Space between icon and text */
-        }
-
-        /* Adjust button size */
-        .modal-body .btn {
-            padding: 8px 16px;
-            font-size: 16px;
-        }
-    </style>
-
-{% block content %}
-<div class="container mt-5">
-    <!-- Referral Details Section -->
-    <div class="card shadow-sm">
-        <div class="card-header">
-            <h4 class="card-title">Referral Details</h4>
-        </div>
-        <div class="card-body">
-            <p><strong>Referral Code:</strong> <span id="referral-code">{{ referral_code }}</span></p>
-            <p><strong>Referrals Made:</strong> <span id="referrals-made" class="badge" style="background-color: #0dcaf0; color: white;">{{ referrals_made }}</span>
-            <p><strong>Total Rewards Earned:</strong> ₹<span id="rewards-earned">{{ total_rewards|floatformat:2 }}</span>
-                <a href="{% url 'withdraw' %}" id="withdraw-icon" style="cursor: pointer; color: #0dcaf0;" title="Withdraw" data-bs-toggle="tooltip" data-bs-placement="top">
-                    <i class="fas fa-wallet fa-sm"></i>
-                <i class="fas fa-exchange-alt fa-sm ms-2" id="convert-icon" style="cursor: pointer; color: #0dcaf0;" title="Convert" data-bs-toggle="tooltip" data-bs-placement="top"></i>
-            </p>
-            <p id="conversion-message" class="text-muted small d-none">
-                <i class="fas fa-info-circle"></i> Your rewards convert into your investment.
-            </p>
-            <button id="copy-link-btn" class="btn btn-primary me-2">Copy Referral Code</button>
-            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#shareModal">Share</button>
-        </div>
-    </div>
-
-    <!-- Referred Persons Table -->
-    <div class="card shadow-sm mt-4">
-        <div class="card-header">
-            <h4 class="card-title">Referred Persons</h4>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Product</th>
-                            <th>Daily Investment</th>
-                            <th>Commission Earned</th>
-                            <th>Timestamp</th>
-                        </tr>
-                    </thead>
-                    <tbody id="referred-persons-table">
-                        {% for investment in referred_investments %}
-                            <tr>
-                                <td>{{ investment.name }}</td>
-                                <td>{{ investment.product }}</td>
-                                <td>₹{{ investment.daily_investment|floatformat:2 }}</td>
-                                <td>₹{{ investment.commission|floatformat:2 }}</td>
-                                <td>{{ investment.timestamp }}</td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="5" class="text-center">No referrals yet.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>                 
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Share Modal -->
-<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="shareModalLabel">Share Your Referral Code</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <p>Share your referral link on:</p>
-                <div class="d-flex justify-content-center gap-3">
-                    <!-- WhatsApp -->
-                    <a href="https://api.whatsapp.com/send?text=Earn 25% commission on every sale! 🎉 Share your referral code ZO8K3HD8 and get rewarded when your friends buy. Start earning today! 🚀 https://epielio.com?code=ZO8K3HD8"
-                       class="btn btn-success" data-platform="whatsapp" target="_blank">
-                       <i class="fab fa-whatsapp"></i>
-                    </a>
-
-                    <!-- Instagram (use URL with referral link) -->
-                    <a href="https://instagram.com" class="btn btn-danger" data-platform="instagram" target="_blank">
-                       <i class="fab fa-instagram"></i>
-                    </a>
-
-                    <!-- Facebook -->
-                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ referral_link }}"
-                       class="btn btn-primary" data-platform="facebook" target="_blank">
-                       <i class="fab fa-facebook"></i>
-                    </a>
-
-                    <!-- Twitter -->
-                    <a href="https://twitter.com/intent/tweet?text=Join%20and%20earn%20rewards!%20Use%20my%20referral%20code%3A%20{{ referral_link }}"
-                       class="btn btn-info" data-platform="twitter" target="_blank">
-                       <i class="fab fa-twitter"></i>
-                    </a>
-
-                    <!-- Email -->
-                    <a href="mailto:?subject=Join%20and%20earn%20rewards!&body=Check%20out%20my%20referral%20link%3A%20{{ referral_link }}"
-                       class="btn btn-danger" data-platform="email" target="_blank">
-                       <i class="fas fa-envelope"></i>
-                    </a>
+            <!-- Referred Persons Table -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-header">
+                    <h4 class="card-title">Referred Persons</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Product</th>
+                                    <th>Daily Investment</th>
+                                    <th>Commission Earned</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="referred-persons-table">
+                                {% for investment in referred_investments %}
+                                    <tr>
+                                        <td>{{ investment.name }}</td>
+                                        <td>{{ investment.product }}</td>
+                                        <td>₹{{ investment.daily_investment|floatformat:2 }}</td>
+                                        <td>₹{{ investment.commission|floatformat:2 }}</td>
+                                        <td>{{ investment.timestamp }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No referrals yet.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>                 
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-</div>
-{% endblock %}
+
+        <!-- Share Modal -->
+        <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="shareModalLabel">Share Your Referral Code</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p>Share your referral link on:</p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <!-- WhatsApp -->
+                            <a href="https://api.whatsapp.com/send?text=Earn 25% commission on every sale! 🎉 Share your referral code ZO8K3HD8 and get rewarded when your friends buy. Start earning today! 🚀 https://epielio.com?code=ZO8K3HD8"
+                            class="btn btn-success" data-platform="whatsapp" target="_blank">
+                            <i class="fab fa-whatsapp"></i>
+                            </a>
+
+                            <!-- Instagram (use URL with referral link) -->
+                            <a href="https://instagram.com" class="btn btn-danger" data-platform="instagram" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                            </a>
+
+                            <!-- Facebook -->
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ referral_link }}"
+                            class="btn btn-primary" data-platform="facebook" target="_blank">
+                            <i class="fab fa-facebook"></i>
+                            </a>
+
+                            <!-- Twitter -->
+                            <a href="https://twitter.com/intent/tweet?text=Join%20and%20earn%20rewards!%20Use%20my%20referral%20code%3A%20{{ referral_link }}"
+                            class="btn btn-info" data-platform="twitter" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                            </a>
+
+                            <!-- Email -->
+                            <a href="mailto:?subject=Join%20and%20earn%20rewards!&body=Check%20out%20my%20referral%20link%3A%20{{ referral_link }}"
+                            class="btn btn-danger" data-platform="email" target="_blank">
+                            <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        {% endblock %}
 
         <!-- Footer Start -->
         <div class="container-fluid footer py-5 wow fadeIn" data-wow-delay="0.2s">

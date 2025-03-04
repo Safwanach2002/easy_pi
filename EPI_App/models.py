@@ -32,6 +32,17 @@ class Profile(models.Model):
             if not Profile.objects.filter(referral_code=code).exists():
                 return code
 
+    def set_referred_by(self, referrer):
+        """Allow setting referred_by only once and prevent changes."""
+        if self.referred_by:
+            raise ValidationError("Referral code can only be set once and cannot be changed.")
+        
+        if referrer == self:
+            raise ValidationError("You cannot refer yourself.")
+        
+        self.referred_by = referrer
+        self.save()
+
     def add_referral(self, referred_user):
         """Add a referral, update the referral count, and rewards."""
         if self.user == referred_user:
@@ -54,7 +65,7 @@ class Profile(models.Model):
     def calculate_daily_commission(self, referred_user):
         """Calculate the daily commission based on the referred user's investments."""
         today = timezone.now().date()
-        referred_user_investment = referred_user.investment_set.filter(date__date=today).aggregate(models.Sum('amount'))['amount__sum'] or 0
+        referred_user_investment = referred_user.investment_set.filter(date_date=today).aggregate(models.Sum('amount'))['amount_sum'] or 0
         
         # Example commission calculation: 25% of the referred user's total investment for the day
         daily_commission = referred_user_investment * Decimal('0.25')
@@ -65,9 +76,8 @@ class Profile(models.Model):
         self.rewards_earned += amount
         self.save()
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.user.username}'s Profile"
-
 
 class Referral(models.Model):
     referred_by = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='referral_by')

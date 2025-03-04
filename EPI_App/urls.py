@@ -44,4 +44,9 @@ urlpatterns = [
     path('wishlist/', views.wishlist_view, name='wishlist'),
     path('wishlist/add/<str:product_type>/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
     path('wishlist/remove/<int:wishlist_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+
+    #email sending 
+    path("send-email/", views.send_email, name="send-email"),
+    path('chatbox/', views.chatbox, name='chatbox'),  # URL for the chatbox page
+
 ]

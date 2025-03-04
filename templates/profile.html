@@ -261,13 +261,21 @@
                         <p><strong>Username:</strong> {{ user.username }}</p>
                         <p><strong>Email:</strong> {{ user.email }}</p>
                         <p><strong>Referral Code:</strong> {{ profile.referral_code }}</p>
+                    
                         <p><strong>Referred By:</strong> 
                             {% if profile.referred_by %}
-                                {{ profile.referred_by.user.username }}  <!-- Fetch the username -->
+                                {{ profile.referred_by.user.username }}  
                             {% else %}
-                                N/A
+                                N/A 
+                                <button id="enter-referral-btn" class="btn btn-sm btn-primary">Enter Referral Code</button>
                             {% endif %}
                         </p>
+                        
+                        <div id="referral-form" class="mt-2 d-none">
+                            <input type="text" id="referral-code-input" class="form-control" placeholder="Enter referral code">
+                            <button id="submit-referral-btn" class="btn btn-success btn-sm mt-2">Submit</button>
+                            <p id="referral-message" class="text-danger mt-1"></p>
+                        </div>
                     </div>
                     <div class="profile-section">
                         <h4>KYC Details</h4>
@@ -403,5 +411,57 @@
 
     <!-- Template Javascript -->
     <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const enterReferralBtn = document.getElementById("enter-referral-btn");
+            const referralForm = document.getElementById("referral-form");
+            const submitReferralBtn = document.getElementById("submit-referral-btn");
+            const referralCodeInput = document.getElementById("referral-code-input");
+            const referralMessage = document.getElementById("referral-message");
+        
+            if (enterReferralBtn) {
+                enterReferralBtn.addEventListener("click", function () {
+                    referralForm.classList.remove("d-none");
+                    enterReferralBtn.style.display = "none"; // Hide the button after clicking
+                });
+            }
+        
+            if (submitReferralBtn) {
+                submitReferralBtn.addEventListener("click", function () {
+                    const referralCode = referralCodeInput.value.trim();
+        
+                    if (!referralCode) {
+                        referralMessage.textContent = "Please enter a referral code.";
+                        return;
+                    }
+        
+                    fetch("{% url 'submit_referral' %}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": "{{ csrf_token }}"
+                        },
+                        body: JSON.stringify({ referral_code: referralCode })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            referralMessage.classList.remove("text-danger");
+                            referralMessage.classList.add("text-success");
+                            referralMessage.textContent = "Referral code submitted successfully!";
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            referralMessage.classList.remove("text-success");
+                            referralMessage.classList.add("text-danger");
+                            referralMessage.textContent = data.message;
+                        }
+                    })
+                    .catch(error => {
+                        referralMessage.textContent = "Something went wrong. Please try again.";
+                    });
+                });
+            }
+        });
+    </script>
 </body>
 </html>

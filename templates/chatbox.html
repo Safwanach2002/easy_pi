@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Chat Support</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            margin: 0;
+        }
+        .chat-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        /* Stylish Close Button */
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            width: 24px;
+            height: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: #555;
+            transition: color 0.3s ease-in-out;
+        }
+        .close-btn:hover {
+            color: #d9534f;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            margin-top: 15px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @media (max-width: 600px) {
+            .chat-container {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <button class="close-btn" onclick="window.close()">&#x2715;</button> <!-- Unicode Close Icon -->
+    <h2>Live Chat Support</h2>
+    <p>Please enter your details below, and we will respond via email.</p>
+
+    <label for="userEmail"><strong>Email Address:</strong></label>
+    <input type="email" id="userEmail" placeholder="Enter your email" required>
+
+    <label for="userPhone"><strong>Phone Number (Optional):</strong></label>
+    <input type="tel" id="userPhone" placeholder="Enter your phone number">
+
+    <label for="messageInput"><strong>Your Message:</strong></label>
+    <textarea id="messageInput" placeholder="Type your message..." required></textarea>
+
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+    function sendMessage() {
+        const userEmail = document.getElementById('userEmail').value.trim();
+        const userPhone = document.getElementById('userPhone').value.trim();
+        const messageText = document.getElementById('messageInput').value.trim();
+
+        if (!userEmail || !messageText) {
+            showAlert("⚠ Please enter both your email and message.", "warning");
+            return;
+        }
+
+        fetch('/send-email/', {  
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({
+                email: userEmail,
+                phone: userPhone,
+                message: messageText
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert("✅ Message sent successfully! Check your email.", "success");
+                setTimeout(() => window.close(), 2000);
+            } else {
+                showAlert("❌ " + data.error, "error");
+            }
+        })
+        .catch(error => {
+            showAlert("⚠ Error sending message. Please check your connection.", "error");
+        });
+    }
+
+    function getCSRFToken() {
+        const cookieValue = document.cookie.match(/csrftoken=([^ ;]+)/);
+        return cookieValue ? cookieValue[1] : '';
+    }
+
+    function showAlert(message, type) {
+        const alertBox = document.createElement("div");
+        alertBox.style.position = "fixed";
+        alertBox.style.bottom = "20px";
+        alertBox.style.left = "50%";
+        alertBox.style.transform = "translateX(-50%)";
+        alertBox.style.padding = "12px";
+        alertBox.style.borderRadius = "5px";
+        alertBox.style.fontSize = "16px";
+        alertBox.style.fontWeight = "bold";
+        alertBox.style.color = "white";
+        alertBox.style.textAlign = "center";
+        alertBox.style.zIndex = "9999";
+        alertBox.style.minWidth = "200px";
+
+        if (type === "success") {
+            alertBox.style.backgroundColor = "#28a745";
+        } else if (type === "warning") {
+            alertBox.style.backgroundColor = "#ffc107";
+            alertBox.style.color = "black";
+        } else if (type === "error") {
+            alertBox.style.backgroundColor = "#dc3545";
+        }
+
+        alertBox.textContent = message;
+        document.body.appendChild(alertBox);
+
+        setTimeout(() => {
+            alertBox.style.opacity = "0";
+            setTimeout(() => alertBox.remove(), 500);
+        }, 3000);
+    }
+</script>
+
+</body>
+</html>

@@ -34,6 +34,7 @@ from datetime import date
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import ProductScheme, Services, PaymentOrder
+from django.core.mail import send_mail
 
 # Create your views here.
 def generate_referral_code():
@@ -100,38 +101,45 @@ def referral_view(request):
     return render(request, 'reference.html', {
         'referral_code': profile.referral_code,
         'referrals_made': profile.referrals_made,
-        'total_rewards': total_rewards,
+        'total_rewards': profile.rewards_earned,
         'referred_investments': referred_data
     })
 
-@csrf_exempt
 def submit_referral(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             referral_code = data.get('referral_code')
-            
+
             if not referral_code:
                 return JsonResponse({'success': False, 'message': 'Referral code is required.'})
-            
+
             referred_by_profile = Profile.objects.filter(referral_code=referral_code).first()
             if not referred_by_profile:
                 return JsonResponse({'success': False, 'message': 'Invalid referral code.'})
-            
+
             user_profile = request.user.profile
+
+            # ✅ Check if the user already has a referrer
+            if user_profile.referred_by:
+                return JsonResponse({'success': False, 'message': 'You can only submit a referral code once.'})
+
             if user_profile == referred_by_profile:
                 return JsonResponse({'success': False, 'message': 'You cannot refer yourself.'})
-            
+
+            # ✅ Set referred_by only once
             user_profile.referred_by = referred_by_profile
             user_profile.save()
+
+            # ✅ Increase referral count and rewards
             referred_by_profile.referrals_made += 1
             referred_by_profile.rewards_earned += Decimal('10.00')
             referred_by_profile.save()
-            
+
             return JsonResponse({'success': True, 'message': 'Referral code submitted successfully!'})
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)})
-    
+
     return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 def login_view(request):
@@ -622,24 +630,34 @@ def payment_callback(request):
 
 @login_required
 def withdraw_request(request):
-    total_rewards = request.user.profile.rewards_earned  # Corrected field name
+    user_profile = request.user.profile
+    total_rewards = user_profile.rewards_earned  # Get user's total rewards
+
     if request.method == "POST":
         form = WithdrawalForm(request.POST)
         if form.is_valid():
             withdrawal = form.save(commit=False)
             withdrawal.user = request.user
+
             if withdrawal.amount > total_rewards:
                 form.add_error("amount", "You do not have enough rewards to withdraw this amount.")
             elif withdrawal.amount < Decimal('10.00'):
                 form.add_error("amount", "Minimum withdrawal amount is ₹10.")
             else:
-                withdrawal.tds_deduction = withdrawal.amount * Decimal('0.1')  # Use Decimal instead of float
+                # Calculate deductions
+                withdrawal.tds_deduction = withdrawal.amount * Decimal('0.1')
                 withdrawal.final_amount = withdrawal.amount - withdrawal.tds_deduction
+                
+                # Deduct the withdrawn amount from user's rewards
+                user_profile.rewards_earned -= withdrawal.amount
+                user_profile.save()  # Save updated rewards
+                
                 withdrawal.save()
                 return redirect("withdrawal_history")
     else:
         form = WithdrawalForm()
-    return render(request, "withdraw.html", {"form": form, "total_rewards": total_rewards})
+
+    return render(request, "withdraw.html", {"form": form, "total_rewards": user_profile.rewards_earned})
 
 @login_required
 def withdrawal_history(request):
@@ -672,3 +690,53 @@ def remove_from_wishlist(request, wishlist_id):
 def wishlist_view(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
+
+# email sending for meassage for quirs 
+@csrf_exempt
+def send_email(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            user_email = data.get("email")  # User's email
+            message = data.get("message")
+
+            if not user_email or not message:
+                return JsonResponse({"success": False, "error": "Email and message are required"}, status=400)
+
+            email_subject = f"New Message from {user_email}"
+            email_body = f"From: {user_email}\n\n{message}"
+
+            recipient_list = ["epielio.com@gmail.com"]  # Epielio email
+
+            # Send email to epielio.com (FROM user)
+            send_mail(
+                subject=email_subject,
+                message=email_body,
+                from_email=user_email,  # Sent from user to epielio
+                recipient_list=recipient_list,
+                fail_silently=False,
+                html_message=None,
+            )
+
+            # Email body for user (copy, but "From: epielio.com")
+            user_copy_body = f"From: epielio.com\n\n{message}"
+
+            # Send a copy to the user (FROM epielio.com)
+            send_mail(
+                subject="Thank You for Messaging",
+                message=f"Thank you for reaching out!\n\n{user_copy_body}",
+                from_email="no-reply@epielio.com",  # Now sending from epielio.com
+                recipient_list=[user_email],  # Send to user
+                fail_silently=False,
+                html_message=None,
+            )
+
+            return JsonResponse({"success": True, "message": "Message sent successfully. A copy has been sent to your email."})
+
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
+
+def chatbox(request):
+    return render(request, 'chatbox.html')  # Ensure this file is inside your templates folder

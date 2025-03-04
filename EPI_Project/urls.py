@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
-from EPI_App.views import welcome_page, payment_callback, login_view, index
+from EPI_App.views import welcome_page, payment_callback, login_view, index, send_email, chatbox
 from django.conf.urls.static import static
 from django.urls import path
 
@@ -28,6 +28,8 @@ urlpatterns = [
     path('', welcome_page, name='welcome'),
     path('login/',login_view, name='login'),
     path('payment/callback/',payment_callback, name='payment_callback'),
+    path('send-email/', send_email, name='send-email'),  # Keep send-email at root
+    path('chatbox/', chatbox, name='chatbox'),  # URL for the chatbox page
 ]
 
 if settings.DEBUG:
