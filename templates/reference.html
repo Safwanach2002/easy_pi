@@ -53,15 +53,15 @@
             color: #333;
         }
         .btn-primary {
-            background-color: rgba(0, 123, 255, 0.8); /* Transparent blue */
-            border-color: rgba(0, 123, 255, 0.8); /* Transparent blue */
+            background-color:#223043; /* Transparent blue */
+            border-color: #223043; /* Transparent blue */
         }
         .btn-secondary {
             background-color: #6c757d;
             border-color: #6c757d;
         }
         .badge.bg-success {
-            background-color: rgba(0, 123, 255, 0.8); /* Transparent blue */
+            background-color: #223043; /* Transparent blue */
             color: #fff;
         }
         .table-striped tbody tr:nth-of-type(odd) {
@@ -108,9 +108,9 @@
                 <div class="row gx-0 align-items-center" style="height: 45px;">
                     <div class="col-lg-8 text-center text-lg-start mb-lg-0">
                         <div class="d-flex flex-wrap">
-                            <a href="#" class="text-muted me-4"><i class="fas fa-map-marker-alt text-primary me-2"></i>Gopal Street, Kannur, Kerala</a>
-                            <a href="#" class="text-muted me-4"><i class="fas fa-phone-alt text-primary me-2"></i>+91 87143 99951</a>
-                            <a href="#" class="text-muted me-0"><i class="fas fa-envelope text-primary me-2"></i>epielio.com@gmail.com</a>
+                            <a href="#" class="text-muted me-4"><i class="fas fa-map-marker-alt me-2" style="color: #fff;"></i>Gopal Street, Kannur, Kerala</a>
+                            <a href="#" class="text-muted me-4"><i class="fas fa-phone-alt me-2" style="color: #fff; transform: rotate(90deg);"></i>+91 87143 99951</a>
+                            <a href="#" class="text-muted me-4"><i class="fas fa-envelope me-2" style="color: #fff;"></i>epielio.com@gmail.com</a>
                         </div>
                     </div>
                     <div class="col-lg-4 text-center text-lg-end">
@@ -126,7 +126,6 @@
         </div>
         <!-- Topbar End -->
 
-
         <!-- Navbar & Hero Start -->
         <div class="container-fluid sticky-top px-0">
             <div class="position-absolute bg-dark" style="left: 0; top: 0; width: 100%; height: 100%;">
@@ -134,7 +133,7 @@
             <div class="container px-0">
                 <nav class="navbar navbar-expand-lg navbar-dark bg-white py-3 px-4">
                     <a href="{% url 'index' %}" class="navbar-brand p-0">
-                        <h1 class="text-primary m-0"><i class="fas fa-donate me-3"></i>Easy Purchase Investment</h1>
+                        <h1 class="text-primary m-0"><!--<i class="fas fa-donate me-3"> --></i>Easy Purchase Investment</h1>
                         <!-- <img src="img/logo.png" alt="Logo"> -->
                     </a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -196,11 +195,11 @@
                 </div>
                 <div class="card-body">
                     <p><strong>Referral Code:</strong> <span id="referral-code">{{ referral_code }}</span></p>
-                    <p><strong>Referrals Made:</strong> <span id="referrals-made" class="badge" style="background-color: #0dcaf0; color: white;">{{ referrals_made }}</span>
+                    <p><strong>Referrals Made:</strong> <span id="referrals-made" class="badge" style="background-color: #223043; color: white;">{{ referrals_made }}</span>
                     <p><strong>Total Rewards Earned:</strong> ₹<span id="rewards-earned">{{ total_rewards|floatformat:2 }}</span>
-                        <a href="{% url 'withdraw' %}" id="withdraw-icon" style="cursor: pointer; color: #0dcaf0;" title="Withdraw" data-bs-toggle="tooltip" data-bs-placement="top">
+                        <a href="{% url 'withdraw' %}" id="withdraw-icon" style="cursor: pointer; color: #223043;" title="Withdraw" data-bs-toggle="tooltip" data-bs-placement="top">
                             <i class="fas fa-wallet fa-sm"></i></a>
-                        <i class="fas fa-exchange-alt fa-sm ms-2" id="convert-icon" style="cursor: pointer; color: #0dcaf0;" title="Convert" data-bs-toggle="tooltip" data-bs-placement="top"></i>  
+                        <i class="fas fa-exchange-alt fa-sm ms-2" id="convert-icon" style="cursor: pointer; color: #223043;" title="Convert" data-bs-toggle="tooltip" data-bs-placement="top"></i>  
                     </p>
                     <p id="conversion-message" class="text-muted small d-none">
                         <i class="fas fa-info-circle"></i> Your rewards convert into your investment.
@@ -369,7 +368,7 @@
             <div class="container">
                 <div class="row g-4 align-items-center">
                     <div class="col-md-6 text-center text-md-start mb-md-0">
-                        <span class="text-body"><a href="#" class="border-bottom text-primary"><i class="fas fa-copyright text-light me-2"></i>2025</a>, All right reserved.<br><span class="d-block mt-2">ELIO is a legally registered company under license number [ACE-4958]</span></span>
+                        <span class="text-body"><a href="#" class="border-bottom text-white"><i class="fas fa-copyright text-light me-2"></i>2025</a>, All right reserved.<br><span class="d-block mt-2">ELIO is a legally registered company under license number [ACE-4958]</span></span>
                     </div>
                 </div>
             </div>

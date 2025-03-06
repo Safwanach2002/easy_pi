@@ -12,14 +12,18 @@
         body {
             background-color: #f8f9fa; /* Light background for better contrast */
         }
+        .container {
+            max-width: 900px; /* Ensures container is not too wide */
+        }
         .table-container {
             background: #fff;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px #223043;
+            overflow-x: auto; /* Ensures table does not overflow on small screens */
         }
         .table th {
-            background-color: #007bff;
+            background-color: #223043;
             color: white;
             text-align: center;
         }
@@ -40,46 +44,50 @@
     <div class="container mt-5">
         <div class="table-container">
             <h2 class="text-center mb-4">Withdrawal History</h2>
-            <table class="table table-bordered table-hover table-striped">
-                <thead>
-                    <tr>
-                        <th>Amount</th>
-                        <th>TDS Deduction</th>
-                        <th>Final Amount</th>
-                        <th>Method</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for withdrawal in withdrawals %}
-                    <tr>
-                        <td>₹{{ withdrawal.amount }}</td>
-                        <td>₹{{ withdrawal.tds_deduction }}</td>
-                        <td><strong>₹{{ withdrawal.final_amount }}</strong></td>
-                        <td>{{ withdrawal.method }}</td>
-                        <td>
-                            {% if withdrawal.status|lower == "pending" %}
-                                <span class="badge badge-pending">Pending</span>
-                            {% elif withdrawal.status|lower == "processing" %}
-                                <span class="badge badge-processing">Processing</span>
-                            {% elif withdrawal.status|lower == "success" %}
-                                <span class="badge badge-success">Success</span>
-                            {% elif withdrawal.status|lower == "failed" %}
-                                <span class="badge badge-failed">Failed</span>
-                            {% else %}
-                                <span class="badge bg-secondary">{{ withdrawal.status }}</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ withdrawal.created_at }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            
+            <!-- Table Wrapper for Scroll on Small Screens -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Amount</th>
+                            <th>TDS Deduction</th>
+                            <th>Final Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for withdrawal in withdrawals %}
+                        <tr>
+                            <td>${{ withdrawal.amount }}</td>
+                            <td>${{ withdrawal.tds_deduction }}</td>
+                            <td><strong>${{ withdrawal.final_amount }}</strong></td>
+                            <td>{{ withdrawal.method }}</td>
+                            <td>
+                                {% if withdrawal.status|lower == "pending" %}
+                                    <span class="badge badge-pending">Pending</span>
+                                {% elif withdrawal.status|lower == "processing" %}
+                                    <span class="badge badge-processing">Processing</span>
+                                {% elif withdrawal.status|lower == "success" %}
+                                    <span class="badge badge-success">Success</span>
+                                {% elif withdrawal.status|lower == "failed" %}
+                                    <span class="badge badge-failed">Failed</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ withdrawal.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ withdrawal.created_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Home Button -->
             <div class="text-center mt-4">
-                <a href="{% url 'index' %}" class="btn btn-primary">Home</a>
+                <a href="{% url 'index' %}" class="btn" style="background-color: #223043; color: #fff;">Home</a>
             </div>
         </div>
     </div>

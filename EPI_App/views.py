@@ -35,6 +35,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import ProductScheme, Services, PaymentOrder
 from django.core.mail import send_mail
+from django.views.decorators.cache import never_cache, cache_control
 
 # Create your views here.
 def generate_referral_code():
@@ -330,7 +331,11 @@ def contact1(request):
 def reference(request):
     return render(request,'reference.html')
 
+@never_cache
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def index(request):
+    if not request.user.is_authenticated:  # If user is not logged in, redirect to welcome page
+        return redirect('welcome')
     return render(request, 'index.html')
 
 def welcome_page(request):
@@ -339,15 +344,24 @@ def welcome_page(request):
 def terms(request):
     return render(request,'terms.html')
 
-@login_required
+@never_cache
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def profile_view(request):
-    # Fetch user profile data
-    profile = request.user.profile
+    if not request.user.is_authenticated:  # If user is not logged in, redirect them
+        return redirect('welcome')  # Redirect to the welcome page instead of showing an error
     return render(request, 'profile.html', {'profile': request.user.profile})
 
 def logout_view(request):
-    logout(request)
-    return redirect('welcome')
+    logout(request)  # Logs out the user
+    request.session.flush()  # Clears all session data
+    response = redirect('welcome')  # Redirect to welcome page
+
+    # Prevent browser from caching the page
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+
+    return response
 
 def services_view(request):
     services = Services.objects.prefetch_related('images').all()
@@ -724,7 +738,7 @@ def send_email(request):
             # Send a copy to the user (FROM epielio.com)
             send_mail(
                 subject="Thank You for Messaging",
-                message=f"Thank you for reaching out!\n\n{user_copy_body}",
+                message=f"Thank you for reaching out!\n\n{'we got a message in your mail we will contact you soon '}",
                 from_email="no-reply@epielio.com",  # Now sending from epielio.com
                 recipient_list=[user_email],  # Send to user
                 fail_silently=False,

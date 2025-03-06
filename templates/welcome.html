@@ -130,9 +130,9 @@
                 <div class="row gx-0 align-items-center" style="height: 45px;">
                     <div class="col-lg-8 text-center text-lg-start mb-lg-0">
                         <div class="d-flex flex-wrap">
-                            <a href="#" class="text-muted me-4"><i class="fas fa-map-marker-alt text-primary me-2"></i>Gopal Street, Kannur, Kerala</a>
-                            <a href="#" class="text-muted me-4"><i class="fas fa-phone-alt text-primary me-2"></i>+91 87143 99951</a>
-                            <a href="#" class="text-muted me-0"><i class="fas fa-envelope text-primary me-2"></i>epielio.com@gmail.com</a>
+                            <a href="#" class="text-muted me-4"><i class="fas fa-map-marker-alt me-2" style="color: #fff;"></i>Gopal Street, Kannur, Kerala</a>
+                            <a href="#" class="text-muted me-4"><i class="fas fa-phone-alt me-2" style="color: #fff;"></i>+91 87143 99951</a>
+                            <a href="#" class="text-muted me-4"><i class="fas fa-envelope me-2" style="color: #fff;"></i>epielio.com@gmail.com</a>
                         </div>
                     </div>
                     <div class="col-lg-4 text-center text-lg-end">
@@ -800,7 +800,7 @@
             <div class="container">
                 <div class="row g-4 align-items-center">
                     <div class="col-md-6 text-center text-md-start mb-md-0">
-                        <span class="text-body"><a href="#" class="border-bottom text-primary"><i class="fas fa-copyright text-light me-2"></i>2025</a>, All right reserved.<br><span class="d-block mt-2">ELIO is a legally registered company under license number [ACE-4958]</span></span>
+                        <span class="text-body"><a href="#" class="border-bottom text-white"><i class="fas fa-copyright text-light me-2"></i>2025</a>, All right reserved.<br><span class="d-block mt-2">ELIO is a legally registered company under license number [ACE-4958]</span></span>
                     </div>
                 </div>
             </div>
@@ -826,106 +826,11 @@
     <!-- Template Javascript -->
     <script src="{% static 'js/main.js' %}"></script>
 
-
     <script>
-        // Flag to track if the "Great! Glad to hear that" message has already been displayed
-        let gladResponseDisplayed = false;
-    
-        // Open chat box when the "Read More Q & A" button is clicked
-        document.getElementById('open-chat-btn').addEventListener('click', function() {
-            const chatContainer = document.getElementById('chat-container');
-            chatContainer.style.display = chatContainer.style.display === 'flex' ? 'none' : 'flex';
-        });
-    
-        // Add message to chat
-        function sendMessage() {
-            const messageInput = document.getElementById('messageInput');
-            const messageText = messageInput.value.trim();
-    
-            if (messageText) {
-                // Display user's message
-                addMessage('user', messageText);
-                messageInput.value = '';
-    
-                // Check for greetings
-                if (isGreeting(messageText)) {
-                    setTimeout(() => {
-                        addMessage('agent', "Hello! Thank you for reaching out. Here are some frequently asked questions:");
-                        displayCommonQuestions();
-                    }, 1000);
-                } 
-                // Check if the message matches acknowledgment messages
-                else if (isGladMessage(messageText) && !gladResponseDisplayed) {
-                    setTimeout(() => {
-                        addMessage('agent', "Great! Glad to hear that.");
-                        gladResponseDisplayed = true;
-                    }, 1000);
-                } 
-                // Default response for irrelevant or random messages
-                else {
-                    setTimeout(() => {
-                        addMessage('agent', "Oops! You can contact our customer support at epi2025@gmail.com or call +91 6238 691 096.");
-                    }, 1000);
-                }
-            }
-        }
-    
-        // Function to check if the message is a greeting
-        function isGreeting(message) {
-            const greetings = ["hi", "hello", "hey", "hy"];
-            return greetings.some(greet => message.toLowerCase().startsWith(greet));
-        }
-    
-        // Function to check if the message is one of the acknowledgment messages
-        function isGladMessage(message) {
-            const gladMessages = [
-                "ok", "okay", "sure", "cool", "perfect", "got it", "awesome", "great", 
-                "nice", "amazing", "alright", "excellent", "fantastic", "fine", "thanks", "thank you"
-            ];
-            return gladMessages.some(pattern => message.toLowerCase().includes(pattern));
-        }
-    
-        // Function to display common questions and answers
-        function displayCommonQuestions() {
-            const commonQuestions = [
-                {
-                    question: "How can I invest in Easy Purchase?",
-                    answer: "To invest in Easy Purchase, you need to create an account, deposit funds, and choose from a list of available investment opportunities."
-                },
-                {
-                    question: "What are the benefits of investing?",
-                    answer: "Investing in Easy Pay allows you to contribute to projects that focus on renewable energy, education, and community development, while earning returns on your investments."
-                },
-                {
-                    question: "How can I contact customer support?",
-                    answer: "You can contact customer support by emailing epi2025@gmail.com or calling +91 6238 691 096."
-                }
-            ];
-    
-            // Display questions and answers in an ordered list
-            const ol = document.createElement('ol');
-            commonQuestions.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.innerHTML = `<strong>Q${index + 1}: </strong>${item.question}<br><strong>A${index + 1}: </strong>${item.answer}`;
-                ol.appendChild(li);
-            });
-    
-            setTimeout(() => {
-                addMessage('agent', ol.outerHTML);
-            }, 1000);
-        }
-    
-        // Function to add message to the chat
-        function addMessage(sender, text) {
-            const chatMessages = document.getElementById('chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', sender);
-            messageDiv.innerHTML = text;
-            chatMessages.appendChild(messageDiv);
-    
-            // Scroll to the latest message
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            window.close(); // Close tab if back is pressed
+        };
     </script>
     </body>
 
