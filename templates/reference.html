@@ -32,6 +32,7 @@
 
         <!-- Template Stylesheet -->
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
+        <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="">
     </head>
     <style>
         .card {
@@ -132,7 +133,9 @@
             </div>
             <div class="container px-0">
                 <nav class="navbar navbar-expand-lg navbar-dark bg-white py-3 px-4">
-                    <a href="{% url 'index' %}" class="navbar-brand p-0">
+                    <a href="{% url 'index' %}" class="navbar-brand p-0 d-flex align-items-center">
+                        <img src="{% static 'img/logo.jpg' %}" alt="Logo" 
+                             style="height: 40px; width: 40px; margin-right: 10px; border-radius: 50%; object-fit: cover;">
                         <h1 class="text-primary m-0"><!--<i class="fas fa-donate me-3"> --></i>Easy Purchase Investment</h1>
                         <!-- <img src="img/logo.png" alt="Logo"> -->
                     </a>
@@ -368,7 +371,7 @@
             <div class="container">
                 <div class="row g-4 align-items-center">
                     <div class="col-md-6 text-center text-md-start mb-md-0">
-                        <span class="text-body"><a href="#" class="border-bottom text-white"><i class="fas fa-copyright text-light me-2"></i>2025</a>, All right reserved.<br><span class="d-block mt-2">ELIO is a legally registered company under license number [ACE-4958]</span></span>
+                        <span class="text-body"><a href="#" class="border-bottom text-white"><i class="fas fa-copyright text-light me-2"></i>2025</a>, All right reserved.<br><span class="d-block mt-2">Saoirse is a legally registered company under license number [ACE-4958]</span></span>
                     </div>
                 </div>
             </div>

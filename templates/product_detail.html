@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.title }} - Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+
+        .full-width-container {
+            max-width: 100%;
+            width: 100%;
+            padding: 30px;
+        }
+
+        .product-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-image img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .product-gallery {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .product-gallery img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s, border 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .product-gallery img:hover, .product-gallery img.selected {
+            transform: scale(1.1);
+            border: 2px solid #ff9f00;
+        }
+
+        .product-price {
+            font-size: 26px;
+            font-weight: bold;
+            color: #e60000;
+        }
+
+        .cart-btn, .buy-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 18px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .cart-btn {
+            background: #706e6d;
+            color: white;
+        }
+
+        .buy-btn {
+            background: #223043;
+            color: white;
+        }
+
+        .related-services {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .related-card {
+            width: 200px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-align: center;
+            background: #fff;
+        }
+
+        .related-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+            .related-services-wrapper {
+                overflow-x: auto;
+                display: flex;
+                white-space: nowrap;
+                padding-bottom: 10px;
+            }
+
+            .related-services {
+                flex-wrap: nowrap;
+                gap: 10px;
+            }
+
+            .related-card {
+                flex: 0 0 auto;
+                width: 140px;
+            }
+
+            .related-card img {
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+{% block content %}
+<div class="container-fluid mt-4 full-width-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-12 product-container position-relative">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="main-image">
+                        <img id="mainImg" src="{{ product.images.first.image.url }}" alt="{{ product.title }}">
+                    </div>
+
+                    <div class="product-gallery mt-3">
+                        {% for image in product.images.all %}
+                            <img src="{{ image.image.url }}" onclick="changeMainImage(this)">
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h2>{{ product.title }}</h2>
+                    <p class="text-muted">Category: {{ product.category }}</p>
+                    <h3 class="product-price">₹{{ product.total }}</h3>
+                    <p>{{ product.desc }}</p>
+
+                    {% if product.more_details %}
+                    <h4 class="mt-4">More Details</h4>
+                    <p>{{ product.more_details }}</p>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <a href="{% url 'product_scheme_manage' %}?id={{ product.id }}&total={{ product.total }}" class="btn cart-btn mb-2">Add to Cart</a>
+                        <a href="{% url 'product_scheme_manage' %}?id={{ product.id }}&total={{ product.total }}" class="btn buy-btn">Buy Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Related Products -->
+<div class="container mt-5">
+    <h3 class="mb-4">Related Services</h3>
+    <div class="related-services-wrapper">
+        <div class="related-services">
+            {% for related_service in related_services %}
+            <div class="related-card">
+                <img src="{{ related_service.images.first.image.url }}" alt="{{ related_service.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ related_service.title }}</h5>
+                    <p class="text-primary">₹{{ related_service.total }}</p>
+                    <a href="{% url 'product_detail' 'service' related_service.id %}" class="btn btn-sm btn-primary">View</a>
+                </div>
+            </div>
+            {% empty %}
+                <p>No related services found.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <h3 class="mt-5">Combo Deals</h3>
+    <div class="related-services-wrapper">
+        <div class="related-services">
+            {% for combo in combo_products %}
+            <div class="related-card">
+                <img src="{{ combo.images.first.image.url }}" alt="{{ combo.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ combo.title }}</h5>
+                    <p class="text-primary">₹{{ combo.total }}</p>
+                    <a href="{% url 'product_detail' 'combo' combo.id %}" class="btn btn-sm btn-primary">View</a>
+                </div>
+            </div>
+            {% empty %}
+                <p>No combo deals found.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <h3 class="mt-5">Upto Offers</h3>
+    <div class="related-services-wrapper">
+        <div class="related-services">
+            {% for upto in upto_products %}
+            <div class="related-card">
+                <img src="{{ upto.images.first.image.url }}" alt="{{ upto.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ upto.title }}</h5>
+                    <p class="text-primary">₹{{ upto.total }}</p>
+                    <a href="{% url 'product_detail' 'upto' upto.id %}" class="btn btn-sm btn-primary">View</a>
+                </div>
+            </div>
+            {% empty %}
+                <p>No upto offers found.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function changeMainImage(img) {
+        document.getElementById('mainImg').src = img.src;
+        document.querySelectorAll('.product-gallery img').forEach(image => {
+            image.classList.remove('selected');
+        });
+        img.classList.add('selected');
+    }
+</script>
+
+{% endblock %}
+</body>
+</html>

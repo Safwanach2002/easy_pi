@@ -1,8 +1,10 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="">
     <title>Live Chat Support</title>
     <style>
         body {
@@ -51,7 +53,7 @@
             font-size: 16px;
         }
         button {
-            background-color: #007bff;
+            background-color: #223043;
             color: white;
             border: none;
             padding: 12px;
@@ -62,73 +64,231 @@
             font-size: 16px;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #757a80;
         }
+        /* Hide by default */
+        .email-animation, .success-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        /* Email Themed Background */
+        .email-card {
+            background: linear-gradient(135deg, #f3f4f6, #e2e8f0);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            position: relative;
+            width: 300px;
+        }
+        
+        /* Email icon glowing */
+        .email-icon {
+            width: 80px;
+            margin-bottom: 15px;
+            animation: pulse 1.5s infinite alternate;
+        }
+        
+        /* Paper plane flying animation */
+        .paper-plane-container {
+            position: absolute;
+            bottom: -10px;
+            left: -40px;
+        }
+        
+        .plane {
+            width: 60px;
+            position: absolute;
+            animation: flyAway 3s ease-in-out forwards;
+        }
+        
+        /* Success Message UI */
+        .success-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 300px;
+        }
+        
+        .success-card img {
+            width: 60px;
+            margin-bottom: 10px;
+            animation: popUp 0.5s ease-in-out;
+        }
+        
+        /* Animations */
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: translate(-50%, -55%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
         }
-        @media (max-width: 600px) {
-            .chat-container {
-                width: 95%;
-            }
+        
+        @keyframes pulse {
+            from { transform: scale(1); opacity: 0.7; }
+            to { transform: scale(1.2); opacity: 1; }
+        }
+        
+        @keyframes flyAway {
+            0% { left: -40px; bottom: -10px; opacity: 1; }
+            100% { left: 120%; bottom: 100px; opacity: 0; }
+        }
+        
+        @keyframes popUp {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-<div class="chat-container">
-    <button class="close-btn" onclick="window.close()">&#x2715;</button> <!-- Unicode Close Icon -->
-    <h2>Live Chat Support</h2>
-    <p>Please enter your details below, and we will respond via email.</p>
-
-    <label for="userEmail"><strong>Email Address:</strong></label>
-    <input type="email" id="userEmail" placeholder="Enter your email" required>
-
-    <label for="userPhone"><strong>Phone Number (Optional):</strong></label>
-    <input type="tel" id="userPhone" placeholder="Enter your phone number">
-
-    <label for="messageInput"><strong>Your Message:</strong></label>
-    <textarea id="messageInput" placeholder="Type your message..." required></textarea>
-
-    <button onclick="sendMessage()">Send</button>
-</div>
+    <div class="chat-container">
+        <button class="close-btn" onclick="window.close()">&#x2715;</button> 
+        <h2>Live Chat Support</h2>
+        <p>Please enter your details below, and we will respond via email.</p>
+    
+        <label for="userEmail"><strong>Email Address:</strong></label>
+        <input type="email" id="userEmail" placeholder="Enter your email" required>
+    
+        <label for="userPhone"><strong>Phone Number (Optional):</strong></label>
+        <input type="tel" id="userPhone" placeholder="Enter your phone number">
+    
+        <label for="messageInput"><strong>Your Message:</strong></label>
+        <textarea id="messageInput" placeholder="Type your message..." required></textarea>
+    
+        <button onclick="sendMessage()">Send</button>
+    </div>
+    
+    <!-- ✨ Email Themed Animation -->
+    <div class="email-animation">
+        <div class="email-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" class="email-icon" alt="Email">
+            <div class="paper-plane-container">
+                <img src="https://cdn-icons-png.flaticon.com/512/6819/6819087.png" class="plane" alt="Flying Paper Plane">
+            </div>
+            <p>Sending your message...</p>
+        </div>
+    </div>
+    
+    <!-- ✅ Success Message -->
+    <div class="success-message">
+        <div class="success-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/845/845646.png" alt="Success">
+            <h3>Message Sent!</h3>
+            <p>Your message has been successfully delivered.</p>
+        </div>
+    </div>
 
 <script>
     function sendMessage() {
-        const userEmail = document.getElementById('userEmail').value.trim();
-        const userPhone = document.getElementById('userPhone').value.trim();
-        const messageText = document.getElementById('messageInput').value.trim();
 
-        if (!userEmail || !messageText) {
-            showAlert("⚠ Please enter both your email and message.", "warning");
-            return;
+    const userEmail = document.getElementById('userEmail').value.trim();
+
+    const userPhone = document.getElementById('userPhone').value.trim();
+
+    const messageText = document.getElementById('messageInput').value.trim();
+
+    const chatbox = document.querySelector(".chat-container");
+
+    const emailAnimation = document.querySelector(".email-animation");
+
+    const successMessage = document.querySelector(".success-message");
+
+
+
+    if (!userEmail || !messageText) {
+
+        showAlert("⚠ Please enter both your email and message.", "warning");
+
+        return;
+
+    }
+
+
+
+    // Hide chat and show email animation
+
+    chatbox.style.display = "none";
+
+    emailAnimation.style.display = "block";
+
+
+
+    fetch('/send-email/', {  
+
+        method: 'POST',
+
+        headers: {
+
+            'Content-Type': 'application/json',
+
+            'X-CSRFToken': getCSRFToken()
+
+        },
+
+        body: JSON.stringify({
+
+            email: userEmail,
+
+            phone: userPhone,
+
+            message: messageText
+
+        })
+
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if (data.success) {
+
+            setTimeout(() => {
+
+                emailAnimation.style.display = "none";
+
+                successMessage.style.display = "block";
+
+                setTimeout(() => window.close(), 3000);
+
+            }, 3000);
+
+        } else {
+
+            showAlert("❌ " + data.error, "error");
+
         }
 
-        fetch('/send-email/', {  
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCSRFToken()
-            },
-            body: JSON.stringify({
-                email: userEmail,
-                phone: userPhone,
-                message: messageText
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAlert("✅ Message sent successfully! Check your email.", "success");
-                setTimeout(() => window.close(), 2000);
-            } else {
-                showAlert("❌ " + data.error, "error");
-            }
-        })
-        .catch(error => {
-            showAlert("⚠ Error sending message. Please check your connection.", "error");
-        });
+    })
+
+    .catch(error => {
+
+        showAlert("⚠ Error sending message. Please check your connection.", "error");
+
+    })
+
+    .finally(() => {
+
+        setTimeout(() => {
+
+            emailAnimation.style.display = "none";
+
+            chatbox.style.display = "block"; 
+
+        }, 4000);
+
+    });
+
     }
 
     function getCSRFToken() {

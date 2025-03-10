@@ -36,23 +36,27 @@ class ProfileAdmin(admin.ModelAdmin):
 
 admin.site.register(Profile, ProfileAdmin)
 
+class ServiceImageInline(admin.TabularInline):
+    model = ServiceImage
+    extra = 1  # Add one extra empty form for adding new images
+
 class ServicesAdmin(admin.ModelAdmin):
     list_display = ('title', 'product_id', 'total')
     search_fields = ('title', 'product_id')
     list_filter = ('total',)
+    fields = ('title', 'product_id', 'total', 'desc', 'more_details')
+    inlines = [ServiceImageInline]
 
-class ServiceImageInline(admin.TabularInline):
-    model = ServiceImage
+class ComboImageInline(admin.TabularInline):
+    model = ComboImage
     extra = 1  # Add one extra empty form for adding new images
 
 class ComboAdmin(admin.ModelAdmin):
     list_display = ('title', 'product_id', 'total')
     search_fields = ('title', 'product_id')
     list_filter = ('total',)
-
-class ComboImageInline(admin.TabularInline):
-    model = ComboImage
-    extra = 1  # Add one extra empty form for adding new images
+    fields = ('title', 'product_id', 'total', 'desc', 'more_details')
+    inlines = [ComboImageInline] 
 
 class ProductSchemeAdmin(admin.ModelAdmin):
     list_display = ('product_id', 'investment', 'start_date', 'end_date', 'days', 'total', 'profile')
@@ -118,6 +122,7 @@ class UptoAdmin(admin.ModelAdmin):
     list_display = ('title', 'product_id', 'total')
     search_fields = ('title', 'product_id')
     list_filter = ('total',)
+    fields = ('title', 'product_id', 'total', 'desc', 'more_details')
     inlines = [UptoImageInline]  # Add ServiceImageInline to manage images
 
 class WithdrawalRequestAdmin(admin.ModelAdmin):

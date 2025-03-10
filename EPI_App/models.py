@@ -114,6 +114,7 @@ class Services(models.Model):
     title = models.CharField(max_length=50)
     total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     desc = models.CharField(max_length=500, null=True)
+    more_details = models.TextField(blank=True, null=True)
     category = models.CharField(
         max_length=20,
         choices=CATEGORY_CHOICES,
@@ -147,6 +148,7 @@ class Upto(models.Model):
     title = models.CharField(max_length=50)
     total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     desc = models.CharField(max_length=500, null=True)
+    more_details = models.TextField(blank=True, null=True)
     category = models.CharField(
         max_length=20,
         choices=CATEGORY_CHOICES,
@@ -184,6 +186,7 @@ class Combo(models.Model):
     title = models.CharField(max_length=50)
     total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     desc = models.CharField(max_length=500, null=True)
+    more_details = models.TextField(blank=True, null=True)
     category = models.CharField(
         max_length=20,
         choices=CATEGORY_CHOICES,

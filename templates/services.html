@@ -30,6 +30,7 @@
 
         <!-- Template Stylesheet -->
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
+        <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="">
 
     <style>
         /* General Product Card Styling */
@@ -152,7 +153,7 @@
             top: 10px;
             right: 10px;
             font-size: 20px;
-            color: #44d2f6;
+            color: red;
             text-decoration: none;
             transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
             z-index: 10; /* Higher than .overlay */
@@ -167,11 +168,11 @@
         }
 
         .favorite-icon i.far {
-            color: #44d2f6; /* Outlined Heart */
+            color: red; /* Outlined Heart */
         }
 
         .favorite-icon i.fas {
-            color: #44d2f6; /* Filled Heart */
+            color: red; /* Filled Heart */
         }
 
         .details {
@@ -508,7 +509,9 @@
             </div>
             <div class="container px-0">
                 <nav class="navbar navbar-expand-lg navbar-dark bg-white py-3 px-4">
-                    <a href="{% url 'index' %}" class="navbar-brand p-0">
+                    <a href="{% url 'index' %}" class="navbar-brand p-0 d-flex align-items-center">
+                        <img src="{% static 'img/logo.jpg' %}" alt="Logo" 
+                             style="height: 40px; width: 40px; margin-right: 10px; border-radius: 50%; object-fit: cover;">
                         <h1 class="text-primary m-0"><!--<i class="fas fa-donate me-3"> --></i>Easy Purchase Investment</h1>
                         <!-- <img src="img/logo.png" alt="Logo"> -->
                     </a>
@@ -649,7 +652,10 @@
         
                     <!-- Product Title and Price -->
                     <div class="product-content p-3">
-                        <h5 class="mb-2 text-dark">{{ service.title }}</h5>
+                        <h5 class="mb-2 text-dark">
+                            <a href="{% url 'product_detail' 'service' service.id %}"class="text-dark text-decoration-none">
+                            {{ service.title }}</a>
+                        </h5>
                         <p class="h5 text-primary">₹{{ service.total }}</p>
         
                         <!-- Toggle Button -->
@@ -737,7 +743,7 @@
             <div class="container">
                 <div class="row g-4 align-items-center">
                     <div class="col-md-6 text-center text-md-start mb-md-0">
-                        <span class="text-body"><a href="#" class="border-bottom text-white"><i class="fas fa-copyright text-light me-2"></i>2025</a>, All right reserved.<br><span class="d-block mt-2">ELIO is a legally registered company under license number [ACE-4958]</span></span>
+                        <span class="text-body"><a href="#" class="border-bottom text-white"><i class="fas fa-copyright text-light me-2"></i>2025</a>, All right reserved.<br><span class="d-block mt-2">Saoirse is a legally registered company under license number [ACE-4958]</span></span>
                     </div>
                 </div>
             </div>
@@ -828,6 +834,33 @@
                 selectedCategory = this.value.toLowerCase();
                 searchInput.value = "";
                 filterProducts();
+            });
+
+            document.querySelectorAll(".favorite-icon").forEach(function (icon) {
+                icon.addEventListener("click", function (event) {
+                    event.preventDefault();
+
+                    let url = this.getAttribute("href");
+                    let iconElement = this.querySelector("i");
+
+                    fetch(url, {
+                        method: "GET",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "added") {
+                            iconElement.classList.remove("far");
+                            iconElement.classList.add("fas"); // Filled heart
+                        } else if (data.status === "removed") {
+                            iconElement.classList.remove("fas");
+                            iconElement.classList.add("far"); // Empty heart
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+                });
             });
         
             // Toggle View Details Functionality

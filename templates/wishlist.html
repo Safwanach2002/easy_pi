@@ -30,6 +30,7 @@
 
         <!-- Template Stylesheet -->
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
+        <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="">
 
     <style>
         .wishlist-title {
@@ -37,7 +38,7 @@
             align-items: center;
             font-weight: 600; 
             font-size: 32px; 
-            color: #222; 
+            color: #223043; 
             text-transform: capitalize; 
             letter-spacing: 1px; 
             margin-bottom: 40px; 
@@ -194,7 +195,7 @@
         /* Hover & Focus Effects */
         .back-button:hover,
         .back-button:focus {
-            background-color: #44d2f6;
+            background-color: #223043;
             color: white;
             box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
         }
@@ -341,7 +342,7 @@
 <body>
     {% block content %}
     <div class="container mt-4">
-        <h2 style="text-align: center; align-items: center; font-weight: 600; font-size: 32px; color: #222; text-transform: capitalize; letter-spacing: 1px; margin-bottom: 40px; padding-bottom: 10px;">Favourites</h2>
+        <h2 style="text-align: center; align-items: center; font-weight: 600; font-size: 32px; color: #223043; text-transform: capitalize; letter-spacing: 1px; margin-bottom: 40px; padding-bottom: 10px;">Favourites</h2>
         
         {% if wishlist_items %}
             <div class="row">
@@ -429,7 +430,7 @@
     
         <!-- Back to Home Link -->
         <div class="text-center mt-4">
-            <a href="{% url 'index' %}" class="btn" style="color: #fff; background-color: #44d2f6;">
+            <a href="{% url 'index' %}" class="btn" style="color: #fff; background-color: #223043;">
                 <i class="fas fa-arrow-left"></i> Back to home
             </a>
         </div>

@@ -49,4 +49,6 @@ urlpatterns = [
     path("send-email/", views.send_email, name="send-email"),
     path('chatbox/', views.chatbox, name='chatbox'),  # URL for the chatbox page
 
+    path('<str:product_type>/<int:product_id>/', views.product_detail, name='product_detail'),
+
 ]

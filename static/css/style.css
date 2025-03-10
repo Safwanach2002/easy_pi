@@ -131,6 +131,18 @@
     transition: 0.5s !important;
 }
 
+/* Navbar links */
+.navbar .navbar-nav .nav-item.nav-link,
+.navbar .navbar-nav .nav-link {
+    color: var(--bs-dark) !important;
+}
+
+/*** Navbar ***/
+.sticky-top,
+.sticky-top .container {
+    transition: 0.5s !important;
+}
+
 .navbar .navbar-nav .nav-item.nav-link,
 .navbar .navbar-nav .nav-link {
     color: var(--bs-dark) !important;
@@ -210,7 +222,37 @@
     .navbar .navbar-nav .nav-item.nav-link {
         margin: 15px 0 !important;
     }
+}
 
+/* Fix for "Easy Purchase Investment" text cutoff */
+.navbar-brand {
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.navbar-brand h1 {
+    font-size: 1.8rem; /* Adjust font size for better fit */
+    white-space: normal; /* Allow text to wrap */
+    word-wrap: break-word; /* Ensure text wraps properly */
+    text-align: center;
+    max-width: 100%; /* Ensure it doesn’t overflow */
+}
+
+/* Reduce font size further for smaller screens */
+@media (max-width: 768px) {
+    .navbar-brand h1 {
+        font-size: 1.5rem;
+    }
+}
+
+
+@media (max-width: 576px) {
+    .navbar-brand h1 {
+        font-size: 1rem;
+    }
 }
 
 .dropdown .dropdown-menu a:hover {
@@ -272,7 +314,7 @@
 
 .owl-prev:hover,
 .owl-next:hover {
-    background: var(--bs-dark) !important;
+    background: #8b8f92;
     color: var(--bs-white) !important;
 }
 

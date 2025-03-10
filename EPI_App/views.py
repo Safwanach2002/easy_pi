@@ -303,14 +303,41 @@ def product_scheme_upto(request):
 def privacy_view(request):
    return render(request, 'privacy.html')
 
+def services_view(request):
+    services = Services.objects.prefetch_related('images').all()
+    user_favorites = []  
+
+    if request.user.is_authenticated:
+        user_favorites = Wishlist.objects.filter(user=request.user).values_list('service_id', flat=True)
+
+    return render(request, 'services.html', {
+        'services': services,
+        'user_favorites': list(user_favorites),
+    })
+
 def combo_view(request):
     combo = Combo.objects.prefetch_related('images').all()
-    return render(request, 'combo.html', {'combo': combo})
+    user_favorites = []  
 
-@login_required
+    if request.user.is_authenticated:
+        user_favorites = Wishlist.objects.filter(user=request.user).values_list('combo_id', flat=True)
+
+    return render(request, 'combo.html', {
+        'combo': combo,
+        'user_favorites': list(user_favorites),
+    })
+
 def upto_view(request):
-   upto = Upto.objects.prefetch_related('images').all()  # Fetch services with images
-   return render(request, 'upto.html', {'upto': upto})
+    upto = Upto.objects.prefetch_related('images').all()
+    user_favorites = []
+
+    if request.user.is_authenticated:
+        user_favorites = Wishlist.objects.filter(user=request.user).values_list('upto_id', flat=True)
+
+    return render(request, 'upto.html', {
+        'upto': upto,
+        'user_favorites': list(user_favorites),
+    })
 
 @login_required
 def comingsoon_view(request):
@@ -362,58 +389,6 @@ def logout_view(request):
     response['Expires'] = '0'
 
     return response
-
-def services_view(request):
-    services = Services.objects.prefetch_related('images').all()
-    return render(request, 'services.html', {'services':services})
-
-def services_view(request):
-    services = Services.objects.all()
-    return render(request, 'services.html', {'services': services})
-
-# @csrf_exempt  # For security, replace with proper CSRF handling
-# @require_POST
-# def toggle_favorite(request, product_type, product_id):
-#     if not request.user.is_authenticated:
-#         return JsonResponse({'error': 'User not authenticated'}, status=403)
-
-#     # Toggle favorite for any type (service, upto22, combo)
-#     favorite, created = Favorite.objects.get_or_create(
-#         user=request.user,
-#         item_id=product_id,
-#         item_type=product_type
-#     )
-
-#     if not created:
-#         favorite.delete()
-#         favorited = False
-#     else:
-#         favorited = True
-
-#     return JsonResponse({'favorited': favorited})
-
-
-# @login_required
-# def favorite_list(request):
-#     """Fetches the favorite items of a user and categorizes them."""
-
-#     favorite_data = Favorite.objects.filter(user=request.user)
-
-#     item_ids = {
-#         'service': list(favorite_data.filter(item_type='service').values_list('item_id', flat=True)),
-#         'upto22': list(favorite_data.filter(item_type='upto22').values_list('item_id', flat=True)),
-#         'combo': list(favorite_data.filter(item_type='combo').values_list('item_id', flat=True))
-#     }
-
-#     favorites_services = Services.objects.filter(id__in=item_ids['service'])
-#     favorites_upto22 = Upto.objects.filter(id__in=item_ids['upto22'])
-#     favorites_combo = Combo.objects.filter(id__in=item_ids['combo'])
-
-#     return render(request, 'favorites_page.html', {
-#         'favorites_services': favorites_services,
-#         'favorites_upto22': favorites_upto22,
-#         'favorites_combo': favorites_combo
-#     })
 
 @login_required
 def payment_success(request):
@@ -681,18 +656,25 @@ def withdrawal_history(request):
 @login_required
 def add_to_wishlist(request, product_type, product_id):
     user = request.user
+    wishlist_item = None
+    created = False  # Track if a new item is added
 
     if product_type == 'service':
         product = get_object_or_404(Services, id=product_id)
-        Wishlist.objects.get_or_create(user=user, service=product)
+        wishlist_item, created = Wishlist.objects.get_or_create(user=user, service=product)
     elif product_type == 'upto':
         product = get_object_or_404(Upto, id=product_id)
-        Wishlist.objects.get_or_create(user=user, upto=product)
+        wishlist_item, created = Wishlist.objects.get_or_create(user=user, upto=product)
     elif product_type == 'combo':
         product = get_object_or_404(Combo, id=product_id)
-        Wishlist.objects.get_or_create(user=user, combo=product)
+        wishlist_item, created = Wishlist.objects.get_or_create(user=user, combo=product)
 
-    return redirect('wishlist')
+    # If item exists and was NOT newly created, remove it (toggle behavior)
+    if not created:
+        wishlist_item.delete()
+        return JsonResponse({"status": "removed", "product_id": product_id})
+
+    return JsonResponse({"status": "added", "product_id": product_id})
 
 @login_required
 def remove_from_wishlist(request, wishlist_id):
@@ -754,3 +736,26 @@ def send_email(request):
 
 def chatbox(request):
     return render(request, 'chatbox.html')  # Ensure this file is inside your templates folder
+
+
+def product_detail(request, product_type, product_id):
+    if product_type == "service":
+        product = get_object_or_404(Services, id=product_id)
+    elif product_type == "combo":
+        product = get_object_or_404(Combo, id=product_id)
+    elif product_type == "upto":
+        product = get_object_or_404(Upto, id=product_id)
+    else:
+        return render(request, '404.html')  # Handle invalid product type
+
+    # Fetch related products based on category
+    related_services = Services.objects.filter(category=product.category).exclude(id=product.id)[:4]
+    combo_products = Combo.objects.filter(category=product.category).exclude(id=product.id)[:4]
+    upto_products = Upto.objects.filter(category=product.category).exclude(id=product.id)[:4]
+
+    return render(request, 'product_detail.html', {
+        'product': product,
+        'related_services': related_services,
+        'combo_products': combo_products,
+        'upto_products': upto_products
+    })
