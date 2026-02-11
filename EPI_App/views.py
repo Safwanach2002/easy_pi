@@ -11,7 +11,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from .models import Combo, Investment, Referral, Profile, ProductScheme, Services, Upto, Wishlist, WithdrawalRequest
+from .models import Combo, ComboRating, Feedback, Investment, Referral, Profile, ProductScheme, ServiceRating, Services, Upto, UptoRating, Wishlist, WithdrawalRequest
 from datetime import datetime, timedelta, date, timezone
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -36,6 +36,9 @@ from django.contrib.auth.decorators import login_required
 from .models import ProductScheme, Services, PaymentOrder
 from django.core.mail import send_mail
 from django.views.decorators.cache import never_cache, cache_control
+from django.core.mail import EmailMultiAlternatives
+from django.utils.html import format_html
+from django.db.models import Avg
 
 # Create your views here.
 def generate_referral_code():
@@ -161,47 +164,62 @@ def login_view(request):
         
     return render(request, 'login.html', {'form': form})
 
-@login_required 
+@login_required
 def product_scheme_manage(request):
-    product_id = request.GET.get('id') # Fetch `id` (service ID) from the request
-    total = request.GET.get('total') # Fetch `total` from the request
+    product_id = request.GET.get('id')
+    total = request.GET.get('total')
 
-    # Fetch the product_id and total from the Services model
+    # Fetch the service details
     if product_id:
         try:
-            service = Services.objects.get(id=product_id) # Fetch service based on ID
-            product_id = service.product_id # Extract product_id from the service
-            total = service.total # Extract total from the service
+            service = Services.objects.get(id=product_id)
+            product_id = service.product_id
+            total = service.total
         except Services.DoesNotExist:
-            product_id = None # Reset to None if the service is not found
+            service = None
+            product_id = None
             total = None
 
     if request.method == 'POST':
         form = ProductSchemeForm(request.POST)
         if form.is_valid():
             scheme = form.save(commit=False)
-
-            # Set the profile to the currently logged-in user's profile
             profile = Profile.objects.get(user=request.user)
-            scheme.profile = profile # Automatically set the profile field
-
-            # Explicitly set product_id and total to ensure they are saved
+            scheme.profile = profile
             scheme.product_id = product_id
             scheme.total = total
-            scheme.start_date = datetime.now()  # Set start date to current date
+            scheme.start_date = datetime.now()
+            scheme.save()
 
-            # The end_date will be automatically calculated in the model during save
-            scheme.save() # Save the scheme, which will also calculate the end_date
+            # Construct Email Content (Without Image)
+            subject = "Product Added Successfully"
 
-            return redirect('plans') # Redirect to the payment page
+            html_message = format_html(f"""
+                <p>Dear {request.user.username},</p>
+
+                <p>You have successfully added a product.</p>
+
+                <p><strong>📌 Product:</strong> {service.title if service else 'N/A'}</p>
+                <p><strong>💰 Investment Amount:</strong> ₹{scheme.investment}</p>
+                <p><strong>🔢 Total:</strong> ₹{total}</p>
+                <p><strong>📅 Number of Days:</strong> {scheme.days}</p>
+
+                <p>Thank you for investing with us.<br>
+                If you have any questions, feel free to contact us.</p>
+
+                <p><strong>Best Regards,<br>Team Epielio</strong></p>
+            """)
+
+            # Send Email
+            email = EmailMultiAlternatives(subject, '', 'epielio.com@gmail.com', [request.user.email])
+            email.attach_alternative(html_message, "text/html")
+            email.send()
+
+            return redirect('plans')
+
     else:
-        # Pass initial values for product_id and total to the form
-        form = ProductSchemeForm(initial={
-            'product_id': product_id,
-            'total': total,
-        })
+        form = ProductSchemeForm(initial={'product_id': product_id, 'total': total})
 
-    # Render the template with the form and context
     return render(request, 'product_scheme_manage.html', {
         'form': form,
         'product_id': product_id,
@@ -209,17 +227,17 @@ def product_scheme_manage(request):
     })
 
 def product_scheme_combo(request):
-    product_id = request.GET.get('id') # Fetch id (service ID) from the request
-    total = request.GET.get('total') # Fetch total from the request
+    product_id = request.GET.get('id')  # Fetch id (service ID) from the request
+    total = request.GET.get('total')    # Fetch total from the request
 
-    # Fetch the product_id and total from the Services model
+    combo = None  # Initialize combo
     if product_id:
         try:
-            combo = Combo.objects.get(id=product_id) # Fetch service based on ID
-            product_id = combo.product_id # Extract product_id from the service
-            total = combo.total # Extract total from the service
+            combo = Combo.objects.get(id=product_id)  # Fetch combo based on ID
+            product_id = combo.product_id  # Extract product_id from the combo
+            total = combo.total            # Extract total from the combo
         except Combo.DoesNotExist:
-            product_id = None # Reset to None if the service is not found
+            product_id = None
             total = None
 
     if request.method == 'POST':
@@ -234,20 +252,36 @@ def product_scheme_combo(request):
             # Explicitly set product_id and total to ensure they are saved
             scheme.product_id = product_id
             scheme.total = total
-            scheme.start_date = datetime.now() # Set start date to current date
+            scheme.start_date = datetime.now()  # Set start date to current date
 
-            # The end_date will be automatically calculated in the model during save
-            scheme.save() # Save the scheme, which will also calculate the end_date
+            scheme.save()  # Save the scheme, which will also calculate the end_date
 
-            return redirect('plans') # Redirect to the payment page
+            # Construct Email Content (Without Image)
+            subject = "Product Added Successfully"
+            html_message = format_html(f"""
+                <p>Dear {request.user.username},</p>
+                <p>You have successfully added a product.</p>
+                <p><strong>📌 Product:</strong> {combo.title if combo else 'N/A'}</p>
+                <p><strong>💰 Investment Amount:</strong> ₹{scheme.investment}</p>
+                <p><strong>🔢 Total:</strong> ₹{total}</p>
+                <p><strong>📅 Number of Days:</strong> {scheme.days}</p>
+                <p>Thank you for investing with us.<br>
+                If you have any questions, feel free to contact us.</p>
+                <p><strong>Best Regards,<br>Team Epielio</strong></p>
+            """)
+
+            # Send Email
+            email = EmailMultiAlternatives(subject, '', 'epielio.com@gmail.com', [request.user.email])
+            email.attach_alternative(html_message, "text/html")
+            email.send()
+
+            return redirect('plans')
+
     else:
-        # Pass initial values for product_id and total to the form
-        form = ProductSchemeForm(initial={
-            'product_id': product_id,
-            'total': total,
-        })
+        # For GET request, initialize the form with product_id and total
+        form = ProductSchemeForm(initial={'product_id': product_id, 'total': total})
 
-    # Render the template with the form and context
+    # Always return a response
     return render(request, 'product_scheme_combo.html', {
         'form': form,
         'product_id': product_id,
@@ -284,7 +318,31 @@ def product_scheme_upto(request):
             scheme.start_date = datetime.now()
             scheme.save()
 
-            return redirect('plans')  # Redirect to plans page
+                        # Construct Email Content (Without Image)
+            subject = "Product Added Successfully"
+
+            html_message = format_html(f"""
+                <p>Dear {request.user.username},</p>
+
+                <p>You have successfully added a product.</p>
+
+                <p><strong>📌 Product:</strong> {upto22.title if upto22 else 'N/A'}</p>
+                <p><strong>💰 Investment Amount:</strong> ₹{scheme.investment}</p>
+                <p><strong>🔢 Total:</strong> ₹{total}</p>
+                <p><strong>📅 Number of Days:</strong> {scheme.days}</p>
+
+                <p>Thank you for investing with us.<br>
+                If you have any questions, feel free to contact us.</p>
+
+                <p><strong>Best Regards,<br>Team Epielio</strong></p>
+            """)
+
+            # Send Email
+            email = EmailMultiAlternatives(subject, '', 'epielio.com@gmail.com', [request.user.email])
+            email.attach_alternative(html_message, "text/html")
+            email.send()
+
+            return redirect('plans')
 
     else:
         form = ProductSchemeForm(initial={
@@ -304,39 +362,129 @@ def privacy_view(request):
    return render(request, 'privacy.html')
 
 def services_view(request):
-    services = Services.objects.prefetch_related('images').all()
-    user_favorites = []  
+    min_price = request.GET.get('min_price', 3000)  # Default min price
+    max_price = request.GET.get('max_price', 200000)  # Default max price
 
+    try:
+        min_price = float(min_price)
+        max_price = float(max_price)
+    except ValueError:
+        min_price = 3000
+        max_price = 200000
+
+    services = Services.objects.prefetch_related('images').filter(
+        total__gte=min_price,  # Use 'total' instead of 'price'
+        total__lte=max_price
+    )
+
+    user_favorites = []
     if request.user.is_authenticated:
         user_favorites = Wishlist.objects.filter(user=request.user).values_list('service_id', flat=True)
 
     return render(request, 'services.html', {
         'services': services,
         'user_favorites': list(user_favorites),
+        'min_price': min_price,
+        'max_price': max_price,
     })
 
-def combo_view(request):
-    combo = Combo.objects.prefetch_related('images').all()
-    user_favorites = []  
+@login_required
+def submit_rating(request):
+    if request.method == "POST":
+        item_type = request.POST.get("item_type")
+        item_id = request.POST.get("item_id")
+        rating_value = request.POST.get("rating")
 
+        if not item_type or not item_id or not rating_value:
+            return JsonResponse({"success": False, "error": "Missing required fields"})
+
+        try:
+            rating_value = int(rating_value)
+            if rating_value < 1 or rating_value > 5:
+                return JsonResponse({"success": False, "error": "Invalid rating value"})
+        except ValueError:
+            return JsonResponse({"success": False, "error": "Invalid rating format"})
+
+        user = request.user
+        avg_rating = 0
+
+        if item_type == "service":
+            service = get_object_or_404(Services, id=item_id)
+            rating, created = ServiceRating.objects.get_or_create(service=service, user=user)
+            rating.rating = rating_value
+            rating.save()
+            avg_rating = ServiceRating.objects.filter(service=service).aggregate(Avg('rating'))['rating__avg'] or 0
+        
+        elif item_type == "combo":
+            combo = get_object_or_404(Combo, id=item_id)
+            rating, created = ComboRating.objects.get_or_create(combo=combo, user=user)
+            rating.rating = rating_value
+            rating.save()
+            avg_rating = ComboRating.objects.filter(combo=combo).aggregate(Avg('rating'))['rating__avg'] or 0
+
+        elif item_type == "upto":
+            upto = get_object_or_404(Upto, id=item_id)
+            rating, created = UptoRating.objects.get_or_create(upto=upto, user=user)
+            rating.rating = rating_value
+            rating.save()
+            avg_rating = UptoRating.objects.filter(upto=upto).aggregate(Avg('rating'))['rating__avg'] or 0
+        
+        else:
+            return JsonResponse({"success": False, "error": "Invalid item type"})
+
+        return JsonResponse({
+            "success": True,
+            "avg_rating": round(avg_rating, 1),
+            "user_rating": rating_value
+        })
+
+    return JsonResponse({"success": False, "error": "Invalid request"})
+
+def combo_view(request):
+    try:
+        min_total = int(request.GET.get('min_price', 3000))
+        max_total = int(request.GET.get('max_price', 200000))
+    except ValueError:
+        min_total = 3000
+        max_total = 200000
+
+    # Ensure min_total is not greater than max_total
+    if min_total > max_total:
+        min_total, max_total = 3000, 200000  # Reset to default if invalid
+
+    # Filter combos based on total field
+    combo = Combo.objects.prefetch_related('images').filter(total__gte=min_total, total__lte=max_total)
+
+    # Get user favorites if authenticated
+    user_favorites = []
     if request.user.is_authenticated:
         user_favorites = Wishlist.objects.filter(user=request.user).values_list('combo_id', flat=True)
 
     return render(request, 'combo.html', {
         'combo': combo,
         'user_favorites': list(user_favorites),
+        'min_price': min_total,  # Keeping names consistent with template
+        'max_price': max_total,
     })
 
 def upto_view(request):
-    upto = Upto.objects.prefetch_related('images').all()
-    user_favorites = []
+    try:
+        min_price = int(request.GET.get('min_price', 3000))
+        max_price = int(request.GET.get('max_price', 200000))
+    except ValueError:
+        min_price, max_price = 3000, 200000  # Default values if conversion fails
 
+    upto = Upto.objects.prefetch_related('images').filter(total__gte=min_price, total__lte=max_price)
+
+    user_favorites = []
     if request.user.is_authenticated:
         user_favorites = Wishlist.objects.filter(user=request.user).values_list('upto_id', flat=True)
 
     return render(request, 'upto.html', {
         'upto': upto,
         'user_favorites': list(user_favorites),
+        'min_price': min_price,
+        'max_price': max_price,
     })
 
 @login_required
@@ -344,7 +492,8 @@ def comingsoon_view(request):
    return render(request, 'coming_soon.html')
 
 def about(request):
-    return render(request,'about.html')
+    feedbacks = Feedback.objects.all().order_by('-created_at')  # Fetch feedbacks in descending order
+    return render(request, 'about.html', {'feedbacks':feedbacks})
 
 def about1(request):
     return render(request,'about1.html')
@@ -746,7 +895,7 @@ def product_detail(request, product_type, product_id):
     elif product_type == "upto":
         product = get_object_or_404(Upto, id=product_id)
     else:
-        return render(request, '404.html')  # Handle invalid product type
+        return render(request, '404.html') # Handle invalid product type
 
     # Fetch related products based on category
     related_services = Services.objects.filter(category=product.category).exclude(id=product.id)[:4]
@@ -759,3 +908,15 @@ def product_detail(request, product_type, product_id):
         'combo_products': combo_products,
         'upto_products': upto_products
     })
+
+@login_required  # Ensure only logged-in users can submit feedback
+def submit_feedback(request):
+    if request.method == "POST":
+        rating = request.POST.get("rating")
+        message = request.POST.get("message", "")
+
+        Feedback.objects.create(user=request.user, rating=rating, message=message)
+
+        return JsonResponse({"success": True, "message": "Feedback submitted successfully!"})
+
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)

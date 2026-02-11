@@ -131,9 +131,9 @@
                 <div class="row gx-0 align-items-center" style="height: 45px;">
                     <div class="col-lg-8 text-center text-lg-start mb-lg-0">
                         <div class="d-flex flex-wrap">
-                            <a href="#" class="text-muted me-4"><i class="fas fa-map-marker-alt me-2" style="color: #fff;"></i>Gopal Street, Kannur, Kerala</a>
-                            <a href="#" class="text-muted me-4"><i class="fas fa-phone-alt me-2" style="color: #fff;"></i>+91 87143 99951</a>
-                            <a href="#" class="text-muted me-4"><i class="fas fa-envelope me-2" style="color: #fff;"></i>epielio.com@gmail.com</a>
+                            <a href="https://www.google.com/maps/search/?q=Gopal+Street,+Kannur,+Kerala" target="_blank" class="text-muted me-4"><i class="fas fa-map-marker-alt me-2" style="color: #fff;"></i>Gopal Street, Kannur, Kerala</a>
+                            <a href="tel:+91 87143 99951" class="text-muted me-4"><i class="fas fa-phone-alt me-2" style="color: #fff;"></i>+91 87143 99951</a>
+                            <a href="mailto:epielio.com@gmail.com" class="text-muted me-4"><i class="fas fa-envelope me-2" style="color: #fff;"></i>epielio.com@gmail.com</a>
                         </div>
                     </div>
                     <div class="col-lg-4 text-center text-lg-end">
@@ -707,28 +707,14 @@
                     <div class="col-lg-6 wow fadeInRight" data-wow-delay="0.3s">
                         <div class="faq-img RotateMoveRight rounded">
                             <img src="{% static 'img/faq-img.jpg' %}" class="img-fluid rounded w-100" alt="Image">
-                            <a class="faq-btn btn btn-primary rounded-pill text-white py-3 px-5" id="open-chat-btn">For more Queries <i class="fas fa-arrow-right ms-2"></i></a>
+                            <a class="faq-btn btn btn-primary rounded-pill text-white py-3 px-5" id="open-chat-btn" href="{% url 'login' %}">For more Queries <i class="fas fa-arrow-right ms-2"></i></a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Chat Box -->
-    <div class="chat-container" id="chat-container">
-        <div class="chat-header">
-            Live Chat
-        </div>
-        <div class="chat-messages" id="chat-messages">
-            <!-- Messages will appear here -->
-        </div>
-        <div class="chat-input">
-            <input type="text" id="messageInput" placeholder="Type your message..." />
-            <button onclick="sendMessage()">Send</button>
-        </div>
-    </div>
-        <!-- FAQ End -->
+    <!-- FAQ End -->
 
         <!-- Footer Start -->
         <div class="container-fluid footer py-5 wow fadeIn" data-wow-delay="0.2s">

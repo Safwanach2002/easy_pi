@@ -44,7 +44,7 @@ class ServicesAdmin(admin.ModelAdmin):
     list_display = ('title', 'product_id', 'total')
     search_fields = ('title', 'product_id')
     list_filter = ('total',)
-    fields = ('title', 'product_id', 'total', 'desc', 'more_details')
+    fields = ('title', 'product_id', 'total', 'desc', 'more_details', 'category')
     inlines = [ServiceImageInline]
 
 class ComboImageInline(admin.TabularInline):
@@ -55,7 +55,7 @@ class ComboAdmin(admin.ModelAdmin):
     list_display = ('title', 'product_id', 'total')
     search_fields = ('title', 'product_id')
     list_filter = ('total',)
-    fields = ('title', 'product_id', 'total', 'desc', 'more_details')
+    fields = ('title', 'product_id', 'total', 'desc', 'more_details', 'category')
     inlines = [ComboImageInline] 
 
 class ProductSchemeAdmin(admin.ModelAdmin):
@@ -122,7 +122,7 @@ class UptoAdmin(admin.ModelAdmin):
     list_display = ('title', 'product_id', 'total')
     search_fields = ('title', 'product_id')
     list_filter = ('total',)
-    fields = ('title', 'product_id', 'total', 'desc', 'more_details')
+    fields = ('title', 'product_id', 'total', 'desc', 'more_details', 'category')
     inlines = [UptoImageInline]  # Add ServiceImageInline to manage images
 
 class WithdrawalRequestAdmin(admin.ModelAdmin):

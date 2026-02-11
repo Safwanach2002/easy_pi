@@ -44,7 +44,7 @@
             transition: border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
         .form-field-container:hover {
-            border-color: #007bff;
+            border-color: #223043;
             box-shadow: 0px 8px 15px rgba(0, 123, 255, 0.1);
         }
         .form-field-container .form-label {
@@ -52,7 +52,7 @@
             top: -8px;
             left: 15px;
             font-size: 12px;
-            color: #007bff;
+            color: #223043;
             font-weight: 500;
             background-color: white;
             padding: 0 5px;
@@ -67,7 +67,7 @@
             transition: all 0.3s ease-in-out;
         }
         .form-control:focus {
-            border-color: #007bff;
+            border-color: #223043;
             box-shadow: 0px 0px 10px rgba(0, 123, 255, 0.3);
         }
         .form-control::placeholder {
@@ -83,12 +83,12 @@
             border-radius: 8px;
             transition: all 0.3s ease-in-out;
             width: 100%;
-            border: 2px solid #007bff;
+            border: 2px solid #223043;
             background-color: white;
-            color: #007bff;
+            color: #223043;
         }
         .btn:hover {
-            background-color: #007bff;
+            background-color: #223043;
             color: white;
             transform: translateY(-2px);
         }
@@ -105,7 +105,7 @@
             height: 150px;
             object-fit: cover;
             border-radius: 50%;
-            border: 4px solid #007bff;
+            border: 4px solid #223043;
             transition: all 0.3s ease-in-out;
             box-shadow: 0px 8px 15px rgba(0, 123, 255, 0.1);
         }
@@ -116,7 +116,7 @@
             position: absolute;
             bottom: 0;
             padding: 8px 20px;
-            background-color: #007bff;
+            background-color: #223043;
             color: white;
             font-weight: 500;
             cursor: pointer;
@@ -124,7 +124,7 @@
             transition: background-color 0.3s ease-in-out;
         }
         .profile-photo-label:hover {
-            background-color: #0056b3;
+            background-color: #223043;
         }
 
         /* Progress Bar for Profile Photo Upload */
@@ -137,7 +137,7 @@
         .progress-bar {
             width: 0;
             height: 100%;
-            background-color: #007bff;
+            background-color: #223043;
             transition: width 0.3s ease-in-out;
         }
 
@@ -173,7 +173,7 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background-color: #007bff;
+            background-color: #223043;
             color: white;
             border-radius: 50%;
             padding: 10px;
@@ -230,14 +230,8 @@
 
 <div class="container">
     <div class="profile-container">
-        <!-- Dark Mode Toggle -->
-        <!-- <div class="text-end">
-            <button class="btn btn-dark btn-sm" onclick="toggleDarkMode()">
-                <i class="fa fa-moon"></i> Dark Mode
-            </button>
-        </div> -->
-
-        <h2><i class="fa fa-user-edit"></i> Edit Profile</h2>
+        
+        <h2><i class="fa fa-user-edit"></i> Edit Profile </h2>
         
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}

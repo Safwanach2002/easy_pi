@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Successful</title>
-    <!-- Include Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="">
-    <!-- Custom CSS -->
+    <meta name="csrf-token" content="{{ csrf_token }}">  <!-- ✅ CSRF Token Fix -->
+
     <style>
         body {
             background-color: #f8f9fa;
@@ -23,18 +23,29 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        .container h1 {
-            font-size: 36px;
-            color: #091479;
-            font-weight: bold;
-        }
-        .container p {
-            font-size: 18px;
-            color: #333;
+        .emoji-container {
             margin-top: 20px;
         }
-        .btn-home {
-            margin-top: 30px;
+        .emoji {
+            font-size: 40px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: transform 0.2s, filter 0.2s;
+            filter: grayscale(100%);
+        }
+        .emoji:hover, .selected {
+            transform: scale(1.2);
+            filter: grayscale(0%);
+        }
+        .feedback-text {
+            margin-top: 15px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .btn-submit {
+            margin-top: 20px;
             background-color: #007bff;
             color: white;
             padding: 10px 20px;
@@ -43,23 +54,8 @@
             font-size: 16px;
             cursor: pointer;
         }
-        .btn-home:hover {
+        .btn-submit:hover {
             background-color: #0056b3;
-            color: #f8f9fa;
-        }
-
-        /* Media Queries for responsiveness */
-        @media (max-width: 768px) {
-            .container h1 {
-                font-size: 28px;
-            }
-            .container p {
-                font-size: 16px;
-            }
-            .btn-home {
-                padding: 8px 15px;
-                font-size: 14px;
-            }
         }
     </style>
 </head>
@@ -67,13 +63,59 @@
 
 <div class="container">
     <h1>Payment Submitted Successfully</h1>
-    <a href="{% url 'index' %}" class="btn-home">Go to Homepage</a>
+
+    <!-- Feedback Section -->
+    <div class="emoji-container">
+        <p>Rate your experience:</p>
+        <span class="emoji" data-value="Very Bad">😡</span>
+        <span class="emoji" data-value="Bad">😞</span>
+        <span class="emoji" data-value="Average">😐</span>
+        <span class="emoji" data-value="Good">😊</span>
+        <span class="emoji" data-value="Excellent">😃</span>
+    </div>
+
+    <input type="hidden" id="feedback-rating" value="">
+    <textarea class="feedback-text" id="feedback-message" placeholder="Leave a comment (optional)"></textarea>
+    <button class="btn-submit" onclick="submitFeedback()">Submit Feedback</button>
 </div>
 
-<!-- Include Bootstrap JS (optional, for responsiveness) -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.emoji').click(function() {
+            $('.emoji').removeClass('selected'); // ✅ Simplified selection fix
+            $(this).addClass('selected'); 
+            $('#feedback-rating').val($(this).attr('data-value'));
+        });
+    });
+
+    function submitFeedback() {
+        let rating = $('#feedback-rating').val();
+        let message = $('#feedback-message').val();
+
+        if (rating === '') {
+            alert('❌ Please select a rating before submitting.');
+            return;
+        }
+
+        $.ajax({
+            url: '{% url "submit_feedback" %}',
+            type: 'POST',
+            headers: { "X-CSRFToken": $('meta[name="csrf-token"]').attr('content') }, // ✅ CSRF Token Fix
+            data: {
+                'rating': rating,
+                'message': message,
+            },
+            success: function(response) {
+                alert('✅ Feedback submitted successfully!');
+                window.location.href = '{% url "index" %}';  // Redirect to homepage
+            },
+            error: function() {
+                alert('⚠️ Error submitting feedback. Please try again.');
+            }
+        });
+    }
+</script>
 
 </body>
 </html>

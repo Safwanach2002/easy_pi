@@ -63,9 +63,9 @@
                     <tbody>
                         {% for withdrawal in withdrawals %}
                         <tr>
-                            <td>${{ withdrawal.amount }}</td>
-                            <td>${{ withdrawal.tds_deduction }}</td>
-                            <td><strong>${{ withdrawal.final_amount }}</strong></td>
+                            <td>₹{{ withdrawal.amount }}</td>
+                            <td>₹{{ withdrawal.tds_deduction }}</td>
+                            <td><strong>₹{{ withdrawal.final_amount }}</strong></td>
                             <td>{{ withdrawal.method }}</td>
                             <td>
                                 {% if withdrawal.status|lower == "pending" %}

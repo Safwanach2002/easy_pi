@@ -810,7 +810,7 @@
     left: 0;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    background: rgba(22, 75, 189, 0.4);;
+    background: rgba(165, 165, 171, 0.4);
     transition: 0.5s;
 }
 
@@ -887,7 +887,7 @@
 }
 
 .team .team-item:hover .team-content .team-content-inner h4 {
-    color: var(--bs-dark) !important;
+    color: var(--bs-white) !important;
 }
 
 /* Paragraph Styling */

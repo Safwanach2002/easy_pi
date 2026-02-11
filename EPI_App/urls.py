@@ -50,5 +50,6 @@ urlpatterns = [
     path('chatbox/', views.chatbox, name='chatbox'),  # URL for the chatbox page
 
     path('<str:product_type>/<int:product_id>/', views.product_detail, name='product_detail'),
-
+    path("submit-rating/", views.submit_rating, name="submit_rating"),
+    path('submit-feedback/', views.submit_feedback, name='submit_feedback'),
 ]

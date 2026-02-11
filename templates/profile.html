@@ -24,7 +24,6 @@
         <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
         <link href="{% static 'lib/lightbox/css/lightbox.min.css' %}" rel="stylesheet">
 
-
         <!-- Customized Bootstrap Stylesheet -->
         <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
         <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="">
@@ -33,7 +32,128 @@
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
         <link href="{% static 'css/profil.css' %}" rel="stylesheet">
     </head>
+    <style>
 
+        /* Profile Container */
+        .container {
+            padding-top: 30px;
+        }
+
+        /* Profile Image Styling */
+        .profile-photo {
+            width: 120px; /* Adjust size */
+            height: 120px; 
+            position: relative;
+        }
+
+        .profile-photo img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ddd;
+        }
+
+        /* Edit Icon Styling */
+        .edit-icon {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background-color: #ffc107; /* Yellow (Warning) */
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .edit-icon:hover {
+            background-color: #e0a800;
+        }
+
+        /* Remove link styling */
+        .edit-profile-link {
+            text-decoration: none;
+        }
+
+        .profile-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .profile-header h2 {
+            font-size: 28px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-section {
+            margin-bottom: 30px;
+        }
+
+        .profile-section h4 {
+            font-size: 22px;
+            color: #223043;
+            margin-bottom: 15px;
+        }
+
+        .profile-section p {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .profile-section p strong {
+            color: #333;
+        }
+
+        .profile-section a {
+            color: #223043;
+            text-decoration: none;
+        }
+
+        .profile-section a:hover {
+            text-decoration: underline;
+        }
+
+        /* Profile Photo Section */
+        .profile-photo img {
+            width: 100px;  /* Adjust the size */
+            height: 100px;  /* Adjust the size */
+            border-radius: 50%;
+            object-fit: cover;  /* Ensures the image fills the circle without distortion */
+            border: 3px solid #ddd; /* Optional: Add a border for a cleaner look */
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .logout-btn a {
+            background-color: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        .logout-btn a:hover {
+            background-color: #d32f2f;
+        }
+    </style>
     <body>
 
         <!-- Spinner Start -->
@@ -44,16 +164,15 @@
         </div>
         <!-- Spinner End -->
 
-
         <!-- Topbar Start -->
         <div class="container-fluid topbar px-0 d-none d-lg-block">
             <div class="container px-0">
                 <div class="row gx-0 align-items-center" style="height: 45px;">
                     <div class="col-lg-8 text-center text-lg-start mb-lg-0">
                         <div class="d-flex flex-wrap">
-                            <a href="#" class="text-muted me-4"><i class="fas fa-map-marker-alt me-2" style="color: #fff;"></i>Gopal Street, Kannur, Kerala</a>
-                            <a href="#" class="text-muted me-4"><i class="fas fa-phone-alt me-2" style="color: #fff;"></i>+91 87143 99951</a>
-                            <a href="#" class="text-muted me-4"><i class="fas fa-envelope me-2" style="color: #fff;"></i>epielio.com@gmail.com</a>
+                            <a href="https://www.google.com/maps/search/?q=Gopal+Street,+Kannur,+Kerala" target="_blank" class="text-muted me-4"><i class="fas fa-map-marker-alt me-2" style="color: #fff;"></i>Gopal Street, Kannur, Kerala</a>
+                            <a href="tel:+91 87143 99951" class="text-muted me-4"><i class="fas fa-phone-alt me-2" style="color: #fff;"></i>+91 87143 99951</a>
+                            <a href="mailto:epielio.com@gmail.com" class="text-muted me-4"><i class="fas fa-envelope me-2" style="color: #fff;"></i>epielio.com@gmail.com</a>
                         </div>
                     </div>
                     <div class="col-lg-4 text-center text-lg-end">
@@ -68,7 +187,6 @@
             </div>
         </div>
         <!-- Topbar End -->
-
 
         <!-- Navbar & Hero Start -->
         <div class="container-fluid sticky-top px-0">
@@ -119,128 +237,6 @@
             </div>
         </div>
         <!-- Navbar & Hero End -->
-        <style>
-
-            /* Profile Container */
-            .container {
-                padding-top: 30px;
-            }
-
-            /* Profile Image Styling */
-            .profile-photo {
-                width: 120px; /* Adjust size */
-                height: 120px; 
-                position: relative;
-            }
-
-            .profile-photo img {
-                width: 100%;
-                height: 100%;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 3px solid #ddd;
-            }
-
-            /* Edit Icon Styling */
-            .edit-icon {
-                position: absolute;
-                bottom: 5px;
-                right: 5px;
-                background-color: #ffc107; /* Yellow (Warning) */
-                color: white;
-                width: 30px;
-                height: 30px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 16px;
-                cursor: pointer;
-                transition: 0.3s;
-            }
-
-            .edit-icon:hover {
-                background-color: #e0a800;
-            }
-
-            /* Remove link styling */
-            .edit-profile-link {
-                text-decoration: none;
-            }
-
-            .profile-container {
-                background-color: white;
-                border-radius: 10px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                padding: 30px;
-                max-width: 800px;
-                margin: 0 auto;
-            }
-
-            .profile-header h2 {
-                font-size: 28px;
-                color: #333;
-                text-align: center;
-                margin-bottom: 20px;
-            }
-
-            .profile-section {
-                margin-bottom: 30px;
-            }
-
-            .profile-section h4 {
-                font-size: 22px;
-                color: #223043;
-                margin-bottom: 15px;
-            }
-
-            .profile-section p {
-                font-size: 16px;
-                color: #555;
-                line-height: 1.6;
-            }
-
-            .profile-section p strong {
-                color: #333;
-            }
-
-            .profile-section a {
-                color: #223043;
-                text-decoration: none;
-            }
-
-            .profile-section a:hover {
-                text-decoration: underline;
-            }
-
-            /* Profile Photo Section */
-            .profile-photo img {
-                width: 100px;  /* Adjust the size */
-                height: 100px;  /* Adjust the size */
-                border-radius: 50%;
-                object-fit: cover;  /* Ensures the image fills the circle without distortion */
-                border: 3px solid #ddd; /* Optional: Add a border for a cleaner look */
-            }
-
-            /* Logout Button */
-            .logout-btn {
-                text-align: center;
-                margin-top: 20px;
-            }
-
-            .logout-btn a {
-                background-color: #f44336;
-                color: white;
-                padding: 10px 20px;
-                border-radius: 5px;
-                font-size: 18px;
-                text-decoration: none;
-            }
-
-            .logout-btn a:hover {
-                background-color: #d32f2f;
-            }
-        </style>
 
         <!-- Profile Container -->
         <div class="container mt-5">

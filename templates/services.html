@@ -307,6 +307,62 @@
             transform: scale(0.95);
         }
 
+        .filter-sidebar {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 300px;
+            height: 100%;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+            z-index: 1051;
+            overflow-y: auto;
+            border-radius: 0 12px 12px 0;
+            padding-top: 60px;
+        }
+    
+        .filter-sidebar.open {
+            left: 0;
+        }
+    
+        .filter-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1050;
+            display: none;
+        }
+    
+        .filter-overlay.active {
+            display: block;
+        }
+
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse; /* Ensures stars are filled from left */
+            justify-content: center;
+        }
+
+        .star-rating input {
+            display: none; /* Hide radio buttons */
+        }
+
+        .star-rating label {
+            font-size: 24px;
+            color: gray;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: gold; /* Highlight stars on hover */
+        }
+
         /* Mobile adjustments */
         @media screen and (max-width: 768px) {
             .category-item {
@@ -484,9 +540,9 @@
                 <div class="row gx-0 align-items-center" style="height: 45px;">
                     <div class="col-lg-8 text-center text-lg-start mb-lg-0">
                         <div class="d-flex flex-wrap">
-                            <a href="#" class="text-muted me-4"><i class="fas fa-map-marker-alt me-2" style="color: #fff;"></i>Gopal Street, Kannur, Kerala</a>
-                            <a href="#" class="text-muted me-4"><i class="fas fa-phone-alt me-2" style="color: #fff;"></i>+91 87143 99951</a>
-                            <a href="#" class="text-muted me-4"><i class="fas fa-envelope me-2" style="color: #fff;"></i>epielio.com@gmail.com</a>
+                            <a href="https://www.google.com/maps/search/?q=Gopal+Street,+Kannur,+Kerala" target="_blank" class="text-muted me-4"><i class="fas fa-map-marker-alt me-2" style="color: #fff;"></i>Gopal Street, Kannur, Kerala</a>
+                            <a href="tel:+91 87143 99951" class="text-muted me-4"><i class="fas fa-phone-alt me-2" style="color: #fff;"></i>+91 87143 99951</a>
+                            <a href="mailto:epielio.com@gmail.com" class="text-muted me-4"><i class="fas fa-envelope me-2" style="color: #fff;"></i>epielio.com@gmail.com</a>
                         </div>
                     </div>
                     <div class="col-lg-4 text-center text-lg-end">
@@ -559,11 +615,39 @@
                 <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">Our Products</h4>
                 <ol class="breadcrumb justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
                     <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-                    <li class="breadcrumb-item active text-primary">All Items</li>
+                    <li class="breadcrumb-item active">All Items</li>
                 </ol>    
             </div>
         </div>
         <!-- Header End -->
+
+        <!-- Full-Screen Overlay -->
+        <div id="filter-overlay" class="filter-overlay"></div>
+
+        <!-- Filter Sidebar -->
+        <div id="filter-panel" class="filter-sidebar shadow-lg p-4">
+            <button class="btn-close position-absolute" id="close-filter" style="top: 15px; right: 15px;"></button>
+            
+            <h4 class="fw-bold text-primary mb-3">Filter Options</h4>
+            
+            <form method="GET">
+                <div class="mb-3">
+                    <label for="min_price" class="form-label fw-bold text-muted">Min Price</label>
+                    <input type="number" name="min_price" id="min_price" class="form-control shadow-sm"
+                        value="{{ min_price }}" min="3000" max="200000">
+                </div>
+
+                <div class="mb-3">
+                    <label for="max_price" class="form-label fw-bold text-muted">Max Price</label>
+                    <input type="number" name="max_price" id="max_price" class="form-control shadow-sm"
+                        value="{{ max_price }}" min="3000" max="200000">
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 fw-bold py-2">
+                    <i class="fas fa-filter me-2"></i> Apply Filter
+                </button>
+            </form>
+        </div>
 
         <!-- Add this right above the product listing section -->
         <div id="no-results" style="display: none;">No products found</div>
@@ -575,6 +659,12 @@
                     <input type="text" name="q" id="search-input" class="form-control me-2" placeholder="Search for a product..." value="{{ query }}" oninput="showCategory()">
                     <button type="button" id="search-button" class="btn btn-primary">Search</button>
                 </form>
+                
+                <!-- Filter Button (Hamburger) -->
+                <button class="btn btn-primary" id="filter-toggle" 
+                style="border-radius: 8px;">
+                <i class="fas fa-sliders-h"></i> Filter
+                </button>
                 <div id="category-list" class="mt-2"></div>
             </div>
 
@@ -623,7 +713,7 @@
                                     </div>
                                 {% endfor %}
                             </div>
-        
+
                             <!-- Carousel Controls -->
                             <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ service.id }}" data-bs-slide="prev">
                                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -643,13 +733,13 @@
                                 <i class="far fa-heart"></i> <!-- Empty Heart -->
                             {% endif %}
                         </a>
-                     
+                    
                         <!-- Add Now Button in the Center of Image -->
                         <div class="overlay d-flex align-items-center justify-content-center">
                             <a href="{% url 'product_scheme_manage' %}?id={{ service.id }}&total={{ service.total }}" class="btn btn-primary rounded-pill px-4 py-2">Add Now</a>
                         </div>
                     </div>
-        
+
                     <!-- Product Title and Price -->
                     <div class="product-content p-3">
                         <h5 class="mb-2 text-dark">
@@ -657,12 +747,40 @@
                             {{ service.title }}</a>
                         </h5>
                         <p class="h5 text-primary">₹{{ service.total }}</p>
-        
+
+                        <!-- Rating Section -->
+                        <div class="rating">
+                            <span class="avg-rating">
+                                ⭐ <strong id="avg-rating-{{ service.id }}">{{ service.avg_rating|default:0|floatformat:1 }}</strong> / 5
+                            </span>
+
+                            <!-- Star Rating Form -->
+                            <form class="rating-form" data-service-id="{{ service.id }}">
+                                {% csrf_token %}
+                                <div class="star-rating">
+                                    <input type="radio" name="rating-{{ service.id }}" value="5" id="star5-{{ service.id }}">
+                                    <label for="star5-{{ service.id }}" data-value="5" class="star-label">&#9733;</label>
+
+                                    <input type="radio" name="rating-{{ service.id }}" value="4" id="star4-{{ service.id }}">
+                                    <label for="star4-{{ service.id }}" data-value="4" class="star-label">&#9733;</label>
+
+                                    <input type="radio" name="rating-{{ service.id }}" value="3" id="star3-{{ service.id }}">
+                                    <label for="star3-{{ service.id }}" data-value="3" class="star-label">&#9733;</label>
+
+                                    <input type="radio" name="rating-{{ service.id }}" value="2" id="star2-{{ service.id }}">
+                                    <label for="star2-{{ service.id }}" data-value="2" class="star-label">&#9733;</label>
+
+                                    <input type="radio" name="rating-{{ service.id }}" value="1" id="star1-{{ service.id }}">
+                                    <label for="star1-{{ service.id }}" data-value="1" class="star-label">&#9733;</label>
+                                </div>
+                            </form>
+                        </div>
+
                         <!-- Toggle Button -->
                         <button class="toggle-btn btn btn-link w-100 text-primary" data-id="{{ forloop.counter }}">
                             View Details 
                         </button>
-        
+
                         <!-- Collapsible Details Section -->
                         <div class="details" id="details-{{ forloop.counter }}">
                             <p class="text-muted small">{{ service.desc }}</p>
@@ -670,6 +788,8 @@
                     </div>
                 </div>
             </div>
+            {% empty %}
+                <p style="text-align: center; color: #8f98a4;">No services found in this price range.</p>
             {% endfor %}
         </div>
 
@@ -862,7 +982,82 @@
                     .catch(error => console.error("Error:", error));
                 });
             });
+
+            document.getElementById("filter-toggle").addEventListener("click", function () {
+            document.getElementById("filter-panel").classList.add("open");
+            document.getElementById("filter-overlay").classList.add("active");
+            });
         
+            document.getElementById("close-filter").addEventListener("click", function () {
+                document.getElementById("filter-panel").classList.remove("open");
+                document.getElementById("filter-overlay").classList.remove("active");
+            });
+        
+            document.getElementById("filter-overlay").addEventListener("click", function () {
+                document.getElementById("filter-panel").classList.remove("open");
+                document.getElementById("filter-overlay").classList.remove("active");
+            });
+
+            // Function to highlight stars based on selected rating
+            function highlightStars(starContainer, rating) {
+                let stars = starContainer.querySelectorAll(".star-label");
+                stars.forEach(star => {
+                    let starValue = star.getAttribute("data-value");
+                    if (starValue <= rating) {
+                        star.style.color = "gold"; // Highlight selected stars
+                    } else {
+                        star.style.color = "gray"; // Reset unselected stars
+                    }
+                });
+            }
+
+            // Handle click on star
+            document.querySelectorAll(".star-label").forEach(star => {
+                star.addEventListener("click", function () {
+                    let rating = this.getAttribute("data-value");  // Get clicked star value
+                    let form = this.closest(".rating-form");  // Find the related form
+                    
+                    if (!form) {
+                        console.error("Form element not found.");
+                        return;
+                    }
+
+                    let serviceId = form.getAttribute("data-service-id");
+                    let starContainer = form.querySelector(".star-rating");
+                    let csrfToken = document.querySelector("input[name='csrfmiddlewaretoken']");
+
+                    if (!csrfToken) {
+                        console.error("CSRF token not found.");
+                        return;
+                    }
+
+                    let formData = new FormData();
+                    formData.append("service_id", serviceId);
+                    formData.append("rating", rating);
+
+                    fetch("{% url 'submit_rating' %}", {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            "X-CSRFToken": csrfToken.value
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById("avg-rating-" + serviceId).textContent = data.avg_rating.toFixed(1);
+                            highlightStars(starContainer, rating);
+                        } else {
+                            alert("Error submitting rating. Try again.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("An error occurred. Please try again.");
+                    });
+                });
+            });
+
             // Toggle View Details Functionality
             document.querySelectorAll(".toggle-btn").forEach(button => {
                 button.addEventListener("click", function () {

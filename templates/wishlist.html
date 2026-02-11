@@ -372,15 +372,30 @@
                         <!-- Product Details -->
                         <div class="product-content p-3">
                             {% if item.service %}
-                                <h5 class="mb-2 text-dark">{{ item.service.title }}</h5>
-                                <p class="h5 text-primary">₹{{ item.service.total }}</p>
-                            {% elif item.upto %}
-                                <h5 class="mb-2 text-dark">{{ item.upto.title }}</h5>
-                                <p class="h5 text-primary">₹{{ item.upto.total }}</p>
-                            {% elif item.combo %}
-                                <h5 class="mb-2 text-dark">{{ item.combo.title }}</h5>
-                                <p class="h5 text-primary">₹{{ item.combo.total }}</p>
-                            {% endif %}
+                            <h5 class="mb-2 text-dark">
+                                <a href="{% url 'product_detail' 'service' item.service.id %}" class="text-dark text-decoration-none">
+                                    {{ item.service.title }}
+                                </a>
+                            </h5>
+                            <p class="h5 text-primary">₹{{ item.service.total }}</p>
+                        
+                        {% elif item.upto %}
+                            <h5 class="mb-2 text-dark">
+                                <a href="{% url 'product_detail' 'upto' item.upto.id %}" class="text-dark text-decoration-none">
+                                    {{ item.upto.title }}
+                                </a>
+                            </h5>
+                            <p class="h5 text-primary">₹{{ item.upto.total }}</p>
+                        
+                        {% elif item.combo %}
+                            <h5 class="mb-2 text-dark">
+                                <a href="{% url 'product_detail' 'combo' item.combo.id %}" class="text-dark text-decoration-none">
+                                    {{ item.combo.title }}
+                                </a>
+                            </h5>
+                            <p class="h5 text-primary">₹{{ item.combo.total }}</p>
+                        {% endif %}
+                        
     
                             <!-- View Details Button -->
                             {% if item.service %}
@@ -425,7 +440,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p class="text-muted">Your wishlist is empty.</p>
+            <p class="text-muted" style="text-align: center; color: #223043;">Your wishlist is empty.</p>
         {% endif %}
     
         <!-- Back to Home Link -->

@@ -6,6 +6,7 @@ from django.utils.timezone import now
 from datetime import timedelta, timezone
 from django.core.exceptions import ValidationError
 from decimal import Decimal
+from django.db.models import Avg
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
@@ -120,9 +121,23 @@ class Services(models.Model):
         choices=CATEGORY_CHOICES,
         default=OTHERS,
     )
+   
+    def avg_rating(self):
+        return self.ratings.aggregate(Avg('rating'))['rating__avg'] or 0  # Calculate avg rating
 
     def __str__(self):
         return self.title
+    
+class ServiceRating(models.Model):
+    service = models.ForeignKey(Services, on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    rating = models.IntegerField(default=0)  # Rating 1-5
+
+    class Meta:
+        unique_together = ('service', 'user')  # Prevent duplicate ratings
+
+    def _str_(self):
+        return f"{self.user} - {self.service} - {self.rating}"
 
 class ServiceImage(models.Model):
     service = models.ForeignKey(Services, on_delete=models.CASCADE, related_name='images')
@@ -157,6 +172,17 @@ class Upto(models.Model):
 
     def __str__(self):
         return self.title
+    
+class UptoRating(models.Model):
+    upto = models.ForeignKey(Upto, on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    rating = models.IntegerField(default=0)  # Rating 1-5
+
+    class Meta:
+        unique_together = ('upto', 'user')  # Prevent duplicate ratings
+
+    def _str_(self):
+        return f"{self.user} - {self.upto} - {self.rating}"
 
 class UptoImage(models.Model):
     upto = models.ForeignKey(Upto, on_delete=models.CASCADE, related_name='images')
@@ -192,10 +218,24 @@ class Combo(models.Model):
         choices=CATEGORY_CHOICES,
         default=OTHERS,  # Default to 'Others' if no category is selected
     )
+       
+    def avg_rating(self):
+        return self.ratings.aggregate(Avg('rating'))['rating__avg'] or 0  # Calculate avg rating
 
     def __str__(self):
         return self.title
     
+class ComboRating(models.Model):
+    combo = models.ForeignKey(Combo, on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    rating = models.IntegerField(default=0)  # Rating 1-5
+
+    class Meta:
+        unique_together = ('combo', 'user')  # Prevent duplicate ratings
+
+    def _str_(self):
+        return f"{self.user} - {self.combo} - {self.rating}"
+       
 class ComboImage(models.Model):
     Combo = models.ForeignKey(Combo, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to="pics")
@@ -339,3 +379,29 @@ class Wishlist(models.Model):
 
     def _str_(self):
         return f"{self.user.username}'s Wishlist"
+    
+class Feedback(models.Model):
+    RATING_CHOICES = [
+        ('Very Bad', 'Very Bad 😡'),
+        ('Bad', 'Bad 😞'),
+        ('Average', 'Average 😐'),
+        ('Good', 'Good 😊'),
+        ('Excellent', 'Excellent 😃'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # Allow null users
+    rating = models.CharField(max_length=10, choices=RATING_CHOICES)
+    message = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def _str_(self):
+        username = self.user.username if self.user else "Anonymous"
+        return f"{username} - {self.rating}"
+
+    @property
+    def profile_photo(self):
+        """ Fetch the user's profile photo from Profile model """
+        profile = Profile.objects.filter(user=self.user).first()
+        if profile and profile.profile_photo:
+            return profile.profile_photo.url
+        return None  # Return None if no profile picture
